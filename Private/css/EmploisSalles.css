@@ -356,11 +356,12 @@
             font-size: 0.95rem;
         }
 
+      
         .info-subtitle {
             font-size: 0.85rem;
             color: #6c757d;
         }
-
+        
         .legend-card {
             background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
             border-radius: 15px;

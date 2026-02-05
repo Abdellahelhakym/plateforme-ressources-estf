@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ISTI - Gestion des Salles</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="./css/ajouterSalles.css">
+     <!--AOS--> 
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+</head>
+<body>
+     <header>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+             <a class="navbar-brand" href="#">
+                <div class="estf-logo" >
+                    <div  class="estf-img">
+                    </div>
+               <div class="estf-text" >
+                        <div class="estf-text-ar"> المدرسة العليا للتكنولوجيا </div>
+                        <div class="estf-text-fr">ECOLE SUPERIEURE DE TECHNOLOGIE</div>
+                    </div>
+                </div>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link " href="accueil.html">
+                            <i class="fas fa-home"></i> Accueil
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/private/EmploisTemp.html">
+                            <i class="fas fa-calendar-alt"></i> Emplois du Temps
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="./salles.html">
+                            <i class="fas fa-door-open"></i> Salles
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="materiel.html">
+                            <i class="fas fa-desktop"></i> Matériel
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="EmploisSalles.html">
+                            <i class="fas fa-search"></i> Consultation
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            
+            
+            <div class="admin-indicator">
+                <div class="admin-info">
+                    <i class="fas fa-user-shield admin-icon"></i>
+                    <span class="admin-text">Mode Admin</span>
+                </div>
+                <div class="admin-dropdown">
+                    <a href="/logout" class="logout-btn">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Déconnexion
+                    </a>
+                
+                </div>
+            </div>
+        </div>
+
+        
+    </nav>
+</header>
+
+  <div class="container">
+        <div class="form-container">
+            
+            <!-- En-tête -->
+            <div class="header-section">
+                <div class="logo-icon">🏫</div>
+                <h1>Gestion des Salles</h1>
+                <p>Département Génie Informatique - ESTF</p>
+            </div>
+
+            <!-- Message d'information -->
+            <div class="alert alert-info d-flex align-items-center mb-4" role="alert">
+                <i class="fa-solid fa-circle-info me-3 fs-4"></i>
+                <div>
+                    Veuillez remplir tous les champs obligatoires marqués d'un astérisque 
+                    <span class="required-field">*</span>
+                </div>
+            </div>
+
+            <!-- Formulaire -->
+            <form method="POST" action="traitement_salle.php" enctype="multipart/form-data" data-aos="fade-up">
+                
+                <!-- Nom de la salle -->
+                <div class="mb-4">
+                    <label for="nom_salle" class="form-label">
+                        <i class="fa-solid fa-door-closed me-2"></i>Nom de la salle 
+                        <span class="required-field">*</span>
+                    </label>
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="fa-solid fa-building"></i>
+                        </span>
+                        <input 
+                            type="text" 
+                            class="form-control" 
+                            id="nom_salle" 
+                            name="nom_salle" 
+                            placeholder="Ex: Salle GI-101" 
+                            maxlength="50"
+                            required
+                        >
+                    </div>
+                    <div class="form-text">Maximum 50 caractères</div>
+                </div>
+
+                <!-- Type de salle et Capacité -->
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <label for="type_salle" class="form-label">
+                            <i class="fa-solid fa-list me-2"></i>Type de salle
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="fa-solid fa-clipboard"></i>
+                            </span>
+                            <select class="form-select" id="type_salle" name="type_salle">
+                                <option value="" selected>-- Sélectionner --</option>
+                                <option value="Cours">Cours magistral</option>
+                                <option value="TP">Travaux pratiques (TP)</option>
+                                <option value="TD">Travaux dirigés (TD)</option>
+                                <option value="Laboratoire">Laboratoire</option>
+                                <option value="Amphithéâtre">Amphithéâtre</option>
+                                <option value="Salle info">Salle informatique</option>
+                                <option value="Réunion">Salle de réunion</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 mb-4">
+                        <label for="capacite" class="form-label">
+                            <i class="fa-solid fa-users me-2"></i>Capacité
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="fa-solid fa-user-plus"></i>
+                            </span>
+                            <input 
+                                type="number" 
+                                class="form-control" 
+                                id="capacite" 
+                                name="capacite" 
+                                placeholder="Ex: 30" 
+                                min="1" 
+                                max="500"
+                            >
+                        </div>
+                        <div class="form-text">Nombre de places</div>
+                    </div>
+                </div>
+
+                <!-- État de la salle -->
+                <div class="mb-4">
+                    <label for="etat" class="form-label">
+                        <i class="fa-solid fa-signal me-2"></i>État de la salle
+                    </label>
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="fa-solid fa-circle-check"></i>
+                        </span>
+                        <select class="form-select" id="etat" name="etat">
+                            <option value="Disponible" selected>✅ Disponible</option>
+                            <option value="Occupée">🔴 Occupée</option>
+                            <option value="Maintenance">🔧 En maintenance</option>
+                            <option value="Réservée">📅 Réservée</option>
+                            <option value="Hors service">❌ Hors service</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Équipement -->
+                <div class="mb-4">
+                    <label for="equipement" class="form-label">
+                        <i class="fa-solid fa-gears me-2"></i>Remarques
+                    </label>
+                    <textarea 
+                        class="form-control" 
+                        id="equipement" 
+                        name="equipement" 
+                        rows="4" 
+                        placeholder="Remarques pour la salle"
+                        maxlength="200"
+                    ></textarea>
+                    <div class="form-text"> (maximum 200 caractères)</div>
+                </div>
+
+                <!-- Bâtiment -->
+                <div class="mb-4">
+                    <label for="batiment" class="form-label">
+                        <i class="fa-solid fa-location-dot me-2"></i>Bâtiment
+                    </label>
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="fa-solid fa-map-location-dot"></i>
+                        </span>
+                        <input 
+                            type="text" 
+                            class="form-control" 
+                            id="batiment" 
+                            name="batiment" 
+                            placeholder="Ex: Bâtiment A - Étage 2" 
+                            maxlength="50"
+                        >
+                    </div>
+                    <div class="form-text">Localisation précise dans le campus</div>
+                </div>
+
+                <!-- Image de la salle -->
+                <div class="mb-4">
+                    <label for="image_salle" class="form-label">
+                        <i class="fa-solid fa-camera me-2"></i>Image de la salle
+                    </label>
+                    <div class="upload-area">
+                        <input 
+                            type="file" 
+                            class="form-control" 
+                            id="image_salle" 
+                            name="image_salle" 
+                            accept="image/png, image/jpeg, image/jpg, image/webp"
+                        >
+                        <div class="upload-info mt-2">
+                            <i class="fa-solid fa-circle-info text-muted me-2"></i>
+                            <small class="text-muted">Formats acceptés: JPG, JPEG, PNG, WEBP (Max: 5MB)</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Boutons -->
+                <div class="d-grid gap-2 d-md-flex justify-content-md-center mt-5">
+                    <button type="submit" class="btn btn-submit px-5">
+                        <i class="fa-solid fa-circle-check me-2"></i>Ajouter la salle
+                    </button>
+                    <a href="./salles.html">
+                    <button type="button" class="btn btn-reset px-5">
+                        <i class="fa-solid fa-rotate-right me-2"></i>Retour
+                    </button>
+                    </a>
+                   
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        AOS.init();
+    </script>
+</body>
+</html>
