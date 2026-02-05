@@ -2,7 +2,7 @@
 const express = require('express');
 const router = express.Router();
 
-// si tu veux utiliser la DB
+// base de donner 
 const connection = require('./db');
 
 router.post('/', (req, res) => {

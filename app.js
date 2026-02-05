@@ -2,12 +2,18 @@ const express = require('express');
 const app = express();
 const path = require('path');
 const session = require('express-session');
-const loginRouter = require('./login'); // routes login
 
 // Middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('views'));
+
+
+//route 
+const loginRouter = require('./login'); 
+const salles = require('./salles');
+
+
 
 app.use(session({
     secret: '1234',
@@ -41,6 +47,10 @@ app.get('/private/css/:file', isLoggedIn, (req, res) => {
 app.get('/private/img/:file', isLoggedIn, (req, res) => {
     res.sendFile(path.join(__dirname, 'Private', 'img', req.params.file));
 });
+app.get('/private/js/:file', isLoggedIn, (req, res) => {
+    res.sendFile(path.join(__dirname, 'Private', 'js', req.params.file));
+});
+
 //logout
 app.get('/logout', (req, res) => {
     req.session.destroy(err => {
@@ -48,5 +58,8 @@ app.get('/logout', (req, res) => {
     });
 });
 
+
+// Routes salles 
+app.use('/ajouterSalles', salles);
 
 app.listen(3000, () => console.log('Server running on http://localhost:3000'));
