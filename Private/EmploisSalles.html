@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESTF Génie Informatique - Accueil</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="./css/EmploisSalles.css">
+   <!--AOS--> 
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+
+</head>
+<body>
+     <header>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+             <a class="navbar-brand" href="#">
+                <div class="estf-logo" >
+                    <div  class="estf-img">
+                    </div>
+               <div class="estf-text" >
+                        <div class="estf-text-ar"> المدرسة العليا للتكنولوجيا </div>
+                        <div class="estf-text-fr">ECOLE SUPERIEURE DE TECHNOLOGIE</div>
+                    </div>
+                </div>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link " href="accueil.html">
+                            <i class="fas fa-home"></i> Accueil
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/private/EmploisTemp.html">
+                            <i class="fas fa-calendar-alt"></i> Emplois du Temps
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="./salles.html">
+                            <i class="fas fa-door-open"></i> Salles
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="materiel.html">
+                            <i class="fas fa-desktop"></i> Matériel
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="EmploisSalles.html">
+                            <i class="fas fa-search"></i> Consultation
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            
+           
+            <div class="admin-indicator">
+                <div class="admin-info">
+                    <i class="fas fa-user-shield admin-icon"></i>
+                    <span class="admin-text">Mode Admin</span>
+                </div>
+                <div class="admin-dropdown">
+                    <a href="/logout" class="logout-btn">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Déconnexion
+                    </a>
+                
+                </div>
+            </div>
+        </div>
+    </nav>
+</header>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Header Banner -->
+        <div class="header-banner">
+            <h2>
+                <i class="fas fa-eye"></i>
+                Consultation Emplois du Temps
+            </h2>
+            <p>Département Génie Informatique - ESTF</p>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters-card">
+            <div class="row">
+                <div class="col-md-6 mb-3 mb-md-0">
+                    <label class="filter-label">
+                        <i class="fas fa-calendar-week"></i>
+                        Sélectionner la semaine
+                    </label>
+                    <select class="form-select" id="roomSelect">
+                        <option selected>semaine 0</option>
+                        <option>semaine 2</option>
+                        <option>semaine 3</option>
+                        <option>semaine 4</option>
+                        <option>semaine 5</option>
+                        <option>semaine 6</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="filter-label">
+                        <i class="fas fa-door-open"></i>
+                        Salle
+                    </label>
+                    <select class="form-select" id="roomSelect">
+                        <option selected>Salle F11</option>
+                        <option>Salle F12</option>
+                        <option>Salle F13</option>
+                        <option>Salle F14</option>
+                        <option>Salle F15</option>
+                        <option>Salle F16</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Schedule -->
+        <div class="schedule-section" data-aos="fade-up">
+            <h3 class="section-title">Salle F11</h3>
+            
+            <div class="row" id="scheduleContainer">
+                <!-- Lundi -->
+                <div class="col-lg day-column">
+                    <div class="day-header">
+                        Lundi
+                        <span class="day-date">06/01/2026</span>
+                    </div>
+                    <div class="time-slot">
+                        <div class="time-slot-item">
+                            <div class="time-header">
+                                <span class="time-badge">
+                                    <i class="far fa-clock"></i> 08:30 - 12:30
+                                </span>
+                            </div>
+                            <div class="slot-status occupee">
+                                <span class="status-indicator status-occupee"></span>Occupée
+                            </div>
+                            <div class="slot-info">
+                                <div class="info-title">GI 1ère année</div>
+                                <div class="info-subtitle">Programmation C</div>
+                            </div>
+                        </div>
+                        <div class="time-slot-item">
+                            <div class="time-header">
+                                <span class="time-badge">
+                                    <i class="far fa-clock"></i> 14:30 - 18:30
+                                </span>
+                            </div>
+                            <div class="slot-status occupee">
+                                <span class="status-indicator status-occupee"></span>Occupée
+                            </div>
+                            <div class="slot-info">
+                                <div class="info-title">GI 2ème année</div>
+                                <div class="info-subtitle">Base de Données</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mardi -->
+                <div class="col-lg day-column">
+                    <div class="day-header">
+                        Mardi
+                        <span class="day-date">06/01/2026</span>
+                    </div>
+                    <div class="time-slot">
+                        <div class="time-slot-item">
+                            <div class="time-header">
+                                <span class="time-badge">
+                                    <i class="far fa-clock"></i> 08:30 - 12:30
+                                </span>
+                            </div>
+                            <div class="slot-status occupee">
+                                <span class="status-indicator status-occupee"></span>Occupée
+                            </div>
+                            <div class="slot-info">
+                                <div class="info-title">GI 3ème année</div>
+                                <div class="info-subtitle">Développement Web</div>
+                            </div>
+                        </div>
+                        <div class="time-slot-item">
+                            <div class="time-header">
+                                <span class="time-badge">
+                                    <i class="far fa-clock"></i> 14:30 - 18:30
+                                </span>
+                            </div>
+                            <div class="slot-status libre">
+                                <span class="status-indicator status-libre"></span>Libre
+                            </div>
+                            <div class="info-subtitle">Salle disponible</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mercredi -->
+                <div class="col-lg day-column">
+                    <div class="day-header">
+                        Mercredi
+                        <span class="day-date">07/01/2026</span>
+                    </div>
+                    <div class="time-slot">
+                        <div class="time-slot-item">
+                            <div class="time-header">
+                                <span class="time-badge">
+                                    <i class="far fa-clock"></i> 08:30 - 12:30
+                                </span>
+                            </div>
+                            <div class="slot-status occupee">
+                                <span class="status-indicator status-occupee"></span>Occupée
+                            </div>
+                            <div class="slot-info">
+                                <div class="info-title">Master GI</div>
+                                <div class="info-subtitle">Intelligence Artificielle</div>
+                            </div>
+                        </div>
+                        <div class="time-slot-item">
+                            <div class="time-header">
+                                <span class="time-badge">
+                                    <i class="far fa-clock"></i> 14:30 - 18:30
+                                </span>
+                            </div>
+                            <div class="slot-status occupee">
+                                <span class="status-indicator status-occupee"></span>Occupée
+                            </div>
+                            <div class="slot-info">
+                                <div class="info-title">GI 1ère année</div>
+                                <div class="info-subtitle">TP Algorithmique</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Jeudi -->
+                <div class="col-lg day-column">
+                    <div class="day-header">
+                        Jeudi
+                        <span class="day-date">08/01/2026</span>
+                    </div>
+                    <div class="time-slot">
+                        <div class="time-slot-item">
+                            <div class="time-header">
+                                <span class="time-badge">
+                                    <i class="far fa-clock"></i> 08:30 - 12:30
+                                </span>
+                            </div>
+                            <div class="slot-status occupee">
+                                <span class="status-indicator status-occupee"></span>Occupée
+                            </div>
+                            <div class="slot-info">
+                                <div class="info-title">GI 2ème année</div>
+                                <div class="info-subtitle">Systèmes d'exploitation</div>
+                            </div>
+                        </div>
+                        <div class="time-slot-item">
+                            <div class="time-header">
+                                <span class="time-badge">
+                                    <i class="far fa-clock"></i> 14:30 - 18:30
+                                </span>
+                            </div>
+                            <div class="slot-status libre">
+                                <span class="status-indicator status-libre"></span>Libre
+                            </div>
+                            <div class="info-subtitle">Salle disponible</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Vendredi -->
+                <div class="col-lg day-column">
+                    <div class="day-header">
+                        Vendredi
+                        <span class="day-date">09/01/2026</span>
+                    </div>
+                    <div class="time-slot">
+                        <div class="time-slot-item">
+                            <div class="time-header">
+                                <span class="time-badge">
+                                    <i class="far fa-clock"></i> 08:30 - 12:30
+                                </span>
+                            </div>
+                            <div class="slot-status occupee">
+                                <span class="status-indicator status-occupee"></span>Occupée
+                            </div>
+                            <div class="slot-info">
+                                <div class="info-title">GI 1ère année</div>
+                                <div class="info-subtitle">Architecture des Ordinateurs</div>
+                            </div>
+                        </div>
+                        <div class="time-slot-item">
+                            <div class="time-header">
+                                <span class="time-badge">
+                                    <i class="far fa-clock"></i> 14:30 - 18:30
+                                </span>
+                            </div>
+                            <div class="slot-status occupee">
+                                <span class="status-indicator status-occupee"></span>Occupée
+                            </div>
+                            <div class="slot-info">
+                                <div class="info-title">GI 3ème année</div>
+                                <div class="info-subtitle">Projet</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- Dimanche -->
+                <div class="col-lg day-column">
+                    <div class="day-header">
+                        Dimanche
+                        <span class="day-date">08/01/2026</span>
+                    </div>
+                    <div class="time-slot">
+                        <div class="time-slot-item">
+                            <div class="time-header">
+                                <span class="time-badge">
+                                    <i class="far fa-clock"></i> 08:30 - 12:30
+                                </span>
+                            </div>
+                            <div class="slot-status occupee">
+                                <span class="status-indicator status-occupee"></span>Occupée
+                            </div>
+                            <div class="slot-info">
+                                <div class="info-title">GI 2ème année</div>
+                                <div class="info-subtitle">Systèmes d'exploitation</div>
+                            </div>
+                        </div>
+                        <div class="time-slot-item">
+                            <div class="time-header">
+                                <span class="time-badge">
+                                    <i class="far fa-clock"></i> 14:30 - 18:30
+                                </span>
+                            </div>
+                            <div class="slot-status libre">
+                                <span class="status-indicator status-libre"></span>Libre
+                            </div>
+                            <div class="info-subtitle">Salle disponible</div>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+
+        <!-- Legend -->
+        <div class="legend-card">
+            <div class="legend-title">Légende</div>
+            <div class="legend-item">
+                <span class="legend-dot status-libre"></span>
+                <span>Libre - Salle disponible</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-dot status-occupee"></span>
+                <span>Occupée - Cours en cours</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-dot status-maintenance"></span>
+                <span>Maintenance - Salle indisponible</span>
+            </div>
+        </div>
+    </div>
+
+    <footer class="text-white py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-4" >
+                    <h5 class="text-light "><i class="fas fa-info-circle "></i> À Propos</h5>
+                    <p>Le Département Génie Informatique de l'ESTF offre une formation de qualité en informatique et technologies de l'information.</p>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <h5 class="text-light "><i class="fas fa-envelope"></i> Contact</h5>
+                    <p>
+                        <i class="fas fa-map-marker-alt"></i>  BP 2427 Route d’Imouzzer, 30000 Fès<br>
+                        <i class="fas fa-phone"></i> (+212) 6 66 21 46 30<br>
+                        <i class="fas fa-at"></i> support.est@usmba.ac.ma
+                    </p>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <h5 class="text-light "><i class="fas fa-link"></i> Liens Utiles</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="https://www.est-usmba.ac.ma/" class="text-white"><i class="fas fa-globe"></i> Site ESTF</a></li>
+                        <li><a href="https://www.facebook.com/est.fes01" class="text-white"><i class="fab fa-facebook"></i> Facebook</a></li>
+                        <li><a href="https://www.instagram.com/est.fes.usmba/" class="text-white"><i class="fab fa-instagram"></i> instagram</a></li>
+                        
+                    </ul>
+                </div>
+            </div>
+            <hr class="bg-white">
+            <p class="text-center mb-0">
+                <i class="fas fa-copyright"></i> 2025 Département Génie Informatique - ESTF. Tous droits réservés.
+            </p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+         AOS.init();
+    </script>
+</body>
+</html>

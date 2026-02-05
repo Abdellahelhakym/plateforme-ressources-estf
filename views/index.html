@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des Salles - ESTF</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --gradient-primary: linear-gradient(135deg, #1a236d 0%, #2c75bd 100%);
+            --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+          
+            --gradient-info: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            --gradient-warning: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            --primary-color: #1a236d;
+            --secondary-color: #2c75bd;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--gradient-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .navbar {
+            background: var(--gradient-primary) !important;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+            color: white !important;
+            font-size: 1.2rem;
+        }
+
+        .navbar-brand img {
+            height: 50px;
+            margin-right: 15px;
+        }
+
+         .estf-logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-radius: 5px;
+        }
+
+        .estf-img{
+           border-radius: 3px;
+            height: 9vh;
+            width: 15vh;
+           background-image: url(./img/estf.png);
+           background-size: cover;
+
+        }
+     
+
+        .estf-text {
+            display: flex;
+            flex-direction: column;
+           
+          
+        }
+
+       
+
+       .estf-text-fr {
+    font-family: 'Segoe UI', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--estf-red);
+    letter-spacing: 0.5px;
+    white-space: normal;
+   
+}
+        .estf-text-ar {
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--estf-red);
+            letter-spacing: 0.5px;
+            white-space: normal;
+        }
+
+        .main-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+           
+        }
+
+        .welcome-card {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 50px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            width: 100%;
+            
+           
+        }
+
+      
+
+        .welcome-title {
+            color: var(--primary-color);
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .welcome-subtitle {
+            color: #6b7280;
+            text-align: center;
+            font-size: 1.1rem;
+            margin-bottom: 40px;
+        }
+
+        .mode-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .mode-card {
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 15px;
+            padding: 40px 30px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .mode-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .mode-card:hover::before {
+            left: 100%;
+        }
+
+        .mode-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(42, 117, 189, 0.4);
+            border-color: var(--secondary-color);
+        }
+
+        .mode-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .mode-card:hover .mode-icon {
+            transform: scale(1.1);
+        }
+
+        .admin-card .mode-icon {
+            background: var(--gradient-secondary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .consultation-card .mode-icon {
+            background: var(--gradient-info);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .mode-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+        }
+
+        .mode-description {
+            color: #6b7280;
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+
+        .btn-mode {
+            padding: 12px 40px;
+            border-radius: 25px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .btn-admin {
+            background: var(--gradient-secondary);
+            color: white;
+        }
+
+        .btn-admin:hover {
+            background: linear-gradient(135deg, #e082ea 0%, #e4465b 100%);
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(245, 87, 108, 0.5);
+        }
+
+        .btn-consultation {
+            background: var(--gradient-info);
+            color: white;
+        }
+
+        .btn-consultation:hover {
+            background: linear-gradient(135deg, #32d86b 0%, #28e8c7 100%);
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(56, 249, 215, 0.5);
+        }
+
+        .features {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 50px;
+            flex-wrap: wrap;
+        }
+
+        .feature-item {
+            text-align: center;
+            color: var(--primary-color);
+        }
+
+        .feature-item i {
+            font-size: 2rem;
+            background: var(--gradient-success);
+            -webkit-background-clip: text;
+           
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        
+        footer {
+            background: var(--gradient-primary);
+           
+        }
+
+        footer h5 {
+            font-weight: bold;
+            margin-bottom: 1rem;
+            position: relative;
+            padding-bottom: 0.5rem;
+        }
+
+        footer h5::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background: white;
+        }
+
+        footer a {
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        footer a:hover {
+            opacity: 0.8;
+            padding-left: 5px;
+        }
+
+        .mb-4 {
+            margin-bottom: 2rem !important;
+        }
+
+        h5 {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .welcome-card {
+                padding: 30px 20px;
+            }
+
+            .welcome-title {
+                font-size: 2rem;
+            }
+
+            .mode-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+       <div class="container">
+            <a class="navbar-brand" href="#">
+                <div class="estf-logo" >
+                    <div  class="estf-img">
+                    </div>
+               <div class="estf-text" >
+                        <div class="estf-text-ar"> المدرسة العليا للتكنولوجيا </div>
+                        <div class="estf-text-fr">ECOLE SUPERIEURE DE TECHNOLOGIE</div>
+                    </div>
+                </div>
+            </a>
+            <span class="navbar-text text-white">
+                ESTF - Gestion des Salles
+            </span>
+        </div>
+    </nav>
+
+    <div class="main-container">
+        <div class="welcome-card">
+            <div class="text-center mb-4">
+                <i class="fas fa-door-open" style="font-size: 4rem; background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;"></i>
+            </div>
+            
+            <h1 class="welcome-title">Bienvenue</h1>
+            <p class="welcome-subtitle">
+                Système de Gestion des Salles - Département Génie Informatique
+            </p>
+
+            <div class="mode-container">
+                <!-- Mode Administration -->
+                <div class="mode-card admin-card">
+                    <div class="mode-icon">
+                        <i class="fas fa-user-shield"></i>
+                    </div>
+                    <h3 class="mode-title">Administration</h3>
+                    <p class="mode-description">
+                        Accès complet pour gérer les salles, les réservations et les configurations
+                    </p>
+                    <a href="./login.html">
+                    <button class="btn btn-mode btn-admin">
+                       <i class="fas fa-sign-in-alt me-2"></i>Accéder
+                    </button>
+                    </a>
+                </div>
+
+                <!-- Mode Consultation -->
+                <div class="mode-card consultation-card">
+                    <div class="mode-icon">
+                        <i class="fas fa-eye"></i>
+                    </div>
+                    <h3 class="mode-title">Consultation</h3>
+                    <p class="mode-description">
+                        Consulter les disponibilités des salles et les emplois du temps
+                    </p>
+                     <a href="./accueilPublic.html">
+                    <button class="btn btn-mode btn-consultation">
+                        <i class="fas fa-search me-2"></i>Consulter
+                    </button>
+                    </a>
+                </div>
+            </div>
+
+            <div class="features">
+                <div class="feature-item">
+                    <i class="fas fa-calendar-check"></i>
+                    <p>Réservation Simple</p>
+                </div>
+                <div class="feature-item">
+                    <i class="fas fa-clock"></i>
+                    <p>Temps Réel</p>
+                </div>
+                <div class="feature-item">
+                    <i class="fas fa-chart-line"></i>
+                    <p>Statistiques</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+     <footer class="text-white py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-4" >
+                    <h5 class="text-light "><i class="fas fa-info-circle "></i> À Propos</h5>
+                    <p>Le Département Génie Informatique de l'ESTF offre une formation de qualité en informatique et technologies de l'information.</p>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <h5 class="text-light "><i class="fas fa-envelope"></i> Contact</h5>
+                    <p>
+                        <i class="fas fa-map-marker-alt"></i>  BP 2427 Route d’Imouzzer, 30000 Fès<br>
+                        <i class="fas fa-phone"></i> (+212) 6 66 21 46 30<br>
+                        <i class="fas fa-at"></i> support.est@usmba.ac.ma
+                    </p>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <h5 class="text-light "><i class="fas fa-link"></i> Liens Utiles</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="https://www.est-usmba.ac.ma/" class="text-white"><i class="fas fa-globe"></i> Site ESTF</a></li>
+                        <li><a href="https://www.facebook.com/est.fes01" class="text-white"><i class="fab fa-facebook"></i> Facebook</a></li>
+                        <li><a href="https://www.instagram.com/est.fes.usmba/" class="text-white"><i class="fab fa-instagram"></i> instagram</a></li>
+                        
+                    </ul>
+                </div>
+            </div>
+            <hr class="bg-white">
+            <p class="text-center mb-0">
+                <i class="fas fa-copyright"></i> 2025 Département Génie Informatique - ESTF. Tous droits réservés. Créé par Abdellah El hakym
+            </p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+     
+    </script>
+</body>
+</html>

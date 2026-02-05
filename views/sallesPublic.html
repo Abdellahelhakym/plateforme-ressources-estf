@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ISTI - Gestion des Salles</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="./css/sallesPublic.css">
+     <!--AOS--> 
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+</head>
+<body>
+     <header>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+             <a class="navbar-brand" href="index.html">
+                <div class="estf-logo" >
+                    <div  class="estf-img">
+                    </div>
+               <div class="estf-text" >
+                        <div class="estf-text-ar"> المدرسة العليا للتكنولوجيا </div>
+                        <div class="estf-text-fr">ECOLE SUPERIEURE DE TECHNOLOGIE</div>
+                    </div>
+                </div>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link " href="accueilPublic.html">
+                            <i class="fas fa-home"></i> Accueil
+                        </a>
+                    </li>
+                   
+                    <li class="nav-item">
+                        <a class="nav-link active" href="./sallesPublic.html">
+                            <i class="fas fa-door-open"></i> Salles
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="materielPublic.html">
+                            <i class="fas fa-desktop"></i> Matériel
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="EmploisSallesPublic.html">
+                            <i class="fas fa-search"></i> Consultation
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            
+            
+           
+        </div>
+    </nav>
+</header>
+
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="page-header d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="page-title">Gestion des Salles</h1>
+                <p class="page-subtitle">Gérer les salles informatiques du département</p>
+            </div>
+            
+        </div>
+
+         <!-- Filters -->
+        <div class="filters-section">
+            <div class="row g-3">
+                 
+               
+                <div class="col-md-7">
+                    <select class="filter-select w-100" id="roomFilter">
+                        <option value="">Toutes les salles</option>
+                        <option>Salle F11</option>
+                        <option>Salle F12</option>
+                        <option>Salle F13</option>
+                        <option>Salle F14</option>
+                        <option>Salle F15</option>
+                        <option>Salle F16</option>
+                    </select>
+                </div>
+                <div class="col-md-5">
+                    <select class="filter-select w-100" id="statusFilter">
+                        <option value="">Tous les états</option>
+                        <option>Fonctionnel</option>
+                        <option>En Panne</option>
+                        <option>Réparation</option>
+                    </select>
+                </div>
+               
+            </div>
+        </div>
+
+        <!-- Rooms Grid -->
+        <div class="row g-4" id="roomsContainer">
+            <!-- Salle F11 -->
+            <div class="col-md-6 col-lg-4" data-aos="fade-up">
+                <div class="room-card">
+                    <div class="room-image">
+                        <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=600" alt="Salle F11">
+                        <span class="status-badge status-libre">Libre</span>
+                    </div>
+                    <div class="room-content">
+                        <h3 class="room-title">Salle F11</h3>
+                        
+                        <div class="room-info">
+                            <div class="info-label">Capacité</div>
+                            <div class="info-value">30 personnes</div>
+                        </div>
+
+                        <div class="material-section">
+                            <div class="material-label">Matériel</div>
+                            <span class="material-badge">30 PC</span>
+                            <span class="material-badge">1 Projecteur</span>
+                            <span class="material-badge">+1</span>
+                        </div>
+
+                        <div class="remarks-section">
+                            <div class="remarks-label">Remarques</div>
+                            <div class="remarks-text">Salle principale - Bon état</div>
+                        </div>
+                    </div>
+                    <div class="room-actions">
+                        <button class="btn-action btn-details">
+                            <i class="fas fa-info-circle"></i> Détails
+                        </button>
+                      
+                    </div>
+                </div>
+            </div>
+
+            <!-- Salle F12 -->
+            <div class="col-md-6 col-lg-4" data-aos="fade-up">
+                <div class="room-card">
+                    <div class="room-image">
+                        <img src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=600" alt="Salle F12">
+                        <span class="status-badge status-occupee">Occupée</span>
+                    </div>
+                    <div class="room-content">
+                        <h3 class="room-title">Salle F12</h3>
+                        
+                        <div class="room-info">
+                            <div class="info-label">Capacité</div>
+                            <div class="info-value">25 personnes</div>
+                        </div>
+
+                        <div class="material-section">
+                            <div class="material-label">Matériel</div>
+                            <span class="material-badge">15 PC</span>
+                            <span class="material-badge">1 Projecteur</span>
+                            <span class="material-badge">+1</span>
+                        </div>
+
+                        <div class="remarks-section">
+                            <div class="remarks-label">Remarques</div>
+                            <div class="remarks-text">Réservée pour TP Réseaux</div>
+                        </div>
+                    </div>
+                    <div class="room-actions">
+                        <button class="btn-action btn-details">
+                            <i class="fas fa-info-circle"></i> Détails
+                        </button>
+                       
+                    </div>
+                </div>
+            </div>
+
+            <!-- Salle F13 -->
+            <div class="col-md-6 col-lg-4" data-aos="fade-up">
+                <div class="room-card">
+                    <div class="room-image">
+                        <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=600" alt="Salle F13">
+                        <span class="status-badge status-maintenance">Maintenance</span>
+                    </div>
+                    <div class="room-content">
+                        <h3 class="room-title">Salle F13</h3>
+                        
+                        <div class="room-info">
+                            <div class="info-label">Capacité</div>
+                            <div class="info-value">20 personnes</div>
+                        </div>
+
+                        <div class="material-section">
+                            <div class="material-label">Matériel</div>
+                            <span class="material-badge">10 PC</span>
+                            <span class="material-badge">1 Projecteur</span>
+                        </div>
+
+                        <div class="remarks-section">
+                            <div class="remarks-label">Remarques</div>
+                            <div class="remarks-text">Climatisation en panne</div>
+                        </div>
+                    </div>
+                    <div class="room-actions">
+                        <button class="btn-action btn-details">
+                            <i class="fas fa-info-circle"></i> Détails
+                        </button>
+                        
+                    </div>
+                </div>
+            </div>
+
+            <!-- Salle F14 -->
+            <div class="col-md-6 col-lg-4" data-aos="fade-up">
+                <div class="room-card">
+                    <div class="room-image">
+                        <img src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=600" alt="Salle F14">
+                        <span class="status-badge status-libre">Libre</span>
+                    </div>
+                    <div class="room-content">
+                        <h3 class="room-title">Salle F14</h3>
+                        
+                        <div class="room-info">
+                            <div class="info-label">Capacité</div>
+                            <div class="info-value">30 personnes</div>
+                        </div>
+
+                        <div class="material-section">
+                            <div class="material-label">Matériel</div>
+                            <span class="material-badge">20 PC</span>
+                            <span class="material-badge">1 Projecteur</span>
+                            <span class="material-badge">+1</span>
+                        </div>
+
+                        <!-- Pas de remarques pour cette salle -->
+                    </div>
+                    <div class="room-actions">
+                        <button class="btn-action btn-details">
+                            <i class="fas fa-info-circle"></i> Détails
+                        </button>
+                        
+                    </div>
+                </div>
+            </div>
+
+            <!-- Salle F15 -->
+            <div class="col-md-6 col-lg-4" data-aos="fade-up">
+                <div class="room-card">
+                    <div class="room-image">
+                        <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=600" alt="Salle F15">
+                        <span class="status-badge status-occupee">Occupée</span>
+                    </div>
+                    <div class="room-content">
+                        <h3 class="room-title">Salle F15</h3>
+                        
+                        <div class="room-info">
+                            <div class="info-label">Capacité</div>
+                            <div class="info-value">35 personnes</div>
+                        </div>
+
+                        <div class="material-section">
+                            <div class="material-label">Matériel</div>
+                            <span class="material-badge">25 PC</span>
+                            <span class="material-badge">2 Projecteurs</span>
+                            <span class="material-badge">+1</span>
+                        </div>
+
+                        <div class="remarks-section">
+                            <div class="remarks-label">Remarques</div>
+                            <div class="remarks-text">Grande salle - Amphi</div>
+                        </div>
+                    </div>
+                    <div class="room-actions">
+                        <button class="btn-action btn-details">
+                            <i class="fas fa-info-circle"></i> Détails
+                        </button>
+                        
+                    </div>
+                </div>
+            </div>
+
+            <!-- Salle F16 -->
+            <div class="col-md-6 col-lg-4" data-aos="fade-up">
+                <div class="room-card">
+                    <div class="room-image">
+                        <img src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=600" alt="Salle F16">
+                        <span class="status-badge status-libre">Libre</span>
+                    </div>
+                    <div class="room-content">
+                        <h3 class="room-title">Salle F16</h3>
+                        
+                        <div class="room-info">
+                            <div class="info-label">Capacité</div>
+                            <div class="info-value">20 personnes</div>
+                        </div>
+
+                        <div class="material-section">
+                            <div class="material-label">Matériel</div>
+                            <span class="material-badge">12 PC</span>
+                            <span class="material-badge">1 Projecteur</span>
+                        </div>
+
+                        <!-- Pas de remarques pour cette salle -->
+                    </div>
+                    <div class="room-actions">
+                        <button class="btn-action btn-details">
+                            <i class="fas fa-info-circle"></i> Détails
+                        </button>
+                      
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+    <!-- Footer -->
+    <footer class="text-white py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <h5 class="text-light "><i class="fas fa-info-circle "></i> À Propos</h5>
+                    <p>Le Département Génie Informatique de l'ESTF offre une formation de qualité en informatique et technologies de l'information.</p>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <h5 class="text-light "><i class="fas fa-envelope"></i> Contact</h5>
+                    <p>
+                        <i class="fas fa-map-marker-alt"></i>  BP 2427 Route d’Imouzzer, 30000 Fès<br>
+                        <i class="fas fa-phone"></i> (+212) 6 66 21 46 30<br>
+                        <i class="fas fa-at"></i> support.est@usmba.ac.ma
+                    </p>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <h5 class="text-light "><i class="fas fa-link"></i> Liens Utiles</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="https://www.est-usmba.ac.ma/" class="text-white"><i class="fas fa-globe"></i> Site ESTF</a></li>
+                        <li><a href="https://www.facebook.com/est.fes01" class="text-white"><i class="fab fa-facebook"></i> Facebook</a></li>
+                        <li><a href="https://www.instagram.com/est.fes.usmba/" class="text-white"><i class="fab fa-instagram"></i> instagram</a></li>
+                        
+                    </ul>
+                </div>
+            </div>
+            <hr class="bg-white">
+            <p class="text-center mb-0">
+                <i class="fas fa-copyright"></i> 2025 Département Génie Informatique - ESTF. Tous droits réservés.
+            </p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+           AOS.init();
+    </script>
+</body>
+</html>

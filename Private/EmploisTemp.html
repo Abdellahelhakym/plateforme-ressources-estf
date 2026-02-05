@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ISTI - Gestion des Emplois du Temps</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+   <link rel="stylesheet" href="./css/EmploisTemp.css">
+
+
+</head>
+<body>
+    <header>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+             <a class="navbar-brand" href="#">
+                <div class="estf-logo" >
+                    <div  class="estf-img">
+                    </div>
+               <div class="estf-text" >
+                        <div class="estf-text-ar"> المدرسة العليا للتكنولوجيا </div>
+                        <div class="estf-text-fr">ECOLE SUPERIEURE DE TECHNOLOGIE</div>
+                    </div>
+                </div>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link " href="accueil.html">
+                            <i class="fas fa-home"></i> Accueil
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="EmploisTemp.html">
+                            <i class="fas fa-calendar-alt"></i> Emplois du Temps
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="./salles.html">
+                            <i class="fas fa-door-open"></i> Salles
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="materiel.html">
+                            <i class="fas fa-desktop"></i> Matériel
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="EmploisSalles.html">
+                            <i class="fas fa-search"></i> Consultation
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            
+            <!-- logout -->
+            <div class="admin-indicator">
+                <div class="admin-info">
+                    <i class="fas fa-user-shield admin-icon"></i>
+                    <span class="admin-text">Mode Admin</span>
+                </div>
+                <div class="admin-dropdown">
+                    <a href="/logout" class="logout-btn">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Déconnexion
+                    </a>
+                
+                </div>
+            </div>
+        </div>
+    </nav>
+</header>
+
+   
+    <!-- Main Content -->
+    <div class="container">
+        <div class="main-container" >
+            <!-- Page Header -->
+            <div class="page-header" >
+                <h1><i class="fas fa-calendar-week"></i> Gestion des Emplois du Temps</h1>
+                <p>Planification hebdomadaire des salles informatiques</p>
+            </div>
+
+            <!-- Filters -->
+            <div class="filter-section" data-aos="fade-up">
+                
+               
+               <div class="row align-items-end g-3">
+    
+    <div class="col-md-4">
+        <label class="filter-label">
+            <i class="fas fa-calendar"></i> Numéro de Semaine (S 2-24)
+        </label>
+        <select class="form-select" id="weekSelect">
+            <option selected>Semaine 10</option>
+            <option>Semaine 11</option>
+            <option>Semaine 12</option>
+            <option>Semaine 13</option>
+        </select>
+    </div>
+
+    <div class="col-md-4">
+        <label class="filter-label">
+            <i class="fas fa-calendar"></i> Filière
+        </label>
+        <select class="form-select" id="filiereSelect">
+            <option selected>IL 1ère année</option>
+            <option>IL 2ème année</option>
+            <option>ID 1ère année</option>
+            <option>ID 2ème année</option>
+        </select>
+    </div>
+
+    <div class="col-md-2 d-flex align-items-end">
+        <button class="btn-manage w-100">
+            <i class="fas fa-plus"></i> Ajouter Filière
+        </button>
+    </div>
+
+    <div class="col-md-2 d-flex align-items-end">
+        <button class="btn-manage btn-delete">
+              <i class="fas fa-trash"></i> Suprimer Filière
+         </button>
+    </div>
+
+</div>
+
+               
+            </div>
+
+            <!-- Schedule Table -->
+            <div class="table-responsive">
+                <table class="table schedule-table">
+                    <thead class="table-header">
+                        <tr>
+                            <th><i class="far fa-calendar"></i> Jour</th>
+                            <th><i class="far fa-clock"></i> Créneau</th>
+                            <th><i class="fas fa-info-circle"></i> État</th>
+                            <th><i class="fas fa-door-open"></i> Salle</th>
+                        </tr>
+                    </thead>
+                    <tbody id="scheduleBody">
+                        <!-- Lundi -->
+                        <tr >
+                            <td class="day-cell" rowspan="2">
+                                <strong>Lundi</strong>
+                                <span class="date-cell">29/04/2025</span>
+                            </td>
+                            <td class="time-cell">
+                                <i class="far fa-clock"></i> 08:30 - 12:30
+                            </td>
+                            <td class="text-center">
+                                <button class="status-badge occupee">Occupée</button>
+                            </td>
+                            <td class="text-center">
+                                <select class="room-select">
+                                    <option>Salle C302</option>
+                                    <option>Salle A101</option>
+                                    <option>Salle A102</option>
+                                    <option>Salle B201</option>
+                                    <option>Salle C302</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="time-cell">
+                                <i class="far fa-clock"></i> 14:30 - 18:30
+                            </td>
+                            <td class="text-center">
+                                <button class="status-badge libre">Libre</button>
+                            </td>
+                            <td class="text-center">
+                                <select class="room-select">
+                                    <option>Choisir une salle</option>
+                                    <option>Salle A101</option>
+                                    <option>Salle A102</option>
+                                    <option>Salle B201</option>
+                                    <option>Salle C302</option>
+                                </select>
+                            </td>
+                        </tr>
+                        
+                         <!-- Mardi -->
+                        <tr >
+                            <td class="day-cell" rowspan="2">
+                                <strong>Mardi</strong>
+                                <span class="date-cell">29/04/2025</span>
+                            </td>
+                            <td class="time-cell">
+                                <i class="far fa-clock"></i> 08:30 - 12:30
+                            </td>
+                            <td class="text-center">
+                                <button class="status-badge occupee">Occupée</button>
+                            </td>
+                            <td class="text-center">
+                                <select class="room-select">
+                                    <option>Salle C302</option>
+                                    <option>Salle A101</option>
+                                    <option>Salle A102</option>
+                                    <option>Salle B201</option>
+                                    <option>Salle C302</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="time-cell">
+                                <i class="far fa-clock"></i> 14:30 - 18:30
+                            </td>
+                            <td class="text-center">
+                                <button class="status-badge libre">Libre</button>
+                            </td>
+                            <td class="text-center">
+                                <select class="room-select">
+                                    <option>Choisir une salle</option>
+                                    <option>Salle A101</option>
+                                    <option>Salle A102</option>
+                                    <option>Salle B201</option>
+                                    <option>Salle C302</option>
+                                </select>
+                            </td>
+                        </tr>
+
+                         <!-- Mercredi -->
+                        <tr >
+                            <td class="day-cell" rowspan="2">
+                                <strong>Mercredi</strong>
+                                <span class="date-cell">29/04/2025</span>
+                            </td>
+                            <td class="time-cell">
+                                <i class="far fa-clock"></i> 08:30 - 12:30
+                            </td>
+                            <td class="text-center">
+                                <button class="status-badge occupee">Occupée</button>
+                            </td>
+                            <td class="text-center">
+                                <select class="room-select">
+                                    <option>Salle C302</option>
+                                    <option>Salle A101</option>
+                                    <option>Salle A102</option>
+                                    <option>Salle B201</option>
+                                    <option>Salle C302</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="time-cell">
+                                <i class="far fa-clock"></i> 14:30 - 18:30
+                            </td>
+                            <td class="text-center">
+                                <button class="status-badge libre">Libre</button>
+                            </td>
+                            <td class="text-center">
+                                <select class="room-select">
+                                    <option>Choisir une salle</option>
+                                    <option>Salle A101</option>
+                                    <option>Salle A102</option>
+                                    <option>Salle B201</option>
+                                    <option>Salle C302</option>
+                                </select>
+                            </td>
+                        </tr>
+
+                        <!-- Jeudi -->
+                        <tr >
+                            <td class="day-cell" rowspan="2">
+                                <strong>Jeudi</strong>
+                                <span class="date-cell">25/04/2025</span>
+                            </td>
+                            <td class="time-cell">
+                                <i class="far fa-clock"></i> 08:30 - 12:30
+                            </td>
+                            <td class="text-center">
+                                <button class="status-badge libre">Libre</button>
+                            </td>
+                            <td class="text-center">
+                                <select class="room-select">
+                                    <option>Choisir une salle</option>
+                                    <option>Salle A101</option>
+                                    <option>Salle A102</option>
+                                    <option>Salle B201</option>
+                                    <option>Salle C302</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="time-cell">
+                                <i class="far fa-clock"></i> 14:30 - 18:30
+                            </td>
+                            <td class="text-center">
+                                <button class="status-badge libre">Libre</button>
+                            </td>
+                            <td class="text-center">
+                                <select class="room-select">
+                                    <option>Choisir une salle</option>
+                                    <option>Salle A101</option>
+                                    <option>Salle A102</option>
+                                    <option>Salle B201</option>
+                                    <option>Salle C302</option>
+                                </select>
+                            </td>
+                        </tr>
+                        
+                        <!-- Vendredi -->
+                        <tr >
+                            <td class="day-cell" rowspan="2">
+                                <strong>Vendredi</strong>
+                                <span class="date-cell">26/04/2025</span>
+                            </td>
+                            <td class="time-cell">
+                                <i class="far fa-clock"></i> 08:30 - 12:30
+                            </td>
+                            <td class="text-center">
+                                <button class="status-badge libre">Libre</button>
+                            </td>
+                            <td class="text-center">
+                                <select class="room-select">
+                                    <option>Choisir une salle</option>
+                                    <option>Salle A101</option>
+                                    <option>Salle A102</option>
+                                    <option>Salle B201</option>
+                                    <option>Salle C302</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="time-cell">
+                                <i class="far fa-clock"></i> 14:30 - 18:30
+                            </td>
+                            <td class="text-center">
+                                <button class="status-badge occupee">Occupée</button>
+                            </td>
+                            <td class="text-center">
+                                <select class="room-select">
+                                    <option>Salle A101</option>
+                                    <option>Salle A102</option>
+                                    <option>Salle B201</option>
+                                    <option>Salle C302</option>
+                                </select>
+                            </td>
+                        </tr>
+                        
+                        <!-- Samedi -->
+                        <tr >
+                            <td class="day-cell" rowspan="2">
+                                <strong>Samedi</strong>
+                                <span class="date-cell">27/04/2025</span>
+                            </td>
+                            <td class="time-cell">
+                                <i class="far fa-clock"></i> 08:30 - 12:30
+                            </td>
+                            <td class="text-center">
+                                <button class="status-badge libre">Libre</button>
+                            </td>
+                            <td class="text-center">
+                                <select class="room-select">
+                                    <option>Choisir une salle</option>
+                                    <option>Salle A101</option>
+                                    <option>Salle A102</option>
+                                    <option>Salle B201</option>
+                                    <option>Salle C302</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="time-cell">
+                                <i class="far fa-clock"></i> 14:30 - 18:30
+                            </td>
+                            <td class="text-center">
+                                <button class="status-badge maintenance">Maintenance</button>
+                            </td>
+                            <td class="text-center">
+                                <select class="room-select">
+                                    <option>Salle B201</option>
+                                    <option>Salle A101</option>
+                                    <option>Salle A102</option>
+                                    <option>Salle B201</option>
+                                    <option>Salle C302</option>
+                                </select>
+                            </td>
+                        </tr>
+                        
+                        <!-- Dimanche -->
+                        <tr >
+                            <td class="day-cell" rowspan="2">
+                                <strong>Dimanche</strong>
+                                <span class="date-cell">28/04/2025</span>
+                            </td>
+                            <td class="time-cell">
+                                <i class="far fa-clock"></i> 08:30 - 12:30
+                            </td>
+                            <td class="text-center">
+                                <button class="status-badge libre">Libre</button>
+                            </td>
+                            <td class="text-center">
+                                <select class="room-select">
+                                    <option>Choisir une salle</option>
+                                    <option>Salle A101</option>
+                                    <option>Salle A102</option>
+                                    <option>Salle B201</option>
+                                    <option>Salle C302</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="time-cell">
+                                <i class="far fa-clock"></i> 14:30 - 18:30
+                            </td>
+                            <td class="text-center">
+                                <button class="status-badge libre">Libre</button>
+                            </td>
+                            <td class="text-center">
+                                <select class="room-select">
+                                    <option>Choisir une salle</option>
+                                    <option>Salle A101</option>
+                                    <option>Salle A102</option>
+                                    <option>Salle B201</option>
+                                    <option>Salle C302</option>
+                                </select>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Legend -->
+            <div class="legend">
+                <div class="legend-title">
+                    <i class="fas fa-list"></i> Légende
+                </div>
+                <div>
+                    <span class="legend-item">
+                        <span class="legend-color" style="background:rgba(68, 217, 73, 0.907)"></span>
+                        Libre
+                    </span>
+                    <span class="legend-item">
+                        <span class="legend-color" style="background: rgba(238, 5, 5, 0.8)"></span>
+                        Occupée
+                    </span>
+                    <span class="legend-item">
+                        <span class="legend-color" style="background:  rgb(226, 218, 67)"></span>
+                        Maintenance
+                    </span>
+                </div>
+            </div>
+
+            <!-- Manage Button -->
+            <div class="text-center">
+                <button class="btn-manage">
+                    <i class="fas fa-cog"></i> Ajouter  Emplois du Temps
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Footer -->
+    <footer class="text-white py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-4" >
+                    <h5 class="text-light "><i class="fas fa-info-circle "></i> À Propos</h5>
+                    <p>Le Département Génie Informatique de l'ESTF offre une formation de qualité en informatique et technologies de l'information.</p>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <h5 class="text-light "><i class="fas fa-envelope"></i> Contact</h5>
+                    <p>
+                        <i class="fas fa-map-marker-alt"></i>  BP 2427 Route d’Imouzzer, 30000 Fès<br>
+                        <i class="fas fa-phone"></i> (+212) 6 66 21 46 30<br>
+                        <i class="fas fa-at"></i> support.est@usmba.ac.ma
+                    </p>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <h5 class="text-light "><i class="fas fa-link"></i> Liens Utiles</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="https://www.est-usmba.ac.ma/" class="text-white"><i class="fas fa-globe"></i> Site ESTF</a></li>
+                        <li><a href="https://www.facebook.com/est.fes01" class="text-white"><i class="fab fa-facebook"></i> Facebook</a></li>
+                        <li><a href="https://www.instagram.com/est.fes.usmba/" class="text-white"><i class="fab fa-instagram"></i> instagram</a></li>
+                        
+                    </ul>
+                </div>
+            </div>
+            <hr class="bg-white">
+            <p class="text-center mb-0">
+                <i class="fas fa-copyright"></i> 2025 Département Génie Informatique - ESTF. Tous droits réservés.
+            </p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+     
+</body>
+</html>

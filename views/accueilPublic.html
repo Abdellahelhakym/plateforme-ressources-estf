@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESTF Génie Informatique - Accueil</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="./css/accueilPublic.css">
+   <!--AOS--> 
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+</head>
+<body>
+   <header>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+             <a class="navbar-brand" href="index.html">
+                <div class="estf-logo" >
+                    <div  class="estf-img">
+                    </div>
+               <div class="estf-text" >
+                        <div class="estf-text-ar"> المدرسة العليا للتكنولوجيا </div>
+                        <div class="estf-text-fr">ECOLE SUPERIEURE DE TECHNOLOGIE</div>
+                    </div>
+                </div>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="sallesPublic.html">
+                            <i class="fas fa-home"></i> Accueil
+                        </a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="./sallesPublic.html">
+                            <i class="fas fa-door-open"></i> Salles
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="materielPublic.html">
+                            <i class="fas fa-desktop"></i> Matériel
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="EmploisSallesPublic.html">
+                            <i class="fas fa-search"></i> Consultation
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            
+          
+        </div>
+    </nav>
+</header>
+
+    <main class="container my-5"  data-aos="fade-up">
+        <div class="card hero-card text-white mb-3">
+            <div class="card-body">
+                <h2><i class="fas fa-laptop-code"></i> Bienvenue au Département Génie Informatique</h2>
+                <p class="lead">Spécialisé en développement des solutions informatiques - ESTF</p>
+            </div>
+        </div>
+
+        <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel" >
+            <div class="carousel-indicators">
+                <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2" aria-label="Slide 3"></button>
+                <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="3" aria-label="Slide 4"></button>
+                <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="4" aria-label="Slide 5"></button>
+            </div>
+            <div class="carousel-inner">
+                <div class="carousel-item active" >
+                    <img src="./img/est-img-0.png" class="d-block w-100" alt="ESTF Campus" style="border: 1px solid; height: 70vh;">
+                </div>
+                <div class="carousel-item">
+                    <img src="./img/est-img-1.png" class="d-block w-100" alt="Étudiants" style="border: 1px solid; height: 70vh;">
+                </div>
+                <div class="carousel-item">
+                    <img src="./img/est-img-2.png" class="d-block w-100" alt="Technologie" style="border: 1px solid; height: 70vh;">
+                </div>
+                <div class="carousel-item">
+                    <img src="./img/est-img-3.png" class="d-block w-100" alt="Technologie" style="border: 1px solid; height: 70vh;">
+                </div>
+                <div class="carousel-item">
+                    <img src="./img/est-img-4.png" class="d-block w-100" alt="Technologie" style="border: 1px solid; height: 70vh;">
+                </div>
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
+        </div>
+
+        <h5><i class="fas fa-chart-line"></i> Statistiques Générales</h5>
+        <div class="row mb-5" data-aos="fade-up">
+            <div class="col-md-3 mb-3">
+                <div class="stat-card gradient-2">
+                    <i class="fas fa-door-open"></i>
+                    <h3>16</h3>
+                    <p class="mb-0">Salles</p>
+                </div>
+            </div>
+            
+            <div class="col-md-3 mb-3">
+                <div class="stat-card gradient-2">
+                    <i class="fas fa-check-circle"></i>
+                    <h3>28</h3>
+                    <p class="mb-0">Salles Occupées</p>
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <div class="stat-card gradient-2">
+                    <i class="fa-regular fa-building"></i>
+                    <h3>42</h3>
+                    <p class="mb-0">Salles  libre</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-title" data-aos="fade-up">
+            <h4><i class="fas fa-university"></i> École Supérieure de Technologie de Fès</h4>
+        </div>
+
+        <div class="row mb-5" data-aos="fade-up">
+            <div class="col-md-6 mb-3">
+                <div class="info-card">
+                    <div class="info-card-header">
+                        <i class="fas fa-eye "></i>
+                        <h5 class="text-light ">Notre Vision</h5>
+                    </div>
+                    <div class="info-card-body">
+                        <p>Former des techniciens supérieurs, prêts à l'emploi, hautement qualifiés dans les domaines technologiques de pointe.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <div class="info-card">
+                    <div class="info-card-header">
+                        <i class="fas fa-bullseye"></i>
+                        <h5 class="text-light ">Notre Mission</h5>
+                    </div>
+                    <div class="info-card-body">
+                        <p>Promouvoir la recherche appliquée, l'innovation et le transfert de technologie vers le secteur socio-économique.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        
+        <h5><i class="fas fa-building"></i> 5 Départements Académiques</h5>
+        <div class="row" data-aos="fade-up">
+            <div class="col-md-4 mb-4" >
+                <div class="dept-card">
+                    <i class="fas fa-cogs"></i>
+                    <p>Génie Mécanique, Production et Maintenance</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4" >
+                <div class="dept-card">
+                    <i class="fas fa-bolt"></i>
+                    <p>Génie Électrique et Systèmes Intelligents</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4" >
+                <div class="dept-card">
+                    <i class="fas fa-laptop-code"></i>
+                    <p>Génie Informatique</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4" >
+                <div class="dept-card">
+                    <i class="fas fa-flask"></i>
+                    <p>Génie Procédés</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4" >
+                <div class="dept-card">
+                    <i class="fas fa-chart-line"></i>
+                    <p>Sciences, Techniques et Gestion</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="text-white py-5">
+        <div class="container">
+           <div class="row">
+                <div class="col-md-4 mb-4" >
+                    <h5 class="text-light "><i class="fas fa-info-circle "></i> À Propos</h5>
+                    <p>Le Département Génie Informatique de l'ESTF offre une formation de qualité en informatique et technologies de l'information.</p>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <h5 class="text-light "><i class="fas fa-envelope"></i> Contact</h5>
+                    <p>
+                        <i class="fas fa-map-marker-alt"></i>  BP 2427 Route d’Imouzzer, 30000 Fès<br>
+                        <i class="fas fa-phone"></i> (+212) 6 66 21 46 30<br>
+                        <i class="fas fa-at"></i> support.est@usmba.ac.ma
+                    </p>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <h5 class="text-light "><i class="fas fa-link"></i> Liens Utiles</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="https://www.est-usmba.ac.ma/" class="text-white"><i class="fas fa-globe"></i> Site ESTF</a></li>
+                        <li><a href="https://www.facebook.com/est.fes01" class="text-white"><i class="fab fa-facebook"></i> Facebook</a></li>
+                        <li><a href="https://www.instagram.com/est.fes.usmba/" class="text-white"><i class="fab fa-instagram"></i> instagram</a></li>
+                        
+                    </ul>
+                </div>
+            </div>
+            <hr class="bg-white">
+            <p class="text-center mb-0">
+                <i class="fas fa-copyright"></i> 2025 Département Génie Informatique - ESTF. Tous droits réservés.
+            </p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+          AOS.init();
+         
+    </script>
+</body>
+</html>
