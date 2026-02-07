@@ -60,6 +60,6 @@ app.get('/logout', (req, res) => {
 
 
 // Routes salles 
-app.use('/ajouterSalles', salles);
+app.use('/Salles', salles);
 
 app.listen(3000, () => console.log('Server running on http://localhost:3000'));

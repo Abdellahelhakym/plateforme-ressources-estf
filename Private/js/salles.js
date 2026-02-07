@@ -1,47 +1,51 @@
+let salles = [];
+let nombreSalles ;
 
-let nombreSalles;
+async function getNombreInfoSalles() {
+    try {
+        const response = await fetch('/Salles/nombreInfo');
+        const data = await response.json();
 
-async function getNombreSalles() {
-    try{
-           const response = await fetch('/ajouterSalles/nombre', {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
+        console.log(data);
 
-         const data = await response.json();
+        salles = data.salles;                
+        nombreSalles = data.nombre_salles; 
+       
+        afficherSalles();
 
-        
-         nombreSalles = data.nombre_salles;
-
-         console.log(nombreSalles);
-         afficherSalles();
-         
-
-    }catch (err) {
+    } catch (err) {
         console.error("Erreur lors du fetch :", err);
-        return 0; // valeur par défaut en cas d'erreur
     }
 }
+
 
 function afficherSalles(){
     document.getElementById("roomsContainer").innerHTML ="";
     for(i=0 ; i<nombreSalles ; i++){
+        
         document.getElementById("roomsContainer").innerHTML +=` 
          <!-- Salle F${i}-->
             <div class="col-md-6 col-lg-4" data-aos="fade-up">
                 <div class="room-card">
                     <div class="room-image">
-                        <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=600" alt="Salle F11">
-                        <span class="status-badge status-libre">Libre</span>
+                        <img src="${salles[i].img}" alt="Salle F11">
+                        <span class="status-badge status-libre">${salles[i].etat}</span>
                     </div>
                     <div class="room-content">
-                        <h3 class="room-title">Salle F11</h3>
+                        <h3 class="room-title">Salle ${salles[i].nom_salle} </h3>
                         
                         <div class="room-info">
                             <div class="info-label">Capacité</div>
-                            <div class="info-value">30 personnes</div>
+                            <div class="info-value">${salles[i].capacite} personnes</div>
+                        </div>
+
+                         <div class="room-info">
+                            <div class="info-label">Batiment </div>
+                            <div class="info-value">${salles[i].batiment} </div>
+                        </div>
+                         <div class="room-info">
+                            <div class="info-label">Type de salle </div>
+                            <div class="info-value">${salles[i].type} </div>
                         </div>
 
                         <div class="material-section">
@@ -53,17 +57,15 @@ function afficherSalles(){
 
                         <div class="remarks-section">
                             <div class="remarks-label">Remarques</div>
-                            <div class="remarks-text">Salle principale - Bon état</div>
+                            <div class="remarks-text">${salles[i].Remarques}</div>
                         </div>
                     </div>
                     <div class="room-actions">
-                        <button class="btn-action btn-details">
-                            <i class="fas fa-info-circle"></i> Détails
-                        </button>
+                       
                         <button class="btn-action btn-modify">
                             <i class="fas fa-edit"></i> Modifier
                         </button>
-                        <button class="btn-action btn-delete">
+                        <button class="btn-action btn-delete" onclick="suprimer(${salles[i].id_salle})">
                             <i class="fas fa-trash"></i>
                         </button>
                     </div>
@@ -74,8 +76,28 @@ function afficherSalles(){
     }
 }
 
-getNombreSalles();
+getNombreInfoSalles();
 
-console.log("hello world 2");
+
+
+async function suprimer(x){
+   console.log(x);
+
+   try{
+         const suprimer = await fetch('/Salles/supprimer', {
+         method: 'POST',
+         headers: {
+            'Content-Type': 'application/json'
+         },
+         body: JSON.stringify({ id: x })
+      });
+
+       window.location.reload(); 
+
+   }catch (err) {
+      console.error("Erreur réseau :", err);
+   }
+}
+
 
 
