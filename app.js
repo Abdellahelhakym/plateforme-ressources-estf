@@ -13,6 +13,8 @@ app.use(express.static('views'));
 const loginRouter = require('./login'); 
 const salles = require('./salles');
 
+const materiel = require('./materiel');
+
 
 
 app.use(session({
@@ -61,5 +63,9 @@ app.get('/logout', (req, res) => {
 
 // Routes salles 
 app.use('/Salles', salles);
+
+
+// Routes materiel 
+app.use('/materiel', materiel);
 
 app.listen(3000, () => console.log('Server running on http://localhost:3000'));

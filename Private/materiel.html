@@ -90,19 +90,19 @@
         <div class="stats-container">
             <div class="stat-card">
                 <div class="stat-label">Total</div>
-                <div class="stat-value">96</div>
+                <div class="stat-value" id="total"></div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">Fonctionnel</div>
-                <div class="stat-value">93</div>
+                <div class="stat-label">Disponible</div>
+                <div class="stat-value " id="Disponible"></div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">En Panne</div>
-                <div class="stat-value">1</div>
+                <div class="stat-label">Occupée</div>
+                <div class="stat-value" id="Occupee"></div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">En Réparation</div>
-                <div class="stat-value">2</div>
+                <div class="stat-label">En Maintenance </div>
+                <div class="stat-value" id="Maintenance"></div>
             </div>
         </div>
 
@@ -119,30 +119,25 @@
                 <div class="col-md-4">
                     <select class="filter-select w-100" id="roomFilter">
                         <option value="">Toutes les salles</option>
-                        <option>Salle F11</option>
-                        <option>Salle F12</option>
-                        <option>Salle F13</option>
-                        <option>Salle F14</option>
-                        <option>Salle F15</option>
-                        <option>Salle F16</option>
+                        
                     </select>
                 </div>
                 <div class="col-md-2">
                     <select class="filter-select w-100" id="statusFilter">
                         <option value="">Tous les états</option>
-                        <option>Fonctionnel</option>
-                        <option>En Panne</option>
-                        <option>Réparation</option>
+                         <option>Disponible</option>
+                        <option>Occupee</option>
+                        <option>En Maintenance</option>
                     </select>
                 </div>
                 <div  class="col-md-3" >
-                     <button class="btn-manage" > <i class="fas fa-plus"></i> Ajouter Materiel</button>
+                   <a href="ajouterMateriel.html">  <button class="btn-manage" > <i class="fas fa-plus"></i> Ajouter Materiel</button></a>
                 </div>
             </div>
         </div>
 
         <!-- Materials Grid -->
-        <div class="row g-4" id="materialsContainer">
+        <div class="row g-4" id="roomsContainer">
             <!-- Dell OptiPlex 7090 - Salle F11 -->
             <div class="col-md-6 col-lg-3" data-aos="fade-up">
                 <div class="material-card">
@@ -155,6 +150,11 @@
                         <span class="type-badge">PC</span>
                         <h3 class="material-name">Dell OptiPlex 7090</h3>
                         <p class="material-quantity">Quantité: <span>20</span></p>
+                        <p class="material-quantity">Type : <span>Ordinateur</span></p>
+                         <div class="remarks-section">
+                            <div class="remarks-label">Remarques</div>
+                            <div class="remarks-text">test</div>
+                        </div>
                         <button class="btn-details btn-delete">
                            <i class="fas fa-trash"></i>
                         </button>
@@ -163,138 +163,7 @@
                 </div>
             </div>
 
-            <!-- Epson EB-2250U - Salle F11 -->
-            <div class="col-md-6 col-lg-3" data-aos="fade-up">
-                <div class="material-card">
-                    <div class="material-image">
-                        <img src="https://images.unsplash.com/photo-1593642532400-2682810df593?w=600" alt="Epson EB-2250U">
-                        <span class="status-badge status-fonctionnel">Fonctionnel</span>
-                        <span class="room-badge">Salle F11</span>
-                    </div>
-                    <div class="material-content">
-                        <span class="type-badge">Projecteur</span>
-                        <h3 class="material-name">Epson EB-2250U</h3>
-                        <p class="material-quantity">Quantité: <span>1</span></p>
-                       <button class="btn-details btn-delete">
-                           <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- HP EliteDesk 800 - Salle F12 -->
-            <div class="col-md-6 col-lg-3" data-aos="fade-up">
-                <div class="material-card">
-                    <div class="material-image">
-                        <img src="https://images.unsplash.com/photo-1587202372634-32705e3bf49c?w=600" alt="HP EliteDesk 800">
-                        <span class="status-badge status-fonctionnel">Fonctionnel</span>
-                        <span class="room-badge">Salle F12</span>
-                    </div>
-                    <div class="material-content">
-                        <span class="type-badge">PC</span>
-                        <h3 class="material-name">HP EliteDesk 800</h3>
-                        <p class="material-quantity">Quantité: <span>15</span></p>
-                        <button class="btn-details btn-delete">
-                           <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Samsung AR24 - Salle F13 -->
-            <div class="col-md-6 col-lg-3" data-aos="fade-up">
-                <div class="material-card">
-                    <div class="material-image">
-                        <img src="https://images.unsplash.com/photo-1587202372583-49330a15584d?w=600" alt="Samsung AR24">
-                        <span class="status-badge status-panne">Panne</span>
-                        <span class="room-badge">Salle F13</span>
-                    </div>
-                    <div class="material-content">
-                        <span class="type-badge">Climatiseur</span>
-                        <h3 class="material-name">Samsung AR24</h3>
-                        <p class="material-quantity">Quantité: <span>1</span></p>
-                        <button class="btn-details btn-delete">
-                           <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Dell OptiPlex 7090 - Salle F14 -->
-            <div class="col-md-6 col-lg-3" data-aos="fade-up">
-                <div class="material-card">
-                    <div class="material-image">
-                        <img src="https://images.unsplash.com/photo-1587202372583-49330a15584d?w=600" alt="Dell OptiPlex 7090">
-                        <span class="status-badge status-fonctionnel">Fonctionnel</span>
-                        <span class="room-badge">Salle F14</span>
-                    </div>
-                    <div class="material-content">
-                        <span class="type-badge">PC</span>
-                        <h3 class="material-name">Dell OptiPlex 7090</h3>
-                        <p class="material-quantity">Quantité: <span>20</span></p>
-                        <button class="btn-details btn-delete">
-                           <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- HP EliteDesk 800 - Salle F15 -->
-            <div class="col-md-6 col-lg-3" data-aos="fade-up">
-                <div class="material-card">
-                    <div class="material-image">
-                        <img src="https://images.unsplash.com/photo-1587202372634-32705e3bf49c?w=600" alt="HP EliteDesk 800">
-                        <span class="status-badge status-fonctionnel">Fonctionnel</span>
-                        <span class="room-badge">Salle F15</span>
-                    </div>
-                    <div class="material-content">
-                        <span class="type-badge">PC</span>
-                        <h3 class="material-name">HP EliteDesk 800</h3>
-                        <p class="material-quantity">Quantité: <span>25</span></p>
-                        <button class="btn-details btn-delete">
-                           <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- BenQ MH535 - Salle F15 -->
-            <div class="col-md-6 col-lg-3" data-aos="fade-up">
-                <div class="material-card">
-                    <div class="material-image">
-                        <img src="https://images.unsplash.com/photo-1593642532400-2682810df593?w=600" alt="BenQ MH535">
-                        <span class="status-badge status-reparation">Réparation</span>
-                        <span class="room-badge">Salle F15</span>
-                    </div>
-                    <div class="material-content">
-                        <span class="type-badge">Projecteur</span>
-                        <h3 class="material-name">BenQ MH535</h3>
-                        <p class="material-quantity">Quantité: <span>2</span></p>
-                        <button class="btn-details btn-delete">
-                           <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Lenovo ThinkCentre M90 - Salle F16 -->
-            <div class="col-md-6 col-lg-3" data-aos="fade-up">
-                <div class="material-card">
-                    <div class="material-image">
-                        <img src="https://images.unsplash.com/photo-1587202372583-49330a15584d?w=600" alt="Lenovo ThinkCentre M90">
-                        <span class="status-badge status-fonctionnel">Fonctionnel</span>
-                        <span class="room-badge">Salle F16</span>
-                    </div>
-                    <div class="material-content">
-                        <span class="type-badge">PC</span>
-                        <h3 class="material-name">Lenovo ThinkCentre M90</h3>
-                        <p class="material-quantity">Quantité: <span>12</span></p>
-                        <button class="btn-details btn-delete">
-                           <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
+            
         </div>
     </div>
 
@@ -334,5 +203,6 @@
     <script>
           AOS.init();
     </script>
+    <script src="./js/materiel.js"></script>
 </body>
 </html>

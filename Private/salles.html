@@ -88,6 +88,26 @@
             
         </div>
 
+        <!-- Statistics -->
+        <div class="stats-container">
+            <div class="stat-card">
+                <div class="stat-label">Total</div>
+                <div class="stat-value" id="total">1</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Disponible</div>
+                <div class="stat-value " id="Disponible">1</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Occupée</div>
+                <div class="stat-value" id="Occupee">1</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">En Maintenance </div>
+                <div class="stat-value" id="Maintenance">1</div>
+            </div>
+        </div>
+
          <!-- Filters -->
         <div class="filters-section">
             <div class="row g-3">
@@ -96,20 +116,15 @@
                 <div class="col-md-5">
                     <select class="filter-select w-100" id="roomFilter">
                         <option value="">Toutes les salles</option>
-                        <option>Salle F11</option>
-                        <option>Salle F12</option>
-                        <option>Salle F13</option>
-                        <option>Salle F14</option>
-                        <option>Salle F15</option>
-                        <option>Salle F16</option>
+                        
                     </select>
                 </div>
                 <div class="col-md-4">
                     <select class="filter-select w-100" id="statusFilter">
                         <option value="">Tous les états</option>
-                        <option>Fonctionnel</option>
-                        <option>En Panne</option>
-                        <option>Réparation</option>
+                        <option>Disponible</option>
+                        <option>Occupée</option>
+                        <option>En Maintenance</option>
                     </select>
                 </div>
                 <div class="col-md-3">
