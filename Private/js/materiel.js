@@ -47,11 +47,21 @@ function statistique(){
    document.getElementById("total").innerHTML=total;
 }
 
-function afficherFilter(){
+function afficherFilter() {
+    const select = document.getElementById("roomFilter");
+    select.innerHTML = `<option value="">Toutes les salles</option>`;
+
+    const sallesUniques = new Set(); // Stocker les salles sans doublons
+
     materiel.forEach(ele => {
-        document.getElementById("roomFilter").innerHTML += `<option>${ele.salle}</option>` ;
+        sallesUniques.add(ele.salle);
+    });
+
+    sallesUniques.forEach(salle => {
+        select.innerHTML += `<option value="${salle}">${salle}</option>`;
     });
 }
+
 
 document.getElementById("roomFilter").addEventListener("change", filtrer);
 document.getElementById("statusFilter").addEventListener("change", filtrer);

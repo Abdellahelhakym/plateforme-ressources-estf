@@ -73,21 +73,22 @@
         <div class="stats-container">
             <div class="stat-card">
                 <div class="stat-label">Total</div>
-                <div class="stat-value">96</div>
+                <div class="stat-value" id="total">1</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">Fonctionnel</div>
-                <div class="stat-value">93</div>
+                <div class="stat-label">Disponible</div>
+                <div class="stat-value " id="Disponible">1</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">En Panne</div>
-                <div class="stat-value">1</div>
+                <div class="stat-label">Occupée</div>
+                <div class="stat-value" id="Occupee">0</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">En Réparation</div>
-                <div class="stat-value">2</div>
+                <div class="stat-label">En Maintenance </div>
+                <div class="stat-value" id="Maintenance">0</div>
             </div>
         </div>
+            
 
         <!-- Filters -->
         <div class="filters-section">
@@ -142,124 +143,8 @@
                 </div>
             </div>
 
-            <!-- Epson EB-2250U - Salle F11 -->
-            <div class="col-md-6 col-lg-3" data-aos="fade-up">
-                <div class="material-card">
-                    <div class="material-image">
-                        <img src="https://images.unsplash.com/photo-1593642532400-2682810df593?w=600" alt="Epson EB-2250U">
-                        <span class="status-badge status-fonctionnel">Fonctionnel</span>
-                        <span class="room-badge">Salle F11</span>
-                    </div>
-                    <div class="material-content">
-                        <span class="type-badge">Projecteur</span>
-                        <h3 class="material-name">Epson EB-2250U</h3>
-                        <p class="material-quantity">Quantité: <span>1</span></p>
-                      
-                    </div>
-                </div>
-            </div>
+            
 
-            <!-- HP EliteDesk 800 - Salle F12 -->
-            <div class="col-md-6 col-lg-3" data-aos="fade-up">
-                <div class="material-card">
-                    <div class="material-image">
-                        <img src="https://images.unsplash.com/photo-1587202372634-32705e3bf49c?w=600" alt="HP EliteDesk 800">
-                        <span class="status-badge status-fonctionnel">Fonctionnel</span>
-                        <span class="room-badge">Salle F12</span>
-                    </div>
-                    <div class="material-content">
-                        <span class="type-badge">PC</span>
-                        <h3 class="material-name">HP EliteDesk 800</h3>
-                        <p class="material-quantity">Quantité: <span>15</span></p>
-                        
-                    </div>
-                </div>
-            </div>
-
-            <!-- Samsung AR24 - Salle F13 -->
-            <div class="col-md-6 col-lg-3" data-aos="fade-up">
-                <div class="material-card">
-                    <div class="material-image">
-                        <img src="https://images.unsplash.com/photo-1587202372583-49330a15584d?w=600" alt="Samsung AR24">
-                        <span class="status-badge status-panne">Panne</span>
-                        <span class="room-badge">Salle F13</span>
-                    </div>
-                    <div class="material-content">
-                        <span class="type-badge">Climatiseur</span>
-                        <h3 class="material-name">Samsung AR24</h3>
-                        <p class="material-quantity">Quantité: <span>1</span></p>
-                       
-                    </div>
-                </div>
-            </div>
-
-            <!-- Dell OptiPlex 7090 - Salle F14 -->
-            <div class="col-md-6 col-lg-3" data-aos="fade-up">
-                <div class="material-card">
-                    <div class="material-image">
-                        <img src="https://images.unsplash.com/photo-1587202372583-49330a15584d?w=600" alt="Dell OptiPlex 7090">
-                        <span class="status-badge status-fonctionnel">Fonctionnel</span>
-                        <span class="room-badge">Salle F14</span>
-                    </div>
-                    <div class="material-content">
-                        <span class="type-badge">PC</span>
-                        <h3 class="material-name">Dell OptiPlex 7090</h3>
-                        <p class="material-quantity">Quantité: <span>20</span></p>
-                      
-                    </div>
-                </div>
-            </div>
-
-            <!-- HP EliteDesk 800 - Salle F15 -->
-            <div class="col-md-6 col-lg-3" data-aos="fade-up">
-                <div class="material-card">
-                    <div class="material-image">
-                        <img src="https://images.unsplash.com/photo-1587202372634-32705e3bf49c?w=600" alt="HP EliteDesk 800">
-                        <span class="status-badge status-fonctionnel">Fonctionnel</span>
-                        <span class="room-badge">Salle F15</span>
-                    </div>
-                    <div class="material-content">
-                        <span class="type-badge">PC</span>
-                        <h3 class="material-name">HP EliteDesk 800</h3>
-                        <p class="material-quantity">Quantité: <span>25</span></p>
-                     
-                    </div>
-                </div>
-            </div>
-
-            <!-- BenQ MH535 - Salle F15 -->
-            <div class="col-md-6 col-lg-3" data-aos="fade-up">
-                <div class="material-card">
-                    <div class="material-image">
-                        <img src="https://images.unsplash.com/photo-1593642532400-2682810df593?w=600" alt="BenQ MH535">
-                        <span class="status-badge status-reparation">Réparation</span>
-                        <span class="room-badge">Salle F15</span>
-                    </div>
-                    <div class="material-content">
-                        <span class="type-badge">Projecteur</span>
-                        <h3 class="material-name">BenQ MH535</h3>
-                        <p class="material-quantity">Quantité: <span>2</span></p>
-                        
-                    </div>
-                </div>
-            </div>
-
-            <!-- Lenovo ThinkCentre M90 - Salle F16 -->
-            <div class="col-md-6 col-lg-3" data-aos="fade-up">
-                <div class="material-card">
-                    <div class="material-image">
-                        <img src="https://images.unsplash.com/photo-1587202372583-49330a15584d?w=600" alt="Lenovo ThinkCentre M90">
-                        <span class="status-badge status-fonctionnel">Fonctionnel</span>
-                        <span class="room-badge">Salle F16</span>
-                    </div>
-                    <div class="material-content">
-                        <span class="type-badge">PC</span>
-                        <h3 class="material-name">Lenovo ThinkCentre M90</h3>
-                        <p class="material-quantity">Quantité: <span>12</span></p>
-                        
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 

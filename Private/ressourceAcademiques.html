@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESTF - Ressources Académiques</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="./css/ressourceAcademiques.css">
+    <!--AOS--> 
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark">
+            <div class="container">
+                <a class="navbar-brand" href="#">
+                    <div class="estf-logo">
+                        <div class="estf-img"></div>
+                        <div class="estf-text">
+                            <div class="estf-text-ar">المدرسة العليا للتكنولوجيا</div>
+                            <div class="estf-text-fr">ECOLE SUPERIEURE DE TECHNOLOGIE</div>
+                        </div>
+                    </div>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="accueil.html">
+                                <i class="fas fa-home"></i> Accueil
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="dashboard.html">
+                                <i class="fa-solid fa-gauge"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="./ressource.html">
+                                <i class="fas fa-database"></i> Ressource
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/private/occupation.html">
+                                <i class="fas fa-calendar-alt"></i> Occupation
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="consultation.html">
+                                <i class="fas fa-search"></i> Consultation
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="admin-indicator">
+                    <div class="admin-info">
+                        <i class="fas fa-user-shield admin-icon"></i>
+                        <span class="admin-text">Mode Admin</span>
+                    </div>
+                    <div class="admin-dropdown">
+                        <a href="/logout" class="logout-btn">
+                            <i class="fas fa-sign-out-alt"></i>
+                            Déconnexion
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Header Banner -->
+        <div class="header-banner">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2>
+                        <i class="fas fa-graduation-cap"></i>
+                        Ressources Académiques
+                    </h2>
+                    <p>Gestion complète des ressources pédagogiques</p>
+                </div>
+                <a href="ressource.html" class="btn btn-light">
+                    <i class="fas fa-arrow-left"></i> Retour
+                </a>
+            </div>
+        </div>
+
+        <!-- SECTION 1: FILIÈRES -->
+          <div id="filiers"></div>
+
+        <div class="section-container" data-aos="fade-up">
+            <div class="section-header">
+                <div class="section-title">
+                    <i class="fas fa-graduation-cap"></i>
+                    <h3>Gestion des Filières</h3>
+                </div>
+                <button class="btn btn-add" data-bs-toggle="modal" data-bs-target="#addFiliereModal">
+                    <i class="fas fa-plus"></i> Ajouter Filière
+                </button>
+            </div>
+            <div class="section-content">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                
+                                <th><i class="fas fa-text"></i> Nom de la Filière</th>
+                                <th><i class="fas fa-layer-group"></i> Niveau</th>
+                                <th><i class="fas fa-users"></i> NB_Group</th>
+                                <th><i class="fas fa-users"></i> Nombre d'étudiants</th>
+                                
+                             
+                                <th><i class="fas fa-cog"></i> Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                               
+                                <td>Génie Informatique</td>
+                                <td>DUT</td>
+                                <td>3</td>
+                                <td>250</td>
+                                <td>
+                                    <button class="btn btn-sm btn-edit">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-delete">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                
+                                <td>Génie Électrique</td>
+                                <td>DUT</td>
+                                <td>4</td>
+                                <td>180</td>
+                                <td>
+                                    <button class="btn btn-sm btn-edit">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-delete">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+             
+        <!-- SECTION 2: PROFESSEURS -->
+         <div id="prof"></div>
+
+        <div class="section-container" data-aos="fade-up">
+            <div class="section-header">
+                <div class="section-title">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                    <h3>Gestion des Professeurs</h3>
+                </div>
+                <button class="btn btn-add" data-bs-toggle="modal" data-bs-target="#addProfModal">
+                    <i class="fas fa-plus"></i> Ajouter Professeur
+                </button>
+            </div>
+            <div class="section-content">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                               
+                                <th><i class="fas fa-user"></i> Nom </th>
+                                <th><i class="fas fa-envelope"></i> Prenom</th>
+                                <th><i class="fas fa-book"></i> Email</th>
+                                <th><i class="fas fa-award"></i> Departement</th>
+                                <th><i class="fas fa-cog"></i> Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Dr. Ahmed </td>
+                                <td> Alami</td>
+                                <td>a.alami@usmba.ac.ma</td>
+                                <td>Informatique</td>
+                                
+                                <td>
+                                    <button class="btn btn-sm btn-edit">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-delete">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                             <tr>
+                                <td>Dr. Abdellah </td>
+                                <td> el hakym</td>
+                                <td>a.Abdellah@usmba.ac.ma</td>
+                                <td>Informatique</td>
+                                
+                                <td>
+                                    <button class="btn btn-sm btn-edit">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-delete">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 3: MODULES TP -->
+         <div id="modules"></div>
+
+        <div class="section-container" data-aos="fade-up" >
+            <div class="section-header">
+                <div class="section-title">
+                    <i class="fas fa-book"></i>
+                    <h3>Gestion des Modules TP</h3>
+                </div>
+                <button class="btn btn-add" data-bs-toggle="modal" data-bs-target="#addModuleModal">
+                    <i class="fas fa-plus"></i> Ajouter Module TP
+                </button>
+            </div>
+            <div class="section-content">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                
+                                <th><i class="fas fa-text"></i> Nom du Module TP</th>
+                                <th><i class="fas fa-clock"></i> Heures TP</th>
+                                <th><i class="fas fa-cog"></i> Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                
+                                <td>Programmation C</td>
+                                <td>30h</td>
+                               
+                                <td>
+                                    <button class="btn btn-sm btn-edit">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-delete">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                
+                                <td>Programmation C</td>
+                                <td>30h</td>
+                               
+                                <td>
+                                    <button class="btn btn-sm btn-edit">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-delete">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+       
+    <!-- Modal Add Filière -->
+    <div class="modal fade" id="addFiliereModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-graduation-cap"></i> Ajouter une Filière</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="mb-3">
+                            <label class="form-label">Code Filière</label>
+                            <input type="text" class="form-control" placeholder="Ex: GI">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Nom de la Filière</label>
+                            <input type="text" class="form-control" placeholder="Ex: Génie Informatique">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Niveau</label>
+                            <select class="form-select">
+                                <option>DUT</option>
+                                <option>Licence</option>
+                                
+                                <option>Master</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Nombre d'étudiants</label>
+                            <input type="number" class="form-control" placeholder="Ex: 250">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="button" class="btn btn-primary">Enregistrer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Add Professeur -->
+    <div class="modal fade" id="addProfModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-chalkboard-teacher"></i> Ajouter un Professeur</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="mb-3">
+                            <label class="form-label">Matricule</label>
+                            <input type="text" class="form-control" placeholder="Ex: P001">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Nom Complet</label>
+                            <input type="text" class="form-control" placeholder="Ex: Dr. Ahmed Alami">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" placeholder="Ex: a.alami@usmba.ac.ma">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Spécialité</label>
+                            <input type="text" class="form-control" placeholder="Ex: Informatique">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Grade</label>
+                            <select class="form-select">
+                                <option>Professeur</option>
+                                <option>Professeur Habilité</option>
+                                <option>Professeur Assistant</option>
+                                <option>Vacataire</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="button" class="btn btn-primary">Enregistrer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Add Module -->
+    <div class="modal fade" id="addModuleModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-book"></i> Ajouter un Module TP</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="mb-3">
+                            <label class="form-label">Code Module</label>
+                            <input type="text" class="form-control" placeholder="Ex: M101">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Nom du Module</label>
+                            <input type="text" class="form-control" placeholder="Ex: Programmation C">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Filière</label>
+                            <select class="form-select">
+                                <option>GI - Génie Informatique</option>
+                                <option>GE - Génie Électrique</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Semestre</label>
+                            <select class="form-select">
+                                <option>S1</option>
+                                <option>S2</option>
+                                <option>S3</option>
+                                <option>S4</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Heures TP</label>
+                            <input type="number" class="form-control" placeholder="Ex: 30">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Professeur</label>
+                            <select class="form-select">
+                                <option>Dr. Ahmed Alami</option>
+                                <option>Dr. Fatima Zahra</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="button" class="btn btn-primary">Enregistrer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+  
+
+    <footer class="text-white py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <h5 class="text-light"><i class="fas fa-info-circle"></i> À Propos</h5>
+                    <p>Le Département Génie Informatique de l'ESTF offre une formation de qualité en informatique et technologies de l'information.</p>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <h5 class="text-light"><i class="fas fa-envelope"></i> Contact</h5>
+                    <p>
+                        <i class="fas fa-map-marker-alt"></i> BP 2427 Route d'Imouzzer, 30000 Fès<br>
+                        <i class="fas fa-phone"></i> (+212) 6 66 21 46 30<br>
+                        <i class="fas fa-at"></i> support.est@usmba.ac.ma
+                    </p>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <h5 class="text-light"><i class="fas fa-link"></i> Liens Utiles</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="https://www.est-usmba.ac.ma/" class="text-white"><i class="fas fa-globe"></i> Site ESTF</a></li>
+                        <li><a href="https://www.facebook.com/est.fes01" class="text-white"><i class="fab fa-facebook"></i> Facebook</a></li>
+                        <li><a href="https://www.instagram.com/est.fes.usmba/" class="text-white"><i class="fab fa-instagram"></i> Instagram</a></li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="bg-white">
+            <p class="text-center mb-0">
+                <i class="fas fa-copyright"></i> 2025 Département Génie Informatique - ESTF. Tous droits réservés.
+            </p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        AOS.init({
+            duration: 800,
+            once: true
+        });
+    </script>
+</body>
+</html>

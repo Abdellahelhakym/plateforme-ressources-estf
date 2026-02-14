@@ -1,9 +1,9 @@
  :root {
             --gradient-primary: linear-gradient(135deg, #1a236d 0%, #2c75bd 100%);
-            --gradient-secondary: rgba(238, 5, 5, 0.8);
+            --gradient-secondary: rgba(178, 29, 29, 0.866);
             --gradient-success: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            --gradient-info: rgba(68, 217, 73, 0.907);
-            --gradient-warning: rgb(226, 218, 67);
+            --gradient-info: rgba(21, 183, 27, 0.907);
+            --gradient-warning: rgb(193, 184, 20);
         }
 
         body {
