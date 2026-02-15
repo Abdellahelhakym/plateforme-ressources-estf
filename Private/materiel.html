@@ -84,60 +84,49 @@
     <!-- Main Content -->
     <div class="container">
         <!-- Page Header -->
-        <div class="page-header">
-            <h1 class="page-title">Gestion du Matériel</h1>
-            <p class="page-subtitle">Suivi et maintenance du matériel informatique</p>
+         <div class="header-banner">
+            <h2>
+                <i class="fas fa-tools"></i>
+                Gestion du Matériel
+            </h2>
+            <p>Suivi et maintenance du matériel informatique</p>
         </div>
 
-        <!-- Statistics -->
-        <div class="stats-container">
-            <div class="stat-card">
-                <div class="stat-label">Total</div>
-                <div class="stat-value" id="total"></div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Disponible</div>
-                <div class="stat-value " id="Disponible"></div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Occupée</div>
-                <div class="stat-value" id="Occupee"></div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">En Maintenance </div>
-                <div class="stat-value" id="Maintenance"></div>
-            </div>
-        </div>
 
         <!-- Filters -->
-        <div class="filters-section">
-            <div class="row g-3">
-                 
-                <div class="col-md-3">
-                    <div class="search-box">
-                        <i class="fas fa-search"></i>
-                        <input type="text" placeholder="Rechercher..." id="searchInput">
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <select class="filter-select w-100" id="roomFilter">
-                        <option value="">Toutes les salles</option>
-                        
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <select class="filter-select w-100" id="statusFilter">
-                        <option value="">Tous les états</option>
-                         <option>Disponible</option>
-                        <option>Occupee</option>
-                        <option>En Maintenance</option>
-                    </select>
-                </div>
-                <div  class="col-md-3" >
-                   <a href="ajouterMateriel.html">  <button class="btn-manage" > <i class="fas fa-plus"></i> Ajouter Materiel</button></a>
-                </div>
+<div class="filters-section">
+    <div class="row g-3">
+        <div class="col-md-3">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Rechercher..." id="searchInput">
             </div>
         </div>
+        <div class="col-md-3">
+            <select class="filter-select w-100" id="roomFilter">
+                <option value="">Toutes les salles</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <select class="filter-select w-100" id="statusFilter">
+                <option value="">Tous les états</option>
+                <option>Disponible</option>
+                <option>Occupee</option>
+                <option>En Maintenance</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <a href="ajouterMateriel.html" class="btn-manage w-100 text-center d-block">
+                <i class="fas fa-plus"></i> Ajouter Materiel
+            </a>
+        </div>
+        <div class="col-md-2">
+            <a href="ressource.html" class="btn-manage w-100 text-center d-block btn-reset">
+                <i class="fas fa-arrow-left"></i> Retour
+            </a>
+        </div>
+    </div>
+</div>
 
         <!-- Materials Grid -->
         <div class="row g-4" id="roomsContainer">

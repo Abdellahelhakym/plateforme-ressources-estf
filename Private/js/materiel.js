@@ -10,7 +10,7 @@ async function getNombreInfoMateriel() {
         materiel = data.materiel;    
           
         console.log(materiel);
-        statistique();
+      
         afficherFilter();
         afficherMateriel("", "");
         
@@ -20,32 +20,7 @@ async function getNombreInfoMateriel() {
     }
 }
 
-function statistique(){
-    let total =0;
-    let Disponible =0;
-    let Occupee =0;
-    let Maintenance =0;
 
-   materiel.forEach(ele=>{
-    
-    if(ele.etat == "Disponible"){
-      Disponible ++;
-    }
-    if(ele.etat == "Occupee"){
-      Occupee ++;
-    }
-    if(ele.etat == "En Maintenance"){
-      Maintenance ++;
-    }
-    total++;
-   });
-
-   
-   document.getElementById("Disponible").innerHTML=Disponible;
-   document.getElementById("Occupee").innerHTML=Occupee;
-   document.getElementById("Maintenance").innerHTML=Maintenance;
-   document.getElementById("total").innerHTML=total;
-}
 
 function afficherFilter() {
     const select = document.getElementById("roomFilter");

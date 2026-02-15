@@ -11,7 +11,7 @@ async function getNombreInfoSalles() {
         salles = data.salles;                
         console.log(salles);
 
-        statistique();
+
        afficherFilter();
         afficherSalles("", "");
 
@@ -20,32 +20,7 @@ async function getNombreInfoSalles() {
     }
 }
 
-function statistique(){
-    let total =0;
-    let Disponible =0;
-    let Occupee =0;
-    let Maintenance =0;
 
-   salles.forEach(ele=>{
-    
-    if(ele.etat == "Disponible"){
-      Disponible ++;
-    }
-    if(ele.etat == "Occupée"){
-      Occupee ++;
-    }
-    if(ele.etat == "En Maintenance"){
-      Maintenance ++;
-    }
-    total++;
-   });
-
-   
-   document.getElementById("Disponible").innerHTML=Disponible;
-   document.getElementById("Occupee").innerHTML=Occupee;
-   document.getElementById("Maintenance").innerHTML=Maintenance;
-   document.getElementById("total").innerHTML=total;
-}
 
 function afficherFilter(){
     salles.forEach(ele=>{

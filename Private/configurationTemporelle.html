@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESTF - Configuration Temporelle</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="./css/configurationTemporelle.css">
+    <!--AOS--> 
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark">
+            <div class="container">
+                <a class="navbar-brand" href="#">
+                    <div class="estf-logo">
+                        <div class="estf-img"></div>
+                        <div class="estf-text">
+                            <div class="estf-text-ar">المدرسة العليا للتكنولوجيا</div>
+                            <div class="estf-text-fr">ECOLE SUPERIEURE DE TECHNOLOGIE</div>
+                        </div>
+                    </div>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="accueil.html">
+                                <i class="fas fa-home"></i> Accueil
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="dashboard.html">
+                                <i class="fa-solid fa-gauge"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="./ressource.html">
+                                <i class="fas fa-database"></i> Ressource
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/private/occupation.html">
+                                <i class="fas fa-calendar-alt"></i> Occupation
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="consultation.html">
+                                <i class="fas fa-search"></i> Consultation
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="admin-indicator">
+                    <div class="admin-info">
+                        <i class="fas fa-user-shield admin-icon"></i>
+                        <span class="admin-text">Mode Admin</span>
+                    </div>
+                    <div class="admin-dropdown">
+                        <a href="/logout" class="logout-btn">
+                            <i class="fas fa-sign-out-alt"></i>
+                            Déconnexion
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Header Banner -->
+        <div class="header-banner">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2>
+                        <i class="fas fa-calendar"></i>
+                        Configuration Temporelle
+                    </h2>
+                    <p>Gestion des paramètres temporels et planning</p>
+                </div>
+                <a href="ressource.html" class="btn btn-light">
+                    <i class="fas fa-arrow-left"></i> Retour
+                </a>
+            </div>
+        </div>
+
+        <!-- SECTION 1: ANNÉES UNIVERSITAIRES -->
+          <div id="annees"></div>
+
+        <div class="section-container" data-aos="fade-up">
+            <div class="section-header">
+                <div class="section-title">
+                    <i class="fas fa-calendar-alt"></i>
+                    <h3>Années Universitaires</h3>
+                </div>
+                <button class="btn btn-add" data-bs-toggle="modal" data-bs-target="#addAnneeModal">
+                    <i class="fas fa-plus"></i> Ajouter Année
+                </button>
+            </div>
+            <div class="section-content">
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <div class="time-card active-year">
+                            <div class="time-icon">
+                                <i class="fas fa-calendar-check"></i>
+                            </div>
+                            <h5>2024/2025</h5>
+                            <p class="status-badge active">Année Active</p>
+                            <div class="time-info">
+                                <span><i class="fas fa-calendar-day"></i> Début: 01/09/2024</span>
+                                <span><i class="fas fa-calendar-day"></i> Fin: 30/06/2025</span>
+                            </div>
+                            <div class="card-actions">
+                                <button class="btn btn-sm btn-edit">
+                                    <i class="fas fa-edit"></i> Modifier
+                                </button>
+                                <button class="btn btn-sm btn-delete">
+                                    <i class="fas fa-trash"></i> Supprimer
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="time-card">
+                            <div class="time-icon">
+                                <i class="fas fa-calendar"></i>
+                            </div>
+                            <h5>2025/2026</h5>
+                            <p class="status-badge upcoming">À venir</p>
+                            <div class="time-info">
+                                <span><i class="fas fa-calendar-day"></i> Début: 01/09/2025</span>
+                                <span><i class="fas fa-calendar-day"></i> Fin: 30/06/2026</span>
+                            </div>
+                            <div class="card-actions">
+                                <button class="btn btn-sm btn-edit">
+                                    <i class="fas fa-edit"></i> Modifier
+                                </button>
+                                <button class="btn btn-sm btn-delete">
+                                    <i class="fas fa-trash"></i> Supprimer
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="time-card">
+                            <div class="time-icon">
+                                <i class="fas fa-calendar-times"></i>
+                            </div>
+                            <h5>2023/2024</h5>
+                            <p class="status-badge archived">Archivée</p>
+                            <div class="time-info">
+                                <span><i class="fas fa-calendar-day"></i> Début: 01/09/2023</span>
+                                <span><i class="fas fa-calendar-day"></i> Fin: 30/06/2024</span>
+                            </div>
+                            <div class="card-actions">
+                                <button class="btn btn-sm btn-edit">
+                                    <i class="fas fa-edit"></i> Modifier
+                                </button>
+                                <button class="btn btn-sm btn-delete">
+                                    <i class="fas fa-trash"></i> Supprimer
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 2: SEMESTRES -->
+          <div id="semestre"></div>
+
+        <div class="section-container" data-aos="fade-up">
+            <div class="section-header">
+                <div class="section-title">
+                    <i class="fas fa-calendar-check"></i>
+                    <h3>Semestres</h3>
+                </div>
+                <button class="btn btn-add" data-bs-toggle="modal" data-bs-target="#addSemestreModal">
+                    <i class="fas fa-plus"></i> Ajouter Semestre
+                </button>
+            </div>
+            <div class="section-content">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                
+                                <th><i class="fas fa-text"></i> Semestre</th>
+                                <th><i class="fas fa-calendar-day"></i> Date Début</th>
+                                <th><i class="fas fa-calendar-day"></i> Date Fin</th>
+                                <th><i class="fas fa-cog"></i> Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                               
+                                <td>S1</td>
+                                <td>01/09</td>
+                                <td>31/01</td>
+                                <td>
+                                    <button class="btn btn-sm btn-edit">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-delete">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                           <tr>
+                               
+                                <td>S2</td>
+                                <td>01/09</td>
+                                <td>31/01</td>
+                                <td>
+                                    <button class="btn btn-sm btn-edit">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-delete">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                               
+                                <td>S3</td>
+                                <td>01/09</td>
+                                <td>31/01</td>
+                                <td>
+                                    <button class="btn btn-sm btn-edit">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-delete">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 3: SEMAINES -->
+          <div id="semaines"></div>
+
+        <div class="section-container" data-aos="fade-up">
+            <div class="section-header">
+                <div class="section-title">
+                    <i class="fas fa-calendar-week"></i>
+                    <h3>Semaines</h3>
+                </div>
+                <button class="btn btn-add" data-bs-toggle="modal" data-bs-target="#addSemaineModal">
+                    <i class="fas fa-plus"></i> Ajouter Semaine
+                </button>
+            </div>
+            <div class="section-content">
+                <div class="row">
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <div class="week-card">
+                            <div class="week-number">1</div>
+                            <h6>Semaine 1</h6>
+                            <p><i class="fas fa-calendar"></i> 01/09 - 07/09</p>
+                            <p><i class="fas fa-calendar"></i> S1</p>
+                            <div class="card-actions mt-2">
+                                <button class="btn btn-sm btn-edit"><i class="fas fa-edit"></i></button>
+                                <button class="btn btn-sm btn-delete"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <div class="week-card">
+                            <div class="week-number">2</div>
+                            <h6>Semaine 2</h6>
+                            <p><i class="fas fa-calendar"></i> 01/09 - 07/09</p>
+                             <p><i class="fas fa-calendar"></i> S1</p>
+                            <div class="card-actions mt-2">
+                                <button class="btn btn-sm btn-edit"><i class="fas fa-edit"></i></button>
+                                <button class="btn btn-sm btn-delete"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <div class="week-card">
+                            <div class="week-number">3</div>
+                            <h6>Semaine 3</h6>
+                            <p><i class="fas fa-calendar"></i> 01/09 - 07/09</p>
+                             <p><i class="fas fa-calendar"></i> S1</p>
+                            <div class="card-actions mt-2">
+                                <button class="btn btn-sm btn-edit"><i class="fas fa-edit"></i></button>
+                                <button class="btn btn-sm btn-delete"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <div class="week-card">
+                            <div class="week-number">4</div>
+                            <h6>Semaine 4</h6>
+                            <p><i class="fas fa-calendar"></i> 01/09 - 07/09</p>
+                             <p><i class="fas fa-calendar"></i> S1</p>
+                            <div class="card-actions mt-2">
+                                <button class="btn btn-sm btn-edit"><i class="fas fa-edit"></i></button>
+                                <button class="btn btn-sm btn-delete"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+     
+
+        <!-- SECTION 5: HORAIRES -->
+          <div id="creneau"></div>
+
+        <div class="section-container" data-aos="fade-up">
+            <div class="section-header">
+                <div class="section-title">
+                    <i class="fas fa-clock"></i>
+                    <h3>Horaires (Créneaux Temps)</h3>
+                </div>
+                <button class="btn btn-add" data-bs-toggle="modal" data-bs-target="#addTempsModal">
+                    <i class="fas fa-plus"></i> Ajouter Créneau
+                </button>
+            </div>
+            <div class="section-content">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th><i class="fas fa-hashtag"></i> Créneau</th>
+                                <th><i class="fas fa-clock"></i> Heure Début</th>
+                                <th><i class="fas fa-clock"></i> Heure Fin</th>
+                                <th><i class="fas fa-hourglass"></i> Durée</th>
+                               
+                                <th><i class="fas fa-cog"></i> Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="badge bg-info">Créneau 1</span></td>
+                                <td>08:30</td>
+                                <td>12:30</td>
+                                <td>4h 00min</td>
+                               
+                                <td>
+                                    <button class="btn btn-sm btn-edit">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-delete">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge bg-info">Créneau 2</span></td>
+                                <td>14:30</td>
+                                <td>18:30</td>
+                                <td>4h 00min</td>
+                                
+                                <td>
+                                    <button class="btn btn-sm btn-edit">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-delete">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                           
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Modal Add Année -->
+    <div class="modal fade" id="addAnneeModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-calendar-alt"></i> Ajouter Année Universitaire</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="mb-3">
+                            <label class="form-label">Année Universitaire</label>
+                            <input type="text" class="form-control" placeholder="Ex: 2025/2026">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Date Début</label>
+                            <input type="date" class="form-control">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Date Fin</label>
+                            <input type="date" class="form-control">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Statut</label>
+                            <select class="form-select">
+                                <option>Active</option>
+                                <option>À venir</option>
+                                <option>Archivée</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="button" class="btn btn-primary">Enregistrer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Add Semestre -->
+    <div class="modal fade" id="addSemestreModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-calendar-check"></i> Ajouter Semestre</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="mb-3">
+                            <label class="form-label">Code Semestre</label>
+                            <input type="text" class="form-control" placeholder="Ex: S1">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Nom du Semestre</label>
+                            <input type="text" class="form-control" placeholder="Ex: Semestre 1">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Année Universitaire</label>
+                            <select class="form-select">
+                                <option>2024/2025</option>
+                                <option>2025/2026</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Date Début</label>
+                            <input type="date" class="form-control">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Date Fin</label>
+                            <input type="date" class="form-control">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Statut</label>
+                            <select class="form-select">
+                                <option>Actif</option>
+                                <option>À venir</option>
+                                <option>Planifié</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="button" class="btn btn-primary">Enregistrer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Add Semaine -->
+    <div class="modal fade" id="addSemaineModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-calendar-week"></i> Ajouter Semaine</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="mb-3">
+                            <label class="form-label">Numéro de Semaine</label>
+                            <input type="number" class="form-control" placeholder="Ex: 1">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Nom de la Semaine</label>
+                            <input type="text" class="form-control" placeholder="Ex: Semaine 1">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Date Début</label>
+                            <input type="date" class="form-control">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Date Fin</label>
+                            <input type="date" class="form-control">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Semestre</label>
+                            <select class="form-select">
+                                <option>S1 - Semestre 1</option>
+                                <option>S2 - Semestre 2</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="button" class="btn btn-primary">Enregistrer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+    <!-- Modal Add Temps -->
+    <div class="modal fade" id="addTempsModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-clock"></i> Ajouter Créneau Horaire</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="mb-3">
+                            <label class="form-label">Nom du Créneau</label>
+                            <input type="text" class="form-control" placeholder="Ex: Créneau 1">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Heure Début</label>
+                            <input type="time" class="form-control">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Heure Fin</label>
+                            <input type="time" class="form-control">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Type de Séance</label>
+                            <select class="form-select">
+                                <option>TP (Travaux Pratiques)</option>
+                                <option>Cours</option>
+                                <option>TD (Travaux Dirigés)</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="button" class="btn btn-primary">Enregistrer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="text-white py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <h5 class="text-light"><i class="fas fa-info-circle"></i> À Propos</h5>
+                    <p>Le Département Génie Informatique de l'ESTF offre une formation de qualité en informatique et technologies de l'information.</p>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <h5 class="text-light"><i class="fas fa-envelope"></i> Contact</h5>
+                    <p>
+                        <i class="fas fa-map-marker-alt"></i> BP 2427 Route d'Imouzzer, 30000 Fès<br>
+                        <i class="fas fa-phone"></i> (+212) 6 66 21 46 30<br>
+                        <i class="fas fa-at"></i> support.est@usmba.ac.ma
+                    </p>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <h5 class="text-light"><i class="fas fa-link"></i> Liens Utiles</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="https://www.est-usmba.ac.ma/" class="text-white"><i class="fas fa-globe"></i> Site ESTF</a></li>
+                        <li><a href="https://www.facebook.com/est.fes01" class="text-white"><i class="fab fa-facebook"></i> Facebook</a></li>
+                        <li><a href="https://www.instagram.com/est.fes.usmba/" class="text-white"><i class="fab fa-instagram"></i> Instagram</a></li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="bg-white">
+            <p class="text-center mb-0">
+                <i class="fas fa-copyright"></i> 2025 Département Génie Informatique - ESTF. Tous droits réservés.
+            </p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        AOS.init({
+            duration: 800,
+            once: true
+        });
+    </script>
+</body>
+</html>

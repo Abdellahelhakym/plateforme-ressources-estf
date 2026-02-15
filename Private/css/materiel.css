@@ -198,36 +198,28 @@
             font-size: 1rem;
         }
 
-        .stats-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .stat-card {
-            background: white;
+         .header-banner {
+            background: var(--gradient-primary);
+            color: white;
             border-radius: 15px;
-            padding: 1.5rem;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-            transition: all 0.3s;
+            padding: 2rem;
+            margin: 2rem 0;
+            box-shadow: 0 8px 20px rgba(26, 35, 109, 0.3);
         }
 
-        .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.12);
-        }
-
-        .stat-label {
-            font-size: 0.9rem;
-            color: #6c757d;
-            margin-bottom: 0.5rem;
-        }
-
-        .stat-value {
-            font-size: 2rem;
+        .header-banner h2 {
+            font-size: 1.8rem;
             font-weight: bold;
-            color: #1a236d;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-banner p {
+            margin: 0;
+            opacity: 0.95;
+            font-size: 1rem;
         }
 
         .filters-section {
@@ -421,6 +413,7 @@
             transform: translateY(-2px);
         }
         
+        
         footer {
             background: var(--gradient-primary);
             margin-top: 4rem;
@@ -465,9 +458,10 @@
        
 
          .btn-manage {
+            text-decoration: none;
             background: var(--gradient-primary);
             color: white;
-            padding: 12px 30px;
+            padding: 12px 23px;
             border: none;
             border-radius: 12px;
          
@@ -492,6 +486,18 @@
          .btn-delete:hover {
            background: linear-gradient(135deg, #ffcdd2 0%, #ef9a9a 100%);
             transform: translateY(-2px);
+        }
+         .btn-reset {
+            background: #e75507;
+            color: white;
+            
+        }
+
+        .btn-reset:hover {
+            background: #b44307;
+            transform: translateY(-2px);
+            color: white;
+            box-shadow: 0 2px 9px #e15b135c;
         }
 
        
