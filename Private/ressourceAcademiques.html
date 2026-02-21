@@ -92,74 +92,37 @@
             </div>
         </div>
 
-        <!-- SECTION 1: FILIÈRES -->
-          <div id="filiers"></div>
-
+        <div id="filiere"></div>
+       <!-- SECTION Filières -->
         <div class="section-container" data-aos="fade-up">
             <div class="section-header">
                 <div class="section-title">
                     <i class="fas fa-graduation-cap"></i>
                     <h3>Gestion des Filières</h3>
                 </div>
-                <button class="btn btn-add" data-bs-toggle="modal" data-bs-target="#addFiliereModal">
+                <button class="btn  btn-add" data-bs-toggle="modal" data-bs-target="#addFiliereModal">
                     <i class="fas fa-plus"></i> Ajouter Filière
                 </button>
             </div>
             <div class="section-content">
                 <div class="table-responsive">
-                    <table class="table table-hover">
+                    <table class="table table-hover" id="tableFilieres">
                         <thead>
                             <tr>
-                                
-                                <th><i class="fas fa-text"></i> Nom de la Filière</th>
-                                <th><i class="fas fa-layer-group"></i> Niveau</th>
-                                <th><i class="fas fa-users"></i> NB_Group</th>
-                                <th><i class="fas fa-users"></i> Nombre d'étudiants</th>
-                                
-                             
-                                <th><i class="fas fa-cog"></i> Actions</th>
+                                <th>Nom de la Filière</th>
+                                <th>Niveau</th>
+                                <th>Nb Groupes</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr>
-                               
-                                <td>Génie Informatique</td>
-                                <td>DUT</td>
-                                <td>3</td>
-                                <td>250</td>
-                                <td>
-                                    <button class="btn btn-sm btn-edit">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="btn btn-sm btn-delete">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr>
-                                
-                                <td>Génie Électrique</td>
-                                <td>DUT</td>
-                                <td>4</td>
-                                <td>180</td>
-                                <td>
-                                    <button class="btn btn-sm btn-edit">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="btn btn-sm btn-delete">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                        </tbody>
+                        <tbody></tbody>
                     </table>
                 </div>
             </div>
         </div>
-             
-        <!-- SECTION 2: PROFESSEURS -->
-         <div id="prof"></div>
 
+        <div id="professeur"></div>
+        <!-- SECTION Professeurs -->
         <div class="section-container" data-aos="fade-up">
             <div class="section-header">
                 <div class="section-title">
@@ -172,58 +135,25 @@
             </div>
             <div class="section-content">
                 <div class="table-responsive">
-                    <table class="table table-hover">
+                    <table class="table table-hover" id="tableProfesseurs">
                         <thead>
                             <tr>
-                               
-                                <th><i class="fas fa-user"></i> Nom </th>
-                                <th><i class="fas fa-envelope"></i> Prenom</th>
-                                <th><i class="fas fa-book"></i> Email</th>
-                                <th><i class="fas fa-award"></i> Departement</th>
-                                <th><i class="fas fa-cog"></i> Actions</th>
+                                <th>Nom</th>
+                                <th>Prénom</th>
+                                <th>Email</th>
+                                <th>Département</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr>
-                                <td>Dr. Ahmed </td>
-                                <td> Alami</td>
-                                <td>a.alami@usmba.ac.ma</td>
-                                <td>Informatique</td>
-                                
-                                <td>
-                                    <button class="btn btn-sm btn-edit">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="btn btn-sm btn-delete">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                             <tr>
-                                <td>Dr. Abdellah </td>
-                                <td> el hakym</td>
-                                <td>a.Abdellah@usmba.ac.ma</td>
-                                <td>Informatique</td>
-                                
-                                <td>
-                                    <button class="btn btn-sm btn-edit">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="btn btn-sm btn-delete">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                        </tbody>
+                        <tbody></tbody>
                     </table>
                 </div>
             </div>
         </div>
 
-        <!-- SECTION 3: MODULES TP -->
-         <div id="modules"></div>
-
-        <div class="section-container" data-aos="fade-up" >
+        <div id="module"></div>
+        <!-- SECTION Modules TP -->
+        <div class="section-container" data-aos="fade-up">
             <div class="section-header">
                 <div class="section-title">
                     <i class="fas fa-book"></i>
@@ -235,193 +165,218 @@
             </div>
             <div class="section-content">
                 <div class="table-responsive">
-                    <table class="table table-hover">
+                    <table class="table table-hover" id="tableModules">
                         <thead>
                             <tr>
-                                
-                                <th><i class="fas fa-text"></i> Nom du Module TP</th>
-                                <th><i class="fas fa-clock"></i> Heures TP</th>
-                                <th><i class="fas fa-cog"></i> Actions</th>
+                                <th>Nom du Module TP</th>
+                                <th>Filière</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr>
-                                
-                                <td>Programmation C</td>
-                                <td>30h</td>
-                               
-                                <td>
-                                    <button class="btn btn-sm btn-edit">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="btn btn-sm btn-delete">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr>
-                                
-                                <td>Programmation C</td>
-                                <td>30h</td>
-                               
-                                <td>
-                                    <button class="btn btn-sm btn-edit">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="btn btn-sm btn-delete">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                        </tbody>
+                        <tbody></tbody>
                     </table>
                 </div>
             </div>
         </div>
 
-       
-    <!-- Modal Add Filière -->
-    <div class="modal fade" id="addFiliereModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title"><i class="fas fa-graduation-cap"></i> Ajouter une Filière</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form>
-                        <div class="mb-3">
-                            <label class="form-label">Code Filière</label>
-                            <input type="text" class="form-control" placeholder="Ex: GI">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Nom de la Filière</label>
-                            <input type="text" class="form-control" placeholder="Ex: Génie Informatique">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Niveau</label>
-                            <select class="form-select">
-                                <option>DUT</option>
-                                <option>Licence</option>
-                                
-                                <option>Master</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Nombre d'étudiants</label>
-                            <input type="number" class="form-control" placeholder="Ex: 250">
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                    <button type="button" class="btn btn-primary">Enregistrer</button>
+        <!-- Modal Add Filière -->
+        <div class="modal fade" id="addFiliereModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Ajouter une Filière</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="formAddFiliere">
+                            <div class="mb-3">
+                                <label class="form-label">Nom de la Filière</label>
+                                <input type="text" class="form-control" name="nom_filiere" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Niveau</label>
+                                <select class="form-select" name="niveau" required>
+                                    <option value="DUT">DUT</option>
+                                    <option value="Bachelor">Bachelor</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Nombre de groupes</label>
+                                <input type="number" class="form-control" name="nb_group" min="1" required>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <button type="button" class="btn btn-primary" id="btnSaveFiliere">Enregistrer</button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Modal Add Professeur -->
-    <div class="modal fade" id="addProfModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title"><i class="fas fa-chalkboard-teacher"></i> Ajouter un Professeur</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form>
-                        <div class="mb-3">
-                            <label class="form-label">Matricule</label>
-                            <input type="text" class="form-control" placeholder="Ex: P001">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Nom Complet</label>
-                            <input type="text" class="form-control" placeholder="Ex: Dr. Ahmed Alami">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Email</label>
-                            <input type="email" class="form-control" placeholder="Ex: a.alami@usmba.ac.ma">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Spécialité</label>
-                            <input type="text" class="form-control" placeholder="Ex: Informatique">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Grade</label>
-                            <select class="form-select">
-                                <option>Professeur</option>
-                                <option>Professeur Habilité</option>
-                                <option>Professeur Assistant</option>
-                                <option>Vacataire</option>
-                            </select>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                    <button type="button" class="btn btn-primary">Enregistrer</button>
+        <!-- Modal Add Professeur -->
+        <div class="modal fade" id="addProfModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Ajouter un Professeur</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="formAddProf">
+                            <div class="mb-3"><label>Nom</label><input type="text" class="form-control" name="nom" required></div>
+                            <div class="mb-3"><label>Prénom</label><input type="text" class="form-control" name="prenom" required></div>
+                            <div class="mb-3"><label>Email</label><input type="email" class="form-control" name="email" required></div>
+                            <div class="mb-3">
+                                <label>Département</label>
+                                <select class="form-select" name="departement" required>
+                                    <option value="Génie Informatique">Génie Informatique</option>
+                                    <!-- autres options... -->
+                                </select>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <button type="button" class="btn btn-primary" id="btnSaveProf">Enregistrer</button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Modal Add Module -->
-    <div class="modal fade" id="addModuleModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title"><i class="fas fa-book"></i> Ajouter un Module TP</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form>
-                        <div class="mb-3">
-                            <label class="form-label">Code Module</label>
-                            <input type="text" class="form-control" placeholder="Ex: M101">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Nom du Module</label>
-                            <input type="text" class="form-control" placeholder="Ex: Programmation C">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Filière</label>
-                            <select class="form-select">
-                                <option>GI - Génie Informatique</option>
-                                <option>GE - Génie Électrique</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Semestre</label>
-                            <select class="form-select">
-                                <option>S1</option>
-                                <option>S2</option>
-                                <option>S3</option>
-                                <option>S4</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Heures TP</label>
-                            <input type="number" class="form-control" placeholder="Ex: 30">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Professeur</label>
-                            <select class="form-select">
-                                <option>Dr. Ahmed Alami</option>
-                                <option>Dr. Fatima Zahra</option>
-                            </select>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                    <button type="button" class="btn btn-primary">Enregistrer</button>
+        <!-- Modal Add Module -->
+        <div class="modal fade" id="addModuleModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Ajouter un Module TP</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="formAddModule">
+                            <div class="mb-3"><label>Nom du Module</label>
+                                <input type="text" class="form-control" name="nom_module" required></div>
+                            <div class="mb-3">
+                                <label>Filière</label>
+                                <!-- FIX: populated dynamically from DB using id_filiere -->
+                                <select class="form-select" name="id_filiere" id="selectFiliereModule" required>
+                                </select>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <button type="button" class="btn btn-primary" id="btnSaveModule">Enregistrer</button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</div>
-  
+
+        <!-- Modal Confirmation Suppression -->
+        <div class="modal fade" id="confirmDeleteModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Confirmer la suppression</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        Voulez-vous vraiment supprimer <strong id="itemName"></strong> ?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <button type="button" class="btn btn-danger" id="btnConfirmDelete">Supprimer</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Edition Filière -->
+        <div class="modal fade" id="editFiliereModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Modifier Filière</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="formEditFiliere">
+                            <input type="hidden" id="editFiliereId" name="id">
+                            <div class="mb-3"><label>Nom</label><input type="text" class="form-control" id="editNomFiliere" name="nom_filiere" required></div>
+                            <div class="mb-3"><label>Niveau</label>
+                                <select class="form-select" id="editNiveauFiliere" name="niveau" required>
+                                    <option value="DUT">DUT</option>
+                                    <option value="Bachelor">Bachelor</option>
+                                </select>
+                            </div>
+                            <div class="mb-3"><label>Nb Groupes</label><input type="number" class="form-control" id="editNbGroup" name="nb_group" min="1" required></div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <button type="button" class="btn btn-primary" id="btnSaveEditFiliere">Enregistrer</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Edition Professeur -->
+        <div class="modal fade" id="editProfModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Modifier Professeur</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="formEditProf">
+                            <input type="hidden" id="editProfId">
+                            <div class="mb-3"><label>Nom</label><input type="text" class="form-control" id="editNomProf" name="nom" required></div>
+                            <div class="mb-3"><label>Prénom</label><input type="text" class="form-control" id="editPrenomProf" name="prenom" required></div>
+                            <div class="mb-3"><label>Email</label><input type="email" class="form-control" id="editEmailProf" name="email" required></div>
+                            <div class="mb-3"><label>Département</label>
+                                <select class="form-select" id="editDeptProf" name="departement" required>
+                                    <option value="Génie Informatique">Génie Informatique</option>
+                                </select>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <button type="button" class="btn btn-primary" id="btnSaveEditProf">Enregistrer</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Edition Module -->
+        <div class="modal fade" id="editModuleModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Modifier Module TP</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="formEditModule">
+                            <input type="hidden" id="editModuleId">
+                            <div class="mb-3"><label>Nom du Module</label>
+                                <input type="text" class="form-control" id="editNomModule" name="nom_module" required></div>
+                            <div class="mb-3"><label>Filière</label>
+                                <select class="form-select" id="editFiliereModule" name="id_filiere" required>
+                                </select>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <button type="button" class="btn btn-primary" id="btnSaveEditModule">Enregistrer</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div> <!-- end container -->
 
     <footer class="text-white py-5">
         <div class="container">
@@ -455,11 +410,6 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        AOS.init({
-            duration: 800,
-            once: true
-        });
-    </script>
+    <script src="./js/ressourceAcademiques.js"></script>
 </body>
 </html>

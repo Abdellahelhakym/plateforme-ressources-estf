@@ -14,6 +14,11 @@ const loginRouter = require('./login');
 const salles = require('./salles');
 
 const materiel = require('./materiel');
+const ressource = require('./ressource');
+
+const config = require('./configurationTemporelle');
+
+const occupation = require('./occupation');
 
 
 
@@ -67,5 +72,15 @@ app.use('/Salles', salles);
 
 // Routes materiel 
 app.use('/materiel', materiel);
+
+//routes ressource 
+app.use('/ressource', ressource);
+
+//routes configTemporale
+app.use('/config', config);
+
+//routes occupation
+app.use('/occupation', occupation);
+
 
 app.listen(3000, () => console.log('Server running on http://localhost:3000'));

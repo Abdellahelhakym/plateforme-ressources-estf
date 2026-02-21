@@ -529,6 +529,27 @@ body {
     box-shadow: 0 4px 10px rgba(79, 172, 254, 0.4);
 }
 
+ .btn-reset {
+            text-decoration: none;
+            padding: 12px 23px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(26, 35, 109, 0.3);
+            transition: all 0.3s;
+            background: #e75507;
+           
+            color: white;
+            
+        }
+
+        .btn-reset:hover {
+            background: #b44307;
+            transform: translateY(-2px);
+            color: white;
+            box-shadow: 0 2px 9px #e15b135c;
+        }
+
 .btn-delete {
     background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
     color: white;
