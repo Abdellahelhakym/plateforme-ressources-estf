@@ -37,7 +37,17 @@ occupation.get('/data/salles', (req, res) => {
 });
 
 // =============================================================================
-// SALLES LIBRES pour un jour + créneau + période de semaines + année + semestre
+// SALLES LIBRES — VERSION CORRIGÉE
+//
+// Logique de chevauchement d'intervalles :
+//   Deux périodes [A,B] et [C,D] se CHEVAUCHENT si et seulement si :
+//       A <= D  ET  B >= C
+//
+//   Donc une occupation [o.sD, o.sF] chevauche la demande [sd, sf] si :
+//       o.sD <= sf  ET  o.sF >= sd
+//
+//   Une salle est LIBRE si AUCUNE occupation ne répond à cette condition
+//   pour le même jour + créneau + année + semestre.
 // =============================================================================
 occupation.get('/data/salles_libres', (req, res) => {
     const { annee, semestre, jour, creneau, sd, sf } = req.query;
@@ -46,8 +56,20 @@ occupation.get('/data/salles_libres', (req, res) => {
         return res.status(400).json({ error: "Paramètres manquants : annee, semestre, jour, creneau, sd, sf" });
     }
 
-    // On cherche les salles QUI NE SONT PAS dans occupation
-    // pour l'année + semestre + jour + créneau + une semaine comprise entre sd et sf
+    // Convertir en entiers pour éviter les comparaisons de strings
+    const sdInt = parseInt(sd, 10);
+    const sfInt = parseInt(sf, 10);
+
+    if (isNaN(sdInt) || isNaN(sfInt) || sdInt > sfInt) {
+        return res.status(400).json({ error: "sd et sf doivent être des entiers valides avec sd <= sf" });
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Requête : retourne toutes les salles qui n'ont PAS d'occupation
+    // qui chevauche [sd, sf] pour ce jour + créneau + année + semestre.
+    //
+    // Chevauchement : o.sD <= sf  AND  o.sF >= sd
+    // ─────────────────────────────────────────────────────────────────────────
     const sql = `
         SELECT s.id_salle, s.nom_salle
         FROM salles s
@@ -59,35 +81,31 @@ occupation.get('/data/salles_libres', (req, res) => {
               AND o.jour        = ?
               AND o.id_creneau  = ?
               AND o.id_salles   = s.id_salle
-              AND (
-                  -- La période demandée chevauche au moins une semaine de l'occupation
-                  (o.sD <= ? AND o.sF >= ?)   -- occupation englobe la demande
-                  OR (o.sD >= ? AND o.sD <= ?) -- occupation commence dans la période
-                  OR (o.sF >= ? AND o.sF <= ?) -- occupation finit dans la période
-                  OR (o.sD <= ? AND o.sF >= ?) -- occupation chevauche totalement
-              )
+              AND o.sD <= ?
+              AND o.sF >= ?
         )
         ORDER BY s.nom_salle
     `;
 
-    const params = [
-        annee, semestre, jour, creneau,
-        sf, sd,     // o.sD <= sf  ET  o.sF >= sd
-        sd, sf,     // o.sD entre sd et sf
-        sd, sf,     // o.sF entre sd et sf
-        sf, sd      // chevauchement total (redondant mais plus clair)
-    ];
+    // Paramètres dans l'ordre : annee, semestre, jour, creneau, sf, sd
+    const params = [annee, semestre, jour, creneau, sfInt, sdInt];
+
+    console.log(`[salles_libres] jour=${jour} creneau=${creneau} sd=${sdInt} sf=${sfInt} annee=${annee} semestre=${semestre}`);
 
     connection.query(sql, params, (err, results) => {
         if (err) {
-            console.error("Erreur salles_libres:", err);
+            console.error("[salles_libres] Erreur SQL:", err.message);
             return res.status(500).json({ error: err.message });
         }
+        console.log(`[salles_libres] → ${results.length} salle(s) libre(s) trouvée(s)`);
         res.json(results);
     });
 });
 
-// Retourne aussi nb_group pour calculer le nombre de groupes côté frontend
+// =============================================================================
+// FILIÈRES, MODULES, PROFESSEURS, SEMAINES
+// =============================================================================
+
 occupation.get('/data/filieres', (req, res) => {
     connection.query('SELECT id_filiere AS id_filier, nom_filiere, nb_group FROM filiere ORDER BY nom_filiere', (err, r) => {
         if (err) return res.status(500).json({ error: err.message });
@@ -129,10 +147,8 @@ occupation.get('/data/semaines', (req, res) => {
 // =============================================================================
 
 // POST — créer 1 occupation + lier ses semaines dans occupation_semain
-// Le frontend appelle cette route pour CHAQUE créneau rempli
-// Ex: Lundi créneau1 → 1 appel, Lundi créneau2 → 1 appel, etc.
 occupation.post('/', (req, res) => {
-     console.log("BODY REÇU :", req.body); 
+    console.log("BODY REÇU :", req.body);
     const {
         id_annee, id_semestre, id_creneau, jour,
         id_salles, id_filier, group, id_modul, id_prof,
@@ -154,7 +170,6 @@ occupation.post('/', (req, res) => {
 
             const id_occupation = result.insertId;
 
-            // Lier toutes les semaines entre sD et sF
             connection.query(
                 'SELECT id_semaine FROM semaine WHERE id_semaine >= ? AND id_semaine <= ? ORDER BY date_debut',
                 [sD, sF],
@@ -179,7 +194,7 @@ occupation.post('/', (req, res) => {
     );
 });
 
-// GET toutes les occupations (avec jointures)
+// GET toutes les occupations
 occupation.get('/', (req, res) => {
     const sql = `
         SELECT 
@@ -187,7 +202,7 @@ occupation.get('/', (req, res) => {
             a.libelle            AS annee,
             se.nom_semestre      AS semestre,
             cr.heure_debut, cr.heure_fin,
-            sa.nom_salles        AS salle,
+            sa.nom_salle         AS salle,
             f.nom_filiere        AS filiere,
             m.nom_module         AS module,
             CONCAT(p.nom, ' ', p.prenom) AS professeur,
@@ -197,12 +212,12 @@ occupation.get('/', (req, res) => {
         LEFT JOIN annee      a   ON o.id_annee    = a.id_annee
         LEFT JOIN semestre   se  ON o.id_semestre  = se.id_semestre
         LEFT JOIN creneau    cr  ON o.id_creneau   = cr.id_creneau
-        LEFT JOIN salles     sa  ON o.id_salles     = sa.id_salles
-        LEFT JOIN filiere    f   ON o.id_filier     = f.id_filiere
-        LEFT JOIN module_tp  m   ON o.id_modul      = m.id_module
-        LEFT JOIN professeur p   ON o.id_prof       = p.id_prof
-        LEFT JOIN semaine    sd  ON o.sD            = sd.id_semaine
-        LEFT JOIN semaine    sf  ON o.sF            = sf.id_semaine
+        LEFT JOIN salles     sa  ON o.id_salles    = sa.id_salle
+        LEFT JOIN filiere    f   ON o.id_filier    = f.id_filiere
+        LEFT JOIN module_tp  m   ON o.id_modul     = m.id_module
+        LEFT JOIN professeur p   ON o.id_prof      = p.id_prof
+        LEFT JOIN semaine    sd  ON o.sD           = sd.id_semaine
+        LEFT JOIN semaine    sf  ON o.sF           = sf.id_semaine
         ORDER BY FIELD(o.jour,'Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'), cr.heure_debut
     `;
     connection.query(sql, (err, results) => {
@@ -224,7 +239,7 @@ occupation.delete('/:id', (req, res) => {
     });
 });
 
-// GET filtré (pour consultation)
+// GET filtré
 occupation.get('/filter', (req, res) => {
     const { id_filier, id_semestre, id_annee } = req.query;
     const conditions = [], params = [];
@@ -238,7 +253,7 @@ occupation.get('/filter', (req, res) => {
             o.id_occupation, o.jour, o.group,
             a.libelle AS annee, se.nom_semestre AS semestre,
             cr.heure_debut, cr.heure_fin,
-            sa.nom_salles AS salle, f.nom_filiere AS filiere,
+            sa.nom_salle AS salle, f.nom_filiere AS filiere,
             m.nom_module AS module,
             CONCAT(p.nom, ' ', p.prenom) AS professeur,
             sd.nom_semaine AS semaine_debut, sf.nom_semaine AS semaine_fin
@@ -246,12 +261,12 @@ occupation.get('/filter', (req, res) => {
         LEFT JOIN annee      a   ON o.id_annee    = a.id_annee
         LEFT JOIN semestre   se  ON o.id_semestre  = se.id_semestre
         LEFT JOIN creneau    cr  ON o.id_creneau   = cr.id_creneau
-        LEFT JOIN salles     sa  ON o.id_salles     = sa.id_salles
-        LEFT JOIN filiere    f   ON o.id_filier     = f.id_filiere
-        LEFT JOIN module_tp  m   ON o.id_modul      = m.id_module
-        LEFT JOIN professeur p   ON o.id_prof       = p.id_prof
-        LEFT JOIN semaine    sd  ON o.sD            = sd.id_semaine
-        LEFT JOIN semaine    sf  ON o.sF            = sf.id_semaine
+        LEFT JOIN salles     sa  ON o.id_salles    = sa.id_salle
+        LEFT JOIN filiere    f   ON o.id_filier    = f.id_filiere
+        LEFT JOIN module_tp  m   ON o.id_modul     = m.id_module
+        LEFT JOIN professeur p   ON o.id_prof      = p.id_prof
+        LEFT JOIN semaine    sd  ON o.sD           = sd.id_semaine
+        LEFT JOIN semaine    sf  ON o.sF           = sf.id_semaine
         ${where}
         ORDER BY FIELD(o.jour,'Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'), cr.heure_debut
     `;

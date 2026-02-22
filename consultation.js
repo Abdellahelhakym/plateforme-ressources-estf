@@ -39,31 +39,41 @@ consultation.get('/data/semestres', (req, res) => {
 });
 
 // =============================================================================
+// SUPPRIMER UNE OCCUPATION  (+ ses semaines liées)
+// DELETE /consultation/occupation/:id
+// =============================================================================
+consultation.delete('/occupation/:id', (req, res) => {
+    const id = parseInt(req.params.id, 10);
+    if (isNaN(id)) return res.status(400).json({ error: 'id_occupation invalide' });
+
+    // D'abord supprimer les lignes dans occupation_semain (FK)
+    connection.query('DELETE FROM occupation_semain WHERE id_occupation = ?', [id], (err1) => {
+        if (err1) return res.status(500).json({ error: err1.message });
+
+        connection.query('DELETE FROM occupation WHERE id_occupation = ?', [id], (err2, result) => {
+            if (err2) return res.status(500).json({ error: err2.message });
+            if (result.affectedRows === 0) return res.status(404).json({ error: 'Occupation non trouvée' });
+            res.json({ success: true, id_supprime: id });
+        });
+    });
+});
+
+// =============================================================================
 // EMPLOI DU TEMPS SALLE × SEMAINE
 // GET /consultation/salle?id_salle=X&id_semaine=Y[&id_annee=Z&id_semestre=W]
-//
-// ⚠️ CORRECTION CRITIQUE :
-//   - req.query retourne toujours des STRINGS
-//   - MySQL driver retourne les IDs comme NUMBERS
-//   - parseInt() obligatoire sur tous les params avant utilisation
-//   - occupation.id_salles = FK vers salles.id_salle
 // =============================================================================
 consultation.get('/salle', (req, res) => {
-    // ── Parse TOUS les paramètres en entiers dès l'entrée ──
     const id_salle    = parseInt(req.query.id_salle,    10);
     const id_semaine  = parseInt(req.query.id_semaine,  10);
     const id_annee    = req.query.id_annee    ? parseInt(req.query.id_annee,    10) : null;
     const id_semestre = req.query.id_semestre ? parseInt(req.query.id_semestre, 10) : null;
 
     if (isNaN(id_salle) || isNaN(id_semaine)) {
-        return res.status(400).json({ error: 'id_salle et id_semaine sont obligatoires et doivent être des entiers' });
+        return res.status(400).json({ error: 'id_salle et id_semaine sont obligatoires' });
     }
-
-    console.log(`[/salle] Requête : id_salle=${id_salle} (${typeof id_salle}), id_semaine=${id_semaine} (${typeof id_semaine})`);
 
     const sqlCr = 'SELECT id_creneau, heure_debut, heure_fin FROM creneau ORDER BY heure_debut';
 
-    // MySQL reçoit des entiers → comparaison numérique garantie côté DB
     let sqlOcc = `
         SELECT o.id_occupation, o.jour, o.id_creneau, o.\`group\`,
                cr.heure_debut, cr.heure_fin,
@@ -82,7 +92,6 @@ consultation.get('/salle', (req, res) => {
         WHERE o.id_salles = ?
           AND o.sD <= ? AND o.sF >= ?
     `;
-    // Passer les entiers directement — mysql2 les envoie comme INT
     const params = [id_salle, id_semaine, id_semaine];
     if (id_annee)    { sqlOcc += ' AND o.id_annee = ?';    params.push(id_annee); }
     if (id_semestre) { sqlOcc += ' AND o.id_semestre = ?'; params.push(id_semestre); }
@@ -97,17 +106,11 @@ consultation.get('/salle', (req, res) => {
             if (errO) return res.status(500).json({ error: errO.message });
             const occ = occupations || [];
 
-            console.log(`[/salle] Résultat : ${occ.length} occupation(s) pour salle ${id_salle} semaine ${id_semaine}`);
-            if (occ.length > 0) {
-                console.log('[/salle] Exemple occupation:', JSON.stringify(occ[0]));
-            }
-
             const grille = {};
             let occupes = 0;
             JOURS.forEach(jour => {
                 grille[jour] = {};
                 creneaux.forEach(cr => {
-                    // Number() garantit la comparaison numérique même si MySQL retourne des types mixtes
                     const found = occ.find(o =>
                         o.jour === jour &&
                         Number(o.id_creneau) === Number(cr.id_creneau)
@@ -123,12 +126,7 @@ consultation.get('/salle', (req, res) => {
             res.json({
                 creneaux,
                 grille,
-                stats: {
-                    total,
-                    occupes,
-                    libres: total - occupes,
-                    taux: Math.round((occupes / total) * 100)
-                }
+                stats: { total, occupes, libres: total - occupes, taux: Math.round((occupes / total) * 100) }
             });
         });
     });
