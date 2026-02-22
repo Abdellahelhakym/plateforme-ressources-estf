@@ -22,6 +22,8 @@ const occupation = require('./occupation');
 
 const consultation = require('./consultation');
 
+const dashboard = require('./dashboard');
+
 
 
 app.use(session({
@@ -86,6 +88,9 @@ app.use('/occupation', occupation);
 
 //routes consultation
 app.use('/consultation', consultation);
+
+//routes dashboard
+app.use('/dashboard', dashboard);
 
 
 app.listen(3000, () => console.log('Server running on http://localhost:3000'));

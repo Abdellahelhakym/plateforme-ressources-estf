@@ -6,529 +6,209 @@
     <title>ESTF - Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="./css/dashboard.css">
-    <!--AOS--> 
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <!-- Chart.js -->
+    <link rel="stylesheet" href="./css/dashboard.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+   
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-lg navbar-dark">
-            <div class="container">
-                <a class="navbar-brand" href="#">
-                    <div class="estf-logo">
-                        <div class="estf-img"></div>
-                        <div class="estf-text">
-                            <div class="estf-text-ar">المدرسة العليا للتكنولوجيا</div>
-                            <div class="estf-text-fr">ECOLE SUPERIEURE DE TECHNOLOGIE</div>
-                        </div>
-                    </div>
-                </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav ms-auto">
-                        <li class="nav-item">
-                            <a class="nav-link" href="accueil.html">
-                                <i class="fas fa-home"></i> Accueil
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link active" href="dashboard.html">
-                                <i class="fa-solid fa-gauge"></i> Dashboard
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="./ressource.html">
-                                <i class="fas fa-database"></i> Ressource
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/private/occupation.html">
-                                <i class="fas fa-calendar-alt"></i> Occupation
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="consultation.html">
-                                <i class="fas fa-search"></i> Consultation
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-                
-                <div class="admin-indicator">
-                    <div class="admin-info">
-                        <i class="fas fa-user-shield admin-icon"></i>
-                        <span class="admin-text">Mode Admin</span>
-                    </div>
-                    <div class="admin-dropdown">
-                        <a href="/logout" class="logout-btn">
-                            <i class="fas fa-sign-out-alt"></i>
-                            Déconnexion
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </nav>
-    </header>
 
-    <!-- Main Content -->
-    <div class="container">
-        <!-- Header Banner -->
-        <div class="header-banner">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <h2>
-                        <i class="fas fa-chart-line"></i>
-                        Tableau de Bord
-                    </h2>
-                    <p>Vue d'ensemble des ressources et occupations </p>
-                </div>
-                
-            </div>
-        </div>
-
-        <!-- Statistics Cards -->
-        <div class="row mb-4">
-            <!-- Total Salles -->
-            <div class="col-lg-3 col-md-6 mb-3" data-aos="fade-up" data-aos-delay="100">
-                <div class="stat-card salles-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-door-open"></i>
-                    </div>
-                    <div class="stat-info">
-                        <h3>25</h3>
-                        <p>Salles Total</p>
-                        <span class="stat-detail">
-                            15 TP Info + 5 Amphi + 5 Cours
-                        </span>
+<!-- NAVBAR -->
+<header>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <div class="estf-logo">
+                    <div class="estf-img"></div>
+                    <div class="estf-text">
+                        <div class="estf-text-ar">المدرسة العليا للتكنولوجيا</div>
+                        <div class="estf-text-fr">ECOLE SUPERIEURE DE TECHNOLOGIE</div>
                     </div>
                 </div>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="accueil.html"><i class="fas fa-home"></i> Accueil</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="dashboard.html"><i class="fa-solid fa-gauge"></i> Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link" href="./ressource.html"><i class="fas fa-database"></i> Ressource</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/private/occupation.html"><i class="fas fa-calendar-alt"></i> Occupation</a></li>
+                    <li class="nav-item"><a class="nav-link" href="consultation.html"><i class="fas fa-search"></i> Consultation</a></li>
+                </ul>
             </div>
-
-            <!-- Total Matériel -->
-            <div class="col-lg-3 col-md-6 mb-3" data-aos="fade-up" data-aos-delay="150">
-                <div class="stat-card material-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-laptop"></i>
-                    </div>
-                    <div class="stat-info">
-                        <h3>450</h3>
-                        <p>Matériel Total</p>
-                        <span class="stat-detail">
-                            400 Postes + 50 Équipements
-                        </span>
-                    </div>
+            <div class="admin-indicator">
+                <div class="admin-info">
+                    <i class="fas fa-user-shield admin-icon"></i>
+                    <span class="admin-text">Mode Admin</span>
                 </div>
-            </div>
-
-            <!-- Total Filières -->
-            <div class="col-lg-3 col-md-6 mb-3" data-aos="fade-up" data-aos-delay="200">
-                <div class="stat-card filiere-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-graduation-cap"></i>
-                    </div>
-                    <div class="stat-info">
-                        <h3>8</h3>
-                        <p>Filières Total</p>
-                        <span class="stat-detail">
-                            DUT + Licence + Master
-                        </span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Salles Occupées -->
-            <div class="col-lg-3 col-md-6 mb-3" data-aos="fade-up" data-aos-delay="250">
-                <div class="stat-card occupied-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-door-closed"></i>
-                    </div>
-                    <div class="stat-info">
-                        <h3>18</h3>
-                        <p>Salles Occupées</p>
-                        <span class="stat-detail occupied-text">
-                            <i class="fas fa-circle"></i> En cours d'utilisation
-                        </span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Salles Libres -->
-            <div class="col-lg-3 col-md-6 mb-3" data-aos="fade-up" data-aos-delay="300">
-                <div class="stat-card free-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-door-open"></i>
-                    </div>
-                    <div class="stat-info">
-                        <h3>7</h3>
-                        <p>Salles Libres</p>
-                        <span class="stat-detail free-text">
-                            <i class="fas fa-circle"></i> Disponibles maintenant
-                        </span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Taux d'Occupation Global -->
-            <div class="col-lg-3 col-md-6 mb-3" data-aos="fade-up" data-aos-delay="350">
-                <div class="stat-card rate-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-percentage"></i>
-                    </div>
-                    <div class="stat-info">
-                        <h3>72%</h3>
-                        <p>Taux d'Occupation</p>
-                        <span class="stat-detail">
-                            En temps réel
-                        </span>
-                    </div>
+                <div class="admin-dropdown">
+                    <a href="/logout" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Déconnexion</a>
                 </div>
             </div>
         </div>
+    </nav>
+</header>
 
-        <!-- Occupation Stats -->
-        <div class="row mb-4">
-            <div class="col-lg-8 mb-3" data-aos="fade-up">
-                <div class="chart-container">
-                    <div class="chart-header">
-                        <h4><i class="fas fa-chart-bar"></i> Taux d'Occupation des Salles par Jour</h4>
-                        <div class="chart-filters">
-                            <select class="form-select form-select-sm" id="weekFilter">
-                                <option>Semaine Actuelle</option>
-                                <option>Semaine 1</option>
-                                <option>Semaine 2</option>
-                                <option>Semaine 3</option>
-                            </select>
-                        </div>
-                    </div>
-                    <canvas id="occupationChart"></canvas>
-                </div>
-            </div>
+<div class="container">
 
-            <div class="col-lg-4 mb-3" data-aos="fade-up" data-aos-delay="100">
-                <div class="chart-container">
-                    <div class="chart-header">
-                        <h4><i class="fas fa-chart-pie"></i> Répartition Salles</h4>
-                    </div>
-                    <canvas id="sallesTypeChart"></canvas>
-                    <div class="chart-legend">
-                        <div class="legend-item">
-                            <span class="legend-color" style="background: #667eea;"></span>
-                            <span>TP Informatique (15)</span>
-                        </div>
-                        <div class="legend-item">
-                            <span class="legend-color" style="background: #43e97b;"></span>
-                            <span>Amphithéâtres (5)</span>
-                        </div>
-                        <div class="legend-item">
-                            <span class="legend-color" style="background: #fa709a;"></span>
-                            <span>Salles Cours (5)</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <!-- PAGE HEADER -->
+    <div class="page-header" data-aos="fade-down">
+        <div>
+            <h1><i class="fas fa-gauge me-2"></i> Tableau de Bord</h1>
+            <p id="currentDate">Chargement de la date...</p>
         </div>
-
-        <!-- Occupation en temps réel -->
-        <div class="row mb-4">
-            <div class="col-12" data-aos="fade-up">
-                <div class="realtime-container">
-                    <div class="realtime-header">
-                        <h4><i class="fas fa-clock"></i> Occupation en Temps Réel - Créneaux d'Aujourd'hui</h4>
-                        <span class="live-indicator">
-                            <span class="pulse"></span>
-                            En direct
-                        </span>
-                    </div>
-                    <div class="row">
-                        <!-- Créneau 1 -->
-                        <div class="col-lg-3 col-md-6 mb-3">
-                            <div class="creneau-card occupied">
-                                <div class="creneau-time">
-                                    <i class="fas fa-clock"></i>
-                                    08:00 - 10:00
-                                </div>
-                                <div class="creneau-info">
-                                    <h5>Créneau 1</h5>
-                                    <div class="occupation-rate">
-                                        <div class="progress">
-                                            <div class="progress-bar bg-danger" style="width: 85%"></div>
-                                        </div>
-                                        <span>85% Occupé (21/25 salles)</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Créneau 2 -->
-                        <div class="col-lg-3 col-md-6 mb-3">
-                            <div class="creneau-card occupied">
-                                <div class="creneau-time">
-                                    <i class="fas fa-clock"></i>
-                                    10:00 - 12:00
-                                </div>
-                                <div class="creneau-info">
-                                    <h5>Créneau 2</h5>
-                                    <div class="occupation-rate">
-                                        <div class="progress">
-                                            <div class="progress-bar bg-warning" style="width: 72%"></div>
-                                        </div>
-                                        <span>72% Occupé (18/25 salles)</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Créneau 3 -->
-                        <div class="col-lg-3 col-md-6 mb-3">
-                            <div class="creneau-card available">
-                                <div class="creneau-time">
-                                    <i class="fas fa-clock"></i>
-                                    14:00 - 16:00
-                                </div>
-                                <div class="creneau-info">
-                                    <h5>Créneau 3</h5>
-                                    <div class="occupation-rate">
-                                        <div class="progress">
-                                            <div class="progress-bar bg-success" style="width: 48%"></div>
-                                        </div>
-                                        <span>48% Occupé (12/25 salles)</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Créneau 4 -->
-                        <div class="col-lg-3 col-md-6 mb-3">
-                            <div class="creneau-card available">
-                                <div class="creneau-time">
-                                    <i class="fas fa-clock"></i>
-                                    16:00 - 18:00
-                                </div>
-                                <div class="creneau-info">
-                                    <h5>Créneau 4</h5>
-                                    <div class="occupation-rate">
-                                        <div class="progress">
-                                            <div class="progress-bar bg-success" style="width: 36%"></div>
-                                        </div>
-                                        <span>36% Occupé (9/25 salles)</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div class="d-flex align-items-center gap-3 flex-wrap">
+            <div class="live-badge"><div class="live-dot"></div> TEMPS RÉEL</div>
+            <button class="btn-refresh" onclick="loadAll()">
+                <i class="fas fa-sync-alt me-1"></i> Actualiser
+            </button>
         </div>
-
-        <!-- Weekly Overview -->
-        <div class="row mb-4">
-            <div class="col-12" data-aos="fade-up">
-                <div class="chart-container">
-                    <div class="chart-header">
-                        <h4><i class="fas fa-calendar-week"></i> Vue Hebdomadaire des Occupations</h4>
-                    </div>
-                    <canvas id="weeklyChart"></canvas>
-                </div>
-            </div>
-        </div>
-
     </div>
 
-    <footer class="text-white py-5">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-4 mb-4">
-                    <h5 class="text-light"><i class="fas fa-info-circle"></i> À Propos</h5>
-                    <p>Le Département Génie Informatique de l'ESTF offre une formation de qualité en informatique et technologies de l'information.</p>
+    <!-- KPI CARDS -->
+    <div class="row g-3 mb-4" id="kpiRow" data-aos="fade-up">
+        <!-- filled by JS, skeleton par défaut -->
+        <div class="col-lg-2 col-md-4 col-6"><div class="kpi-card kpi-blue" style="min-height:90px"><div class="skeleton" style="height:100%;border-radius:12px;width:100%"></div></div></div>
+        <div class="col-lg-2 col-md-4 col-6"><div class="kpi-card kpi-cyan"   style="min-height:90px"><div class="skeleton" style="height:100%;border-radius:12px;width:100%"></div></div></div>
+        <div class="col-lg-2 col-md-4 col-6"><div class="kpi-card kpi-green"  style="min-height:90px"><div class="skeleton" style="height:100%;border-radius:12px;width:100%"></div></div></div>
+        <div class="col-lg-2 col-md-4 col-6"><div class="kpi-card kpi-amber"  style="min-height:90px"><div class="skeleton" style="height:100%;border-radius:12px;width:100%"></div></div></div>
+        <div class="col-lg-2 col-md-4 col-6"><div class="kpi-card kpi-red"    style="min-height:90px"><div class="skeleton" style="height:100%;border-radius:12px;width:100%"></div></div></div>
+        <div class="col-lg-2 col-md-4 col-6"><div class="kpi-card kpi-purple" style="min-height:90px"><div class="skeleton" style="height:100%;border-radius:12px;width:100%"></div></div></div>
+    </div>
+
+    <!-- ROW 1 : Occupation par Jour + Par Filière -->
+    <div class="row g-3 mb-3">
+        <div class="col-lg-8" data-aos="fade-up">
+            <div class="chart-card h-100">
+                <div class="chart-card-header">
+                    <div class="chart-card-title"><i class="fas fa-chart-bar"></i> Occupations par Jour</div>
+                    <span class="chart-card-subtitle">Toutes semaines confondues</span>
                 </div>
-                <div class="col-md-4 mb-4">
-                    <h5 class="text-light"><i class="fas fa-envelope"></i> Contact</h5>
-                    <p>
-                        <i class="fas fa-map-marker-alt"></i> BP 2427 Route d'Imouzzer, 30000 Fès<br>
-                        <i class="fas fa-phone"></i> (+212) 6 66 21 46 30<br>
-                        <i class="fas fa-at"></i> support.est@usmba.ac.ma
-                    </p>
-                </div>
-                <div class="col-md-4 mb-4">
-                    <h5 class="text-light"><i class="fas fa-link"></i> Liens Utiles</h5>
-                    <ul class="list-unstyled">
-                        <li><a href="https://www.est-usmba.ac.ma/" class="text-white"><i class="fas fa-globe"></i> Site ESTF</a></li>
-                        <li><a href="https://www.facebook.com/est.fes01" class="text-white"><i class="fab fa-facebook"></i> Facebook</a></li>
-                        <li><a href="https://www.instagram.com/est.fes.usmba/" class="text-white"><i class="fab fa-instagram"></i> Instagram</a></li>
-                    </ul>
+                <div class="chart-card-body">
+                    <div class="chart-wrap"><canvas id="chartJour"></canvas></div>
                 </div>
             </div>
-            <hr class="bg-white">
-            <p class="text-center mb-0">
-                <i class="fas fa-copyright"></i> 2025 Département Génie Informatique - ESTF. Tous droits réservés.
-            </p>
         </div>
-    </footer>
+        <div class="col-lg-4" data-aos="fade-up" data-aos-delay="100">
+            <div class="chart-card h-100">
+                <div class="chart-card-header">
+                    <div class="chart-card-title"><i class="fas fa-chart-pie"></i> Répartition par Filière</div>
+                </div>
+                <div class="chart-card-body">
+                    <div class="chart-wrap"><canvas id="chartFiliere"></canvas></div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        AOS.init({
-            duration: 800,
-            once: true
-        });
+    <!-- ROW 2 : Évolution par Semaine + Créneaux -->
+    <div class="row g-3 mb-3">
+        <div class="col-lg-8" data-aos="fade-up">
+            <div class="chart-card h-100">
+                <div class="chart-card-header">
+                    <div class="chart-card-title"><i class="fas fa-chart-line"></i> Évolution par Semaine</div>
+                </div>
+                <div class="chart-card-body">
+                    <div class="chart-wrap"><canvas id="chartSemaine"></canvas></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4" data-aos="fade-up" data-aos-delay="100">
+            <div class="chart-card h-100">
+                <div class="chart-card-header">
+                    <div class="chart-card-title"><i class="fas fa-clock"></i> Charge par Créneau</div>
+                </div>
+                <div class="chart-card-body" id="creneauxBody">
+                    <div class="skeleton" style="height:210px"></div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-        // Display current date
-        const dateElement = document.getElementById('currentDate');
-        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-        dateElement.textContent = new Date().toLocaleDateString('fr-FR', options);
+    <!-- ROW 3 : Top Salles + Top Profs -->
+    <div class="row g-3 mb-3">
+        <div class="col-lg-6" data-aos="fade-up">
+            <div class="chart-card h-100">
+                <div class="chart-card-header">
+                    <div class="chart-card-title"><i class="fas fa-door-open"></i> Top 10 Salles Utilisées</div>
+                </div>
+                <div class="chart-card-body" id="topSallesBody">
+                    <div class="skeleton" style="height:230px"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6" data-aos="fade-up" data-aos-delay="100">
+            <div class="chart-card h-100">
+                <div class="chart-card-header">
+                    <div class="chart-card-title"><i class="fas fa-chalkboard-teacher"></i> Top Professeurs</div>
+                </div>
+                <div class="chart-card-body" id="topProfsBody">
+                    <div class="skeleton" style="height:230px"></div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-        // Occupation Chart by Day
-        const ctx1 = document.getElementById('occupationChart').getContext('2d');
-        const occupationChart = new Chart(ctx1, {
-            type: 'bar',
-            data: {
-                labels: ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi'],
-                datasets: [{
-                    label: 'Taux d\'Occupation (%)',
-                    data: [85, 78, 92, 88, 65],
-                    backgroundColor: [
-                        'rgba(102, 126, 234, 0.8)',
-                        'rgba(240, 147, 251, 0.8)',
-                        'rgba(79, 172, 254, 0.8)',
-                        'rgba(67, 233, 123, 0.8)',
-                        'rgba(250, 112, 154, 0.8)'
-                    ],
-                    borderColor: [
-                        'rgb(102, 126, 234)',
-                        'rgb(240, 147, 251)',
-                        'rgb(79, 172, 254)',
-                        'rgb(67, 233, 123)',
-                        'rgb(250, 112, 154)'
-                    ],
-                    borderWidth: 2,
-                    borderRadius: 8
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                plugins: {
-                    legend: {
-                        display: false
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        max: 100,
-                        ticks: {
-                            callback: function(value) {
-                                return value + '%';
-                            }
-                        }
-                    }
-                }
-            }
-        });
+    <!-- ROW 4 : Activité Récente -->
+    <div class="chart-card mb-4" data-aos="fade-up">
+        <div class="chart-card-header">
+            <div class="chart-card-title"><i class="fas fa-history"></i> Dernières Occupations Créées</div>
+            <span class="chart-card-subtitle">8 plus récentes</span>
+        </div>
+        <div style="overflow-x:auto">
+            <table class="recent-table">
+                <thead>
+                    <tr>
+                        <th>Jour</th><th>Créneau</th><th>Salle</th>
+                        <th>Module</th><th>Filière · Gr.</th>
+                        <th>Professeur</th><th>Semaines</th><th>Créé le</th>
+                    </tr>
+                </thead>
+                <tbody id="recentBody">
+                    <tr><td colspan="8" style="text-align:center;padding:2rem;color:#9ca3af">
+                        <i class="fas fa-spinner fa-spin me-2"></i>Chargement...
+                    </td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 
-        // Salles Type Chart (Pie)
-        const ctx2 = document.getElementById('sallesTypeChart').getContext('2d');
-        const sallesTypeChart = new Chart(ctx2, {
-            type: 'doughnut',
-            data: {
-                labels: ['TP Informatique', 'Amphithéâtres', 'Salles Cours'],
-                datasets: [{
-                    data: [15, 5, 5],
-                    backgroundColor: [
-                        'rgba(102, 126, 234, 0.8)',
-                        'rgba(67, 233, 123, 0.8)',
-                        'rgba(250, 112, 154, 0.8)'
-                    ],
-                    borderColor: [
-                        'rgb(102, 126, 234)',
-                        'rgb(67, 233, 123)',
-                        'rgb(250, 112, 154)'
-                    ],
-                    borderWidth: 2
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                plugins: {
-                    legend: {
-                        display: false
-                    }
-                }
-            }
-        });
+</div><!-- /container -->
 
-        // Weekly Overview Chart
-        const ctx3 = document.getElementById('weeklyChart').getContext('2d');
-        const weeklyChart = new Chart(ctx3, {
-            type: 'line',
-            data: {
-                labels: ['08:00-10:00', '10:00-12:00', '14:00-16:00', '16:00-18:00'],
-                datasets: [
-                    {
-                        label: 'Lundi',
-                        data: [85, 88, 75, 60],
-                        borderColor: 'rgb(102, 126, 234)',
-                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
-                        tension: 0.4
-                    },
-                    {
-                        label: 'Mardi',
-                        data: [78, 82, 70, 55],
-                        borderColor: 'rgb(240, 147, 251)',
-                        backgroundColor: 'rgba(240, 147, 251, 0.1)',
-                        tension: 0.4
-                    },
-                    {
-                        label: 'Mercredi',
-                        data: [92, 90, 85, 70],
-                        borderColor: 'rgb(79, 172, 254)',
-                        backgroundColor: 'rgba(79, 172, 254, 0.1)',
-                        tension: 0.4
-                    },
-                    {
-                        label: 'Jeudi',
-                        data: [88, 85, 80, 65],
-                        borderColor: 'rgb(67, 233, 123)',
-                        backgroundColor: 'rgba(67, 233, 123, 0.1)',
-                        tension: 0.4
-                    },
-                    {
-                        label: 'Vendredi',
-                        data: [65, 70, 60, 45],
-                        borderColor: 'rgb(250, 112, 154)',
-                        backgroundColor: 'rgba(250, 112, 154, 0.1)',
-                        tension: 0.4
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                plugins: {
-                    legend: {
-                        position: 'top',
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        max: 100,
-                        ticks: {
-                            callback: function(value) {
-                                return value + '%';
-                            }
-                        }
-                    }
-                }
-            }
-        });
-    </script>
+<!-- FOOTER -->
+<footer class="text-white py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <h5 class="text-light"><i class="fas fa-info-circle"></i> À Propos</h5>
+                <p>Le Département Génie Informatique de l'ESTF offre une formation de qualité en informatique et technologies de l'information.</p>
+            </div>
+            <div class="col-md-4 mb-4">
+                <h5 class="text-light"><i class="fas fa-envelope"></i> Contact</h5>
+                <p>
+                    <i class="fas fa-map-marker-alt"></i> BP 2427 Route d'Imouzzer, 30000 Fès<br>
+                    <i class="fas fa-phone"></i> (+212) 6 66 21 46 30<br>
+                    <i class="fas fa-at"></i> support.est@usmba.ac.ma
+                </p>
+            </div>
+            <div class="col-md-4 mb-4">
+                <h5 class="text-light"><i class="fas fa-link"></i> Liens Utiles</h5>
+                <ul class="list-unstyled">
+                    <li><a href="https://www.est-usmba.ac.ma/" class="text-white"><i class="fas fa-globe"></i> Site ESTF</a></li>
+                    <li><a href="https://www.facebook.com/est.fes01" class="text-white"><i class="fab fa-facebook"></i> Facebook</a></li>
+                    <li><a href="https://www.instagram.com/est.fes.usmba/" class="text-white"><i class="fab fa-instagram"></i> Instagram</a></li>
+                </ul>
+            </div>
+        </div>
+        <hr class="bg-white">
+        <p class="text-center mb-0"><i class="fas fa-copyright"></i> 2025 Département Génie Informatique - ESTF. Tous droits réservés.</p>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script src="./js/dashboard.js"></script>
 </body>
 </html>

@@ -243,7 +243,7 @@
 
         alert(`${succes} créneau(x) enregistré(s) – ${echecs} échec(s)`);
 
-        if (echec === 0) {
+        if (echecs === 0) {
             // Reset formulaire si tout est OK
             document.querySelectorAll('.time-slot select').forEach(s => s.selectedIndex = 0);
         }
