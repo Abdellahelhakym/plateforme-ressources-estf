@@ -20,6 +20,8 @@ const config = require('./configurationTemporelle');
 
 const occupation = require('./occupation');
 
+const consultation = require('./consultation');
+
 
 
 app.use(session({
@@ -81,6 +83,9 @@ app.use('/config', config);
 
 //routes occupation
 app.use('/occupation', occupation);
+
+//routes consultation
+app.use('/consultation', consultation);
 
 
 app.listen(3000, () => console.log('Server running on http://localhost:3000'));

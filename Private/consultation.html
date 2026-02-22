@@ -3,545 +3,573 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ESTF - Consultation des Occupations</title>
+    <title>ESTF - Consultation des Salles</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="./css/consultation.css">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <style>
+        :root {
+            --primary: linear-gradient(135deg, #1a236d 0%, #2c75bd 100%);
+        }
+        body { background: #f0f4f8; font-family: 'Segoe UI', sans-serif; }
+
+        /* NAVBAR */
+        .navbar { background: var(--primary) !important; box-shadow: 0 4px 12px rgba(0,0,0,.15); padding:.4rem 0; }
+        .nav-link { font-weight:500; margin:0 5px; transition:.3s; position:relative; }
+        .nav-link::after { content:''; position:absolute; bottom:0; left:50%; width:0; height:2px; background:#fff; transition:.3s; transform:translateX(-50%); }
+        .nav-link:hover::after,.nav-link.active::after { width:80%; }
+        .estf-logo { display:flex; align-items:center; gap:15px; }
+        .estf-img  { border-radius:3px; height:9vh; width:15vh; background:url(./../img/estf.png) center/cover; }
+        .estf-text { display:flex; flex-direction:column; }
+        .estf-text-fr,.estf-text-ar { font-size:.9rem; font-weight:600; }
+        .admin-indicator { position:relative; display:flex; align-items:center; margin-left:20px; cursor:pointer; padding:8px 15px; border-radius:6px; background:rgba(255,255,255,.1); transition:.3s; }
+        .admin-indicator:hover { background:rgba(255,255,255,.2); }
+        .admin-info { display:flex; align-items:center; gap:8px; color:#fff; }
+        .admin-icon { font-size:1.2rem; }
+        .admin-text { font-weight:500; font-size:.9rem; }
+        .admin-dropdown { position:absolute; top:100%; right:0; background:#fff; border-radius:8px; padding:10px 0; min-width:180px; box-shadow:0 8px 25px rgba(0,0,0,.2); opacity:0; visibility:hidden; transform:translateY(10px); transition:.3s; z-index:1000; }
+        .admin-indicator:hover .admin-dropdown { opacity:1; visibility:visible; transform:translateY(0); }
+        .logout-btn { display:flex; align-items:center; gap:10px; padding:12px 20px; color:#333; text-decoration:none; font-weight:500; }
+        .logout-btn:hover { background:#f8f9fa; color:#d32f2f; padding-left:25px; }
+        .logout-btn i { color:#d32f2f; }
+
+        /* PAGE */
+        .page-header { background:var(--primary); color:#fff; border-radius:20px; padding:2rem; margin:2rem 0 1.5rem; box-shadow:0 8px 25px rgba(26,35,109,.3); }
+        .page-header h1 { font-size:1.8rem; font-weight:700; margin:0 0 .3rem; }
+
+        /* MODE TABS */
+        .mode-tabs { display:flex; gap:12px; margin-bottom:1.5rem; }
+        .mode-btn { flex:1; padding:.75rem; border:2px solid #e0e0e0; background:#fff; border-radius:12px; font-weight:600; font-size:.9rem; cursor:pointer; transition:.3s; display:flex; align-items:center; justify-content:center; gap:8px; }
+        .mode-btn.active { background:linear-gradient(135deg,#1a236d,#2c75bd) !important; border-color:transparent; color:#fff; box-shadow:0 4px 15px rgba(26,35,109,.3); }
+        .mode-btn:not(.active):hover { border-color:#2c75bd; color:#2c75bd; }
+
+        /* FILTERS */
+        .filters-card { background:#fff; border-radius:16px; padding:1.5rem; box-shadow:0 4px 15px rgba(0,0,0,.08); margin-bottom:1.5rem; }
+        .filter-label { font-weight:600; color:#1a236d; font-size:.88rem; display:flex; align-items:center; gap:6px; margin-bottom:.4rem; }
+        .form-select { border-radius:10px; border:2px solid #e0e0e0; transition:.3s; }
+        .form-select:focus { border-color:#2c75bd; box-shadow:0 0 0 .2rem rgba(44,117,189,.2); }
+        .btn-search { background:linear-gradient(135deg,#1a236d,#2c75bd) !important; color:#fff; border:none; padding:.7rem 2rem; border-radius:12px; font-weight:700; cursor:pointer; transition:.3s; width:100%; }
+        .btn-search:hover { box-shadow:0 4px 15px rgba(26,35,109,.4); transform:translateY(-2px); }
+
+        /* STATS */
+        .stats-row { display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; margin-bottom:1.5rem; }
+        .stat-card { background:#fff; border-radius:14px; padding:1.2rem 1.5rem; display:flex; align-items:center; gap:1rem; box-shadow:0 3px 10px rgba(0,0,0,.08); }
+        .stat-icon { width:50px; height:50px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:1.3rem; color:#fff; flex-shrink:0; }
+        .stat-total   .stat-icon { background:linear-gradient(135deg,#1a236d,#2c75bd); }
+        .stat-occupee .stat-icon { background:linear-gradient(135deg,#ef4444,#f97316); }
+        .stat-libre   .stat-icon { background:linear-gradient(135deg,#22c55e,#16a34a); }
+        .stat-taux    .stat-icon { background:linear-gradient(135deg,#a855f7,#7c3aed); }
+        .stat-info h3 { font-size:1.6rem; font-weight:700; margin:0; color:#1a236d; }
+        .stat-info p  { margin:0; font-size:.82rem; color:#6b7280; }
+
+        /* GRILLE */
+        .schedule-card { background:#fff; border-radius:16px; overflow:hidden; box-shadow:0 4px 15px rgba(0,0,0,.08); margin-bottom:1.5rem; }
+        .schedule-card-header { background:linear-gradient(135deg,#1a236d,#2c75bd); color:#fff; padding:1rem 1.5rem; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:.5rem; }
+        .schedule-card-header h5 { margin:0; font-weight:700; font-size:1.05rem; }
+        .grille-table { width:100%; border-collapse:separate; border-spacing:4px; padding:1rem; }
+        .grille-table th { background:#f8f9fa; color:#1a236d; font-weight:700; font-size:.78rem; text-align:center; padding:.5rem .3rem; border-radius:8px; white-space:nowrap; }
+        .grille-table td { border-radius:8px; padding:.5rem .3rem; font-size:.75rem; text-align:center; vertical-align:middle; transition:.2s; min-width:85px; }
+        .cell-libre   { background:#dcfce7; color:#166534; border:1.5px solid #bbf7d0; }
+        .cell-occupee { background:#fee2e2; color:#991b1b; border:1.5px solid #fecaca; }
+        .cell-libre:hover   { background:#bbf7d0; }
+        .cell-occupee:hover { background:#fecaca; }
+        .cell-heure { font-weight:600; background:#f1f5f9; color:#475569; border-radius:8px; padding:.5rem; font-size:.75rem; white-space:nowrap; }
+        .badge-libre   { display:inline-block; background:#22c55e; color:#fff; border-radius:20px; padding:2px 8px; font-size:.68rem; font-weight:700; }
+        .badge-occupee { display:inline-block; background:#ef4444; color:#fff; border-radius:20px; padding:2px 8px; font-size:.68rem; font-weight:700; }
+        .occ-detail { font-size:.68rem; color:#6b7280; margin-top:3px; line-height:1.4; }
+
+        /* VIEW FILTER BUTTONS */
+        .view-btns { display:flex; gap:6px; flex-wrap:wrap; }
+        .view-btn { padding:4px 12px; border-radius:20px; font-size:.75rem; font-weight:600; border:none; cursor:pointer; transition:.2s; }
+        .view-btn-all { background:#e0e7ff; color:#1a236d; }
+        .view-btn-lib { background:#dcfce7; color:#166534; }
+        .view-btn-occ { background:#fee2e2; color:#991b1b; }
+        .view-btn.active { box-shadow:0 2px 8px rgba(0,0,0,.25); transform:translateY(-1px); }
+
+        /* ACCORDION DETAIL */
+        .sem-accordion { margin-bottom:1rem; border-radius:14px; overflow:hidden; box-shadow:0 3px 10px rgba(0,0,0,.07); }
+        .sem-acc-header { background:#fff; padding:1rem 1.5rem; display:flex; align-items:center; justify-content:space-between; cursor:pointer; border-bottom:2px solid #f0f4f8; transition:.2s; user-select:none; }
+        .sem-acc-header:hover { background:#f8faff; }
+        .sem-title { font-weight:700; color:#1a236d; display:flex; align-items:center; gap:10px; }
+        .sem-dates { font-size:.78rem; color:#6b7280; margin-top:2px; }
+        .sem-taux  { font-size:.85rem; font-weight:700; }
+        .sem-acc-body { background:#fff; display:none; overflow-x:auto; }
+        .sem-acc-body.open { display:block; }
+        .taux-bar { height:6px; border-radius:3px; background:#e5e7eb; margin-top:6px; width:180px; }
+        .taux-bar-fill { height:100%; border-radius:3px; }
+
+        /* LEGENDE */
+        .legend-card { background:#fff; border-radius:14px; padding:1rem 1.5rem; box-shadow:0 3px 10px rgba(0,0,0,.07); margin-bottom:2rem; display:flex; align-items:center; gap:2rem; flex-wrap:wrap; }
+        .legend-item { display:flex; align-items:center; gap:8px; font-size:.85rem; font-weight:500; }
+        .ldot { width:14px; height:14px; border-radius:50%; flex-shrink:0; }
+
+        /* EMPTY */
+        .empty-state { text-align:center; padding:3rem; color:#9ca3af; }
+        .empty-state i { font-size:3rem; margin-bottom:1rem; display:block; opacity:.4; }
+
+        /* FOOTER */
+        footer { background:linear-gradient(135deg,#1a236d,#2c75bd) !important; }
+        footer h5 { font-weight:700; margin-bottom:1rem; padding-bottom:.5rem; position:relative; }
+        footer h5::after { content:''; position:absolute; bottom:0; left:0; width:50px; height:3px; background:#fff; }
+        footer a { text-decoration:none; transition:.3s; }
+        footer a:hover { opacity:.8; padding-left:5px; }
+
+        @media(max-width:768px) {
+            .stats-row { grid-template-columns:repeat(2,1fr); }
+            .mode-tabs  { flex-direction:column; }
+            .grille-table { font-size:.68rem; }
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-lg navbar-dark">
-            <div class="container">
-                <a class="navbar-brand" href="#">
-                    <div class="estf-logo">
-                        <div class="estf-img"></div>
-                        <div class="estf-text">
-                            <div class="estf-text-ar">المدرسة العليا للتكنولوجيا</div>
-                            <div class="estf-text-fr">ECOLE SUPERIEURE DE TECHNOLOGIE</div>
-                        </div>
+
+<!-- NAVBAR -->
+<header>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <div class="estf-logo">
+                    <div class="estf-img"></div>
+                    <div class="estf-text">
+                        <div class="estf-text-ar">المدرسة العليا للتكنولوجيا</div>
+                        <div class="estf-text-fr">ECOLE SUPERIEURE DE TECHNOLOGIE</div>
                     </div>
-                </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                    <span class="navbar-toggler-icon"></span>
+                </div>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="accueil.html"><i class="fas fa-home"></i> Accueil</a></li>
+                    <li class="nav-item"><a class="nav-link" href="dashboard.html"><i class="fa-solid fa-gauge"></i> Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link" href="./ressource.html"><i class="fas fa-database"></i> Ressource</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/private/occupation.html"><i class="fas fa-calendar-alt"></i> Occupation</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="consultation.html"><i class="fas fa-search"></i> Consultation</a></li>
+                </ul>
+            </div>
+            <div class="admin-indicator">
+                <div class="admin-info">
+                    <i class="fas fa-user-shield admin-icon"></i>
+                    <span class="admin-text">Mode Admin</span>
+                </div>
+                <div class="admin-dropdown">
+                    <a href="/logout" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Déconnexion</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+</header>
+
+<!-- CONTENU -->
+<div class="container">
+
+    <div class="page-header" data-aos="fade-down">
+        <h1><i class="fas fa-search"></i> Consultation des Salles</h1>
+        <p>Visualisez l'emploi du temps d'une salle — créneaux libres et occupés</p>
+    </div>
+
+    <!-- MODE -->
+    <div class="mode-tabs" data-aos="fade-up">
+        <button class="mode-btn active" id="modeSemaine" onclick="setMode('semaine')">
+            <i class="fas fa-calendar-week"></i> Par Semaine
+        </button>
+        <button class="mode-btn" id="modeDetail" onclick="setMode('detail')">
+            <i class="fas fa-list-alt"></i> Détail Complet (toutes semaines)
+        </button>
+    </div>
+
+    <!-- FILTRES -->
+    <div class="filters-card" data-aos="fade-up">
+        <div class="row g-3 align-items-end">
+            <div class="col-md-3">
+                <label class="filter-label"><i class="fas fa-calendar-alt"></i> Année Univ.</label>
+                <select class="form-select" id="filtAnnee"><option value="">-- Toutes --</option></select>
+            </div>
+            <div class="col-md-2">
+                <label class="filter-label"><i class="fas fa-calendar-check"></i> Semestre</label>
+                <select class="form-select" id="filtSemestre"><option value="">-- Tous --</option></select>
+            </div>
+            <div class="col-md-3">
+                <label class="filter-label"><i class="fas fa-door-open"></i> Salle <span style="color:red">*</span></label>
+                <select class="form-select" id="filtSalle"><option value="">-- Choisir --</option></select>
+            </div>
+            <div class="col-md-2" id="filtSemaineWrap">
+                <label class="filter-label"><i class="fas fa-calendar-week"></i> Semaine <span style="color:red">*</span></label>
+                <select class="form-select" id="filtSemaine"><option value="">-- Choisir --</option></select>
+            </div>
+            <div class="col-md-2">
+                <button class="btn-search" onclick="rechercher()">
+                    <i class="fas fa-search"></i> Afficher
                 </button>
-                
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav ms-auto">
-                        <li class="nav-item">
-                            <a class="nav-link" href="accueil.html">
-                                <i class="fas fa-home"></i> Accueil
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="dashboard.html">
-                                <i class="fa-solid fa-gauge"></i> Dashboard
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="./ressource.html">
-                                <i class="fas fa-database"></i> Ressource
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/private/occupation.html">
-                                <i class="fas fa-calendar-alt"></i> Occupation
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link active" href="consultation.html">
-                                <i class="fas fa-search"></i> Consultation
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-                
-                <div class="admin-indicator">
-                    <div class="admin-info">
-                        <i class="fas fa-user-shield admin-icon"></i>
-                        <span class="admin-text">Mode Admin</span>
-                    </div>
-                    <div class="admin-dropdown">
-                        <a href="/logout" class="logout-btn">
-                            <i class="fas fa-sign-out-alt"></i>
-                            Déconnexion
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </nav>
-    </header>
-
-    <div class="container">
-        <!-- Header Banner -->
-        <div class="header-banner">
-            <h2>
-                <i class="fas fa-search"></i>
-                Consultation des Occupations
-            </h2>
-            <p>Recherche et visualisation des emplois du temps</p>
-        </div>
-
-        <!-- Filters Section -->
-        <div class="filters-card" data-aos="fade-up">
-            <div class="filters-header mb-4">
-                <h4><i class="fas fa-filter"></i> Filtres de Recherche</h4>
-            </div>
-            
-            <div class="row g-3">
-                <!-- Semaine -->
-                <div class="col-md-3">
-                    <label class="filter-label">
-                        <i class="fas fa-calendar-week"></i> Semaine
-                    </label>
-                    <select class="form-select" id="weekSelect">
-                        <option selected>Toutes les semaines</option>
-                        <option>Semaine 1</option>
-                        <option>Semaine 2</option>
-                        <option>Semaine 3</option>
-                        <option>Semaine 4</option>
-                        <option>Semaine 5</option>
-                    </select>
-                </div>
-
-                <!-- Salle -->
-                <div class="col-md-3">
-                    <label class="filter-label">
-                        <i class="fas fa-door-open"></i> Salle
-                    </label>
-                    <select class="form-select" id="roomSelect">
-                        <option selected>Toutes les salles</option>
-                        <option>Salle 101</option>
-                        <option>Salle 102</option>
-                        <option>Salle 103</option>
-                        <option>Amphi A</option>
-                        <option>Amphi B</option>
-                    </select>
-                </div>
-
-                <!-- Filière -->
-                <div class="col-md-3">
-                    <label class="filter-label">
-                        <i class="fas fa-graduation-cap"></i> Filière
-                    </label>
-                    <select class="form-select" id="filiereSelect">
-                        <option selected>Toutes les filières</option>
-                        <option>GI 1ère année</option>
-                        <option>GI 2ème année</option>
-                        <option>GE 1ère année</option>
-                    </select>
-                </div>
-
-                <!-- Jour -->
-                <div class="col-md-3">
-                    <label class="filter-label">
-                        <i class="fas fa-calendar-day"></i> Jour
-                    </label>
-                    <select class="form-select" id="daySelect">
-                        <option selected>Tous les jours</option>
-                        <option>Lundi</option>
-                        <option>Mardi</option>
-                        <option>Mercredi</option>
-                        <option>Jeudi</option>
-                        <option>Vendredi</option>
-                        <option>Samedi</option>
-                    </select>
-                </div>
-            </div>
-
-            <!-- Navigation Buttons -->
-            <div class="navigation-section mt-4">
-                <div class="row g-2">
-                    <div class="col-md-4">
-                        <button class="btn-nav btn-nav-all" onclick="showAllOccupations()">
-                            <i class="fas fa-list"></i> Toutes les Occupations
-                        </button>
-                    </div>
-                    <div class="col-md-4">
-                        <button class="btn-nav btn-nav-occupied" onclick="showOccupied()">
-                            <i class="fas fa-door-closed"></i> Salles Occupées
-                        </button>
-                    </div>
-                    <div class="col-md-4">
-                        <button class="btn-nav btn-nav-free" onclick="showFree()">
-                            <i class="fas fa-door-open"></i> Salles Libres
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Quick Stats -->
-        <div class="stats-row" data-aos="fade-up">
-            <div class="stat-card stat-total">
-                <div class="stat-icon">
-                    <i class="fas fa-calendar-alt"></i>
-                </div>
-                <div class="stat-info">
-                    <h3>42</h3>
-                    <p>Créneaux Total</p>
-                </div>
-            </div>
-
-            <div class="stat-card stat-occupied">
-                <div class="stat-icon">
-                    <i class="fas fa-door-closed"></i>
-                </div>
-                <div class="stat-info">
-                    <h3>28</h3>
-                    <p>Créneaux Occupés</p>
-                </div>
-            </div>
-
-            <div class="stat-card stat-free">
-                <div class="stat-icon">
-                    <i class="fas fa-door-open"></i>
-                </div>
-                <div class="stat-info">
-                    <h3>14</h3>
-                    <p>Créneaux Libres</p>
-                </div>
-            </div>
-
-            <div class="stat-card stat-rate">
-                <div class="stat-icon">
-                    <i class="fas fa-chart-pie"></i>
-                </div>
-                <div class="stat-info">
-                    <h3>67%</h3>
-                    <p>Taux d'Occupation</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Schedule Display -->
-        <div class="schedule-section" data-aos="fade-up">
-            <div class="schedule-header">
-                <h3 class="section-title">
-                    <i class="fas fa-calendar-week"></i> Emploi du Temps - Salle 101
-                </h3>
-                <button class="btn-export">
-                    <i class="fas fa-file-export"></i> Exporter PDF
-                </button>
-            </div>
-            
-            <div class="row" id="scheduleContainer">
-                <!-- Lundi -->
-                <div class="col-lg day-column">
-                    <div class="day-header lundi">
-                        <i class="fas fa-sun"></i>
-                        Lundi
-                        <span class="day-date">06/01/2025</span>
-                    </div>
-                    <div class="time-slot">
-                        <div class="time-slot-item occupied-slot">
-                            <div class="time-header">
-                                <span class="time-badge">
-                                    <i class="far fa-clock"></i> 08:00 - 10:00
-                                </span>
-                            </div>
-                            <div class="slot-status occupee">
-                                <span class="status-indicator status-occupee"></span>Occupée
-                            </div>
-                            <div class="slot-info">
-                                <div class="info-title"><i class="fas fa-book"></i> Programmation C</div>
-                                <div class="info-subtitle"><i class="fas fa-graduation-cap"></i> GI 1ère année - G1</div>
-                                <div class="info-subtitle"><i class="fas fa-user-tie"></i> Dr. Ahmed Alami</div>
-                            </div>
-                        </div>
-                        <div class="time-slot-item occupied-slot">
-                            <div class="time-header">
-                                <span class="time-badge">
-                                    <i class="far fa-clock"></i> 10:00 - 12:00
-                                </span>
-                            </div>
-                            <div class="slot-status occupee">
-                                <span class="status-indicator status-occupee"></span>Occupée
-                            </div>
-                            <div class="slot-info">
-                                <div class="info-title"><i class="fas fa-book"></i> Base de Données</div>
-                                <div class="info-subtitle"><i class="fas fa-graduation-cap"></i> GI 2ème année - G1</div>
-                                <div class="info-subtitle"><i class="fas fa-user-tie"></i> Dr. Fatima Zahra</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Mardi -->
-                <div class="col-lg day-column">
-                    <div class="day-header mardi">
-                        <i class="fas fa-cloud-sun"></i>
-                        Mardi
-                        <span class="day-date">07/01/2025</span>
-                    </div>
-                    <div class="time-slot">
-                        <div class="time-slot-item occupied-slot">
-                            <div class="time-header">
-                                <span class="time-badge">
-                                    <i class="far fa-clock"></i> 08:00 - 10:00
-                                </span>
-                            </div>
-                            <div class="slot-status occupee">
-                                <span class="status-indicator status-occupee"></span>Occupée
-                            </div>
-                            <div class="slot-info">
-                                <div class="info-title"><i class="fas fa-book"></i> Réseaux</div>
-                                <div class="info-subtitle"><i class="fas fa-graduation-cap"></i> GI 2ème année - G2</div>
-                                <div class="info-subtitle"><i class="fas fa-user-tie"></i> Dr. Mohammed Tazi</div>
-                            </div>
-                        </div>
-                        <div class="time-slot-item free-slot">
-                            <div class="time-header">
-                                <span class="time-badge">
-                                    <i class="far fa-clock"></i> 10:00 - 12:00
-                                </span>
-                            </div>
-                            <div class="slot-status libre">
-                                <span class="status-indicator status-libre"></span>Libre
-                            </div>
-                            <div class="info-subtitle"><i class="fas fa-check-circle"></i> Salle disponible</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Mercredi -->
-                <div class="col-lg day-column">
-                    <div class="day-header mercredi">
-                        <i class="fas fa-cloud"></i>
-                        Mercredi
-                        <span class="day-date">08/01/2025</span>
-                    </div>
-                    <div class="time-slot">
-                        <div class="time-slot-item occupied-slot">
-                            <div class="time-header">
-                                <span class="time-badge">
-                                    <i class="far fa-clock"></i> 08:00 - 10:00
-                                </span>
-                            </div>
-                            <div class="slot-status occupee">
-                                <span class="status-indicator status-occupee"></span>Occupée
-                            </div>
-                            <div class="slot-info">
-                                <div class="info-title"><i class="fas fa-book"></i> Développement Web</div>
-                                <div class="info-subtitle"><i class="fas fa-graduation-cap"></i> GI 1ère année - G2</div>
-                                <div class="info-subtitle"><i class="fas fa-user-tie"></i> Dr. Ahmed Alami</div>
-                            </div>
-                        </div>
-                        <div class="time-slot-item free-slot">
-                            <div class="time-header">
-                                <span class="time-badge">
-                                    <i class="far fa-clock"></i> 10:00 - 12:00
-                                </span>
-                            </div>
-                            <div class="slot-status libre">
-                                <span class="status-indicator status-libre"></span>Libre
-                            </div>
-                            <div class="info-subtitle"><i class="fas fa-check-circle"></i> Salle disponible</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Jeudi -->
-                <div class="col-lg day-column">
-                    <div class="day-header jeudi">
-                        <i class="fas fa-cloud-rain"></i>
-                        Jeudi
-                        <span class="day-date">09/01/2025</span>
-                    </div>
-                    <div class="time-slot">
-                        <div class="time-slot-item free-slot">
-                            <div class="time-header">
-                                <span class="time-badge">
-                                    <i class="far fa-clock"></i> 08:00 - 10:00
-                                </span>
-                            </div>
-                            <div class="slot-status libre">
-                                <span class="status-indicator status-libre"></span>Libre
-                            </div>
-                            <div class="info-subtitle"><i class="fas fa-check-circle"></i> Salle disponible</div>
-                        </div>
-                        <div class="time-slot-item occupied-slot">
-                            <div class="time-header">
-                                <span class="time-badge">
-                                    <i class="far fa-clock"></i> 10:00 - 12:00
-                                </span>
-                            </div>
-                            <div class="slot-status occupee">
-                                <span class="status-indicator status-occupee"></span>Occupée
-                            </div>
-                            <div class="slot-info">
-                                <div class="info-title"><i class="fas fa-book"></i> Systèmes d'exploitation</div>
-                                <div class="info-subtitle"><i class="fas fa-graduation-cap"></i> GI 1ère année - G1</div>
-                                <div class="info-subtitle"><i class="fas fa-user-tie"></i> Pr. Hassan Benali</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Vendredi -->
-                <div class="col-lg day-column">
-                    <div class="day-header vendredi">
-                        <i class="fas fa-umbrella"></i>
-                        Vendredi
-                        <span class="day-date">10/01/2025</span>
-                    </div>
-                    <div class="time-slot">
-                        <div class="time-slot-item occupied-slot">
-                            <div class="time-header">
-                                <span class="time-badge">
-                                    <i class="far fa-clock"></i> 08:00 - 10:00
-                                </span>
-                            </div>
-                            <div class="slot-status occupee">
-                                <span class="status-indicator status-occupee"></span>Occupée
-                            </div>
-                            <div class="slot-info">
-                                <div class="info-title"><i class="fas fa-book"></i> Mathématiques</div>
-                                <div class="info-subtitle"><i class="fas fa-graduation-cap"></i> GI 1ère année - Tous</div>
-                                <div class="info-subtitle"><i class="fas fa-user-tie"></i> Pr. Hassan Benali</div>
-                            </div>
-                        </div>
-                        <div class="time-slot-item free-slot">
-                            <div class="time-header">
-                                <span class="time-badge">
-                                    <i class="far fa-clock"></i> 10:00 - 12:00
-                                </span>
-                            </div>
-                            <div class="slot-status libre">
-                                <span class="status-indicator status-libre"></span>Libre
-                            </div>
-                            <div class="info-subtitle"><i class="fas fa-check-circle"></i> Salle disponible</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Samedi -->
-                <div class="col-lg day-column">
-                    <div class="day-header samedi">
-                        <i class="fas fa-star"></i>
-                        Samedi
-                        <span class="day-date">11/01/2025</span>
-                    </div>
-                    <div class="time-slot">
-                        <div class="time-slot-item free-slot">
-                            <div class="time-header">
-                                <span class="time-badge">
-                                    <i class="far fa-clock"></i> 08:00 - 10:00
-                                </span>
-                            </div>
-                            <div class="slot-status libre">
-                                <span class="status-indicator status-libre"></span>Libre
-                            </div>
-                            <div class="info-subtitle"><i class="fas fa-check-circle"></i> Salle disponible</div>
-                        </div>
-                        <div class="time-slot-item free-slot">
-                            <div class="time-header">
-                                <span class="time-badge">
-                                    <i class="far fa-clock"></i> 10:00 - 12:00
-                                </span>
-                            </div>
-                            <div class="slot-status libre">
-                                <span class="status-indicator status-libre"></span>Libre
-                            </div>
-                            <div class="info-subtitle"><i class="fas fa-check-circle"></i> Salle disponible</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Legend -->
-        <div class="legend-card" data-aos="fade-up">
-            <div class="legend-title">
-                <i class="fas fa-info-circle"></i> Légende
-            </div>
-            <div class="row">
-                <div class="col-md-4">
-                    <div class="legend-item">
-                        <span class="legend-dot status-occupee"></span>
-                        <span>Occupée - Cours en cours</span>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="legend-item">
-                        <span class="legend-dot status-libre"></span>
-                        <span>Libre - Salle disponible</span>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="legend-item">
-                        <span class="legend-dot status-maintenance"></span>
-                        <span>Maintenance - Indisponible</span>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
 
-    <footer class="text-white py-5">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-4 mb-4">
-                    <h5 class="text-light"><i class="fas fa-info-circle"></i> À Propos</h5>
-                    <p>Le Département Génie Informatique de l'ESTF offre une formation de qualité en informatique et technologies de l'information.</p>
+    <!-- STATS -->
+    <div id="statsRow" style="display:none; grid-template-columns:repeat(4,1fr); gap:1rem; margin-bottom:1.5rem;" data-aos="fade-up">
+        <div class="stat-card stat-total">
+            <div class="stat-icon"><i class="fas fa-th"></i></div>
+            <div class="stat-info"><h3 id="statTotal">0</h3><p>Total Créneaux</p></div>
+        </div>
+        <div class="stat-card stat-occupee">
+            <div class="stat-icon"><i class="fas fa-door-closed"></i></div>
+            <div class="stat-info"><h3 id="statOcc">0</h3><p>Occupés</p></div>
+        </div>
+        <div class="stat-card stat-libre">
+            <div class="stat-icon"><i class="fas fa-door-open"></i></div>
+            <div class="stat-info"><h3 id="statLib">0</h3><p>Libres</p></div>
+        </div>
+        <div class="stat-card stat-taux">
+            <div class="stat-icon"><i class="fas fa-chart-pie"></i></div>
+            <div class="stat-info"><h3 id="statTaux">0%</h3><p>Taux d'occupation</p></div>
+        </div>
+    </div>
+
+    <!-- RÉSULTATS -->
+    <div id="resultsContainer"></div>
+
+    <!-- LÉGENDE -->
+    <div class="legend-card" data-aos="fade-up">
+        <strong><i class="fas fa-info-circle" style="color:#2c75bd"></i> Légende :</strong>
+        <div class="legend-item"><span class="ldot" style="background:#22c55e"></span> Libre — salle disponible</div>
+        <div class="legend-item"><span class="ldot" style="background:#ef4444"></span> Occupée — cours planifié</div>
+    </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer class="text-white py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <h5 class="text-light"><i class="fas fa-info-circle"></i> À Propos</h5>
+                <p>Le Département Génie Informatique de l'ESTF offre une formation de qualité.</p>
+            </div>
+            <div class="col-md-4 mb-4">
+                <h5 class="text-light"><i class="fas fa-envelope"></i> Contact</h5>
+                <p>
+                    <i class="fas fa-map-marker-alt"></i> BP 2427 Route d'Imouzzer, 30000 Fès<br>
+                    <i class="fas fa-phone"></i> (+212) 6 66 21 46 30<br>
+                    <i class="fas fa-at"></i> support.est@usmba.ac.ma
+                </p>
+            </div>
+            <div class="col-md-4 mb-4">
+                <h5 class="text-light"><i class="fas fa-link"></i> Liens Utiles</h5>
+                <ul class="list-unstyled">
+                    <li><a href="https://www.est-usmba.ac.ma/" class="text-white"><i class="fas fa-globe"></i> Site ESTF</a></li>
+                    <li><a href="https://www.facebook.com/est.fes01" class="text-white"><i class="fab fa-facebook"></i> Facebook</a></li>
+                    <li><a href="https://www.instagram.com/est.fes.usmba/" class="text-white"><i class="fab fa-instagram"></i> Instagram</a></li>
+                </ul>
+            </div>
+        </div>
+        <hr class="bg-white">
+        <p class="text-center mb-0"><i class="fas fa-copyright"></i> 2025 Département GI - ESTF. Tous droits réservés.</p>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+AOS.init({ duration: 600, once: true });
+
+const JOURS = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'];
+let currentMode = 'semaine';
+
+// ── UTILITAIRES ───────────────────────────────────────────────────────────────
+
+function fillSelect(sel, data, valKey, labelKey) {
+    const first = sel.options[0];
+    sel.innerHTML = '';
+    sel.appendChild(first);
+    (data || []).forEach(item => {
+        const opt = document.createElement('option');
+        opt.value = item[valKey];
+        opt.textContent = item[labelKey];
+        sel.appendChild(opt);
+    });
+}
+
+function formatH(h) { return (h || '').substring(0, 5) || '—'; }
+
+function formatDate(d) {
+    if (!d) return '—';
+    return new Date(d).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' });
+}
+
+// ── CHARGEMENT RÉFÉRENCE ──────────────────────────────────────────────────────
+
+async function loadRefData() {
+    try {
+        const [salles, semaines, annees, semestres] = await Promise.all([
+            fetch('/consultation/data/salles').then(r => r.json()),
+            fetch('/consultation/data/semaines').then(r => r.json()),
+            fetch('/consultation/data/annees').then(r => r.json()),
+            fetch('/consultation/data/semestres').then(r => r.json()),
+        ]);
+
+        // ⚠️ colonnes réelles : id_salle, nom_salle
+        fillSelect(document.getElementById('filtSalle'),    salles,    'id_salle',    'nom_salle');
+        fillSelect(document.getElementById('filtSemaine'),  semaines,  'id_semaine',  'nom_semaine');
+        fillSelect(document.getElementById('filtAnnee'),    annees,    'id_annee',    'libelle');
+        fillSelect(document.getElementById('filtSemestre'), semestres, 'id_semestre', 'nom_semestre');
+    } catch(e) {
+        console.error('Erreur chargement référence :', e);
+    }
+}
+
+// ── MODE ─────────────────────────────────────────────────────────────────────
+
+function setMode(mode) {
+    currentMode = mode;
+    document.getElementById('modeSemaine').classList.toggle('active', mode === 'semaine');
+    document.getElementById('modeDetail').classList.toggle('active', mode === 'detail');
+    document.getElementById('filtSemaineWrap').style.display = mode === 'semaine' ? '' : 'none';
+    document.getElementById('resultsContainer').innerHTML = '';
+    document.getElementById('statsRow').style.display = 'none';
+}
+
+// ── RECHERCHE ─────────────────────────────────────────────────────────────────
+
+async function rechercher() {
+    const id_salle    = document.getElementById('filtSalle').value;
+    const id_semaine  = document.getElementById('filtSemaine').value;
+    const id_annee    = document.getElementById('filtAnnee').value;
+    const id_semestre = document.getElementById('filtSemestre').value;
+
+    if (!id_salle) return alert('Veuillez choisir une salle.');
+    if (currentMode === 'semaine' && !id_semaine) return alert('Veuillez choisir une semaine.');
+
+    document.getElementById('resultsContainer').innerHTML = `
+        <div class="text-center py-5">
+            <div class="spinner-border text-primary"></div>
+            <p class="mt-2 text-muted">Chargement...</p>
+        </div>`;
+
+    try {
+        if (currentMode === 'semaine') {
+            const qs = new URLSearchParams({ id_salle, id_semaine });
+            if (id_annee)    qs.set('id_annee',    id_annee);
+            if (id_semestre) qs.set('id_semestre', id_semestre);
+
+            const resp = await fetch('/consultation/salle?' + qs);
+            if (!resp.ok) throw new Error((await resp.json()).error || resp.statusText);
+            const data = await resp.json();
+
+            // Vérification de sécurité
+            if (!data || !data.creneaux || !data.grille || !data.stats) {
+                throw new Error('Réponse serveur invalide');
+            }
+            renderSemaine(data, document.getElementById('filtSemaine').selectedOptions[0].text);
+
+        } else {
+            const qs = new URLSearchParams({ id_salle });
+            if (id_annee)    qs.set('id_annee',    id_annee);
+            if (id_semestre) qs.set('id_semestre', id_semestre);
+
+            const resp = await fetch('/consultation/salle/detail?' + qs);
+            if (!resp.ok) throw new Error((await resp.json()).error || resp.statusText);
+            const data = await resp.json();
+
+            if (!data || !data.creneaux || !data.semaines) {
+                throw new Error('Réponse serveur invalide');
+            }
+            renderDetail(data);
+        }
+    } catch (e) {
+        console.error(e);
+        document.getElementById('resultsContainer').innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-exclamation-triangle" style="color:#ef4444"></i>
+                <p style="color:#ef4444; font-weight:600;">Erreur : ${e.message}</p>
+            </div>`;
+    }
+}
+
+// ── AFFICHER STATS ────────────────────────────────────────────────────────────
+
+function showStats(total, occupes, libres, taux) {
+    document.getElementById('statTotal').textContent = total;
+    document.getElementById('statOcc').textContent   = occupes;
+    document.getElementById('statLib').textContent   = libres;
+    document.getElementById('statTaux').textContent  = taux + '%';
+    const sr = document.getElementById('statsRow');
+    sr.style.display = 'grid';
+}
+
+// ── RENDER : MODE SEMAINE ─────────────────────────────────────────────────────
+
+function renderSemaine(data, semNom) {
+    const { creneaux, grille, stats } = data;
+    const nomSalle = document.getElementById('filtSalle').selectedOptions[0].text;
+
+    showStats(stats.total, stats.occupes, stats.libres, stats.taux);
+
+    const container = document.getElementById('resultsContainer');
+    container.innerHTML = '';
+
+    if (!creneaux.length) {
+        container.innerHTML = '<div class="empty-state"><i class="fas fa-inbox"></i><p>Aucun créneau trouvé.</p></div>';
+        return;
+    }
+
+    const card = document.createElement('div');
+    card.className = 'schedule-card';
+    card.innerHTML = `
+        <div class="schedule-card-header">
+            <h5><i class="fas fa-calendar-week me-2"></i>${nomSalle} — ${semNom}</h5>
+            <div class="view-btns">
+                <button class="view-btn view-btn-all active" onclick="filterCells('all',this)">Tous</button>
+                <button class="view-btn view-btn-lib" onclick="filterCells('libre',this)"><i class="fas fa-door-open"></i> Libres</button>
+                <button class="view-btn view-btn-occ" onclick="filterCells('occupee',this)"><i class="fas fa-door-closed"></i> Occupés</button>
+            </div>
+        </div>
+        <div style="overflow-x:auto">
+            ${buildGrilleTable(creneaux, grille)}
+        </div>
+    `;
+    container.appendChild(card);
+}
+
+// ── RENDER : MODE DÉTAIL ──────────────────────────────────────────────────────
+
+function renderDetail(data) {
+    const { creneaux, semaines } = data;
+    const nomSalle = document.getElementById('filtSalle').selectedOptions[0].text;
+
+    // Stats globales
+    let totalAll = 0, occAll = 0;
+    semaines.forEach(s => {
+        if (s && s.stats) { totalAll += s.stats.total; occAll += s.stats.occupes; }
+    });
+    showStats(totalAll, occAll, totalAll - occAll, totalAll ? Math.round(occAll / totalAll * 100) : 0);
+
+    const container = document.getElementById('resultsContainer');
+    container.innerHTML = `
+        <h5 class="mb-3" style="color:#1a236d; font-weight:700;">
+            <i class="fas fa-building me-2"></i>${nomSalle} — Toutes les semaines
+        </h5>`;
+
+    if (!semaines.length) {
+        container.innerHTML += '<div class="empty-state"><i class="fas fa-inbox"></i><p>Aucune semaine trouvée.</p></div>';
+        return;
+    }
+
+    semaines.forEach((s, idx) => {
+        if (!s || !s.semaine || !s.stats || !s.grille) return;
+        const { semaine, grille, stats } = s;
+        const tauxColor = stats.taux > 70 ? '#ef4444' : stats.taux > 40 ? '#f59e0b' : '#22c55e';
+
+        const acc = document.createElement('div');
+        acc.className = 'sem-accordion';
+        acc.innerHTML = `
+            <div class="sem-acc-header" onclick="toggleAcc(this)">
+                <div>
+                    <div class="sem-title">
+                        <i class="fas fa-calendar-week" style="color:#2c75bd"></i>
+                        ${semaine.nom_semaine || ''}
+                    </div>
+                    <div class="sem-dates">${formatDate(semaine.date_debut)} → ${formatDate(semaine.date_fin)}</div>
+                    <div class="taux-bar">
+                        <div class="taux-bar-fill" style="width:${stats.taux}%; background:${tauxColor}"></div>
+                    </div>
                 </div>
-                <div class="col-md-4 mb-4">
-                    <h5 class="text-light"><i class="fas fa-envelope"></i> Contact</h5>
-                    <p>
-                        <i class="fas fa-map-marker-alt"></i> BP 2427 Route d'Imouzzer, 30000 Fès<br>
-                        <i class="fas fa-phone"></i> (+212) 6 66 21 46 30<br>
-                        <i class="fas fa-at"></i> support.est@usmba.ac.ma
-                    </p>
-                </div>
-                <div class="col-md-4 mb-4">
-                    <h5 class="text-light"><i class="fas fa-link"></i> Liens Utiles</h5>
-                    <ul class="list-unstyled">
-                        <li><a href="https://www.est-usmba.ac.ma/" class="text-white"><i class="fas fa-globe"></i> Site ESTF</a></li>
-                        <li><a href="https://www.facebook.com/est.fes01" class="text-white"><i class="fab fa-facebook"></i> Facebook</a></li>
-                        <li><a href="https://www.instagram.com/est.fes.usmba/" class="text-white"><i class="fab fa-instagram"></i> Instagram</a></li>
-                    </ul>
+                <div class="text-end">
+                    <div class="sem-taux" style="color:${tauxColor}">${stats.taux}% occupé</div>
+                    <div style="font-size:.75rem; color:#6b7280; margin-top:4px;">
+                        <span style="color:#ef4444">${stats.occupes} occupés</span> ·
+                        <span style="color:#22c55e">${stats.libres} libres</span>
+                    </div>
+                    <i class="fas ${idx === 0 ? 'fa-chevron-up' : 'fa-chevron-down'} mt-1" style="color:#9ca3af; font-size:.8rem"></i>
                 </div>
             </div>
-            <hr class="bg-white">
-            <p class="text-center mb-0">
-                <i class="fas fa-copyright"></i> 2025 Département Génie Informatique - ESTF. Tous droits réservés.
-            </p>
-        </div>
-    </footer>
+            <div class="sem-acc-body ${idx === 0 ? 'open' : ''}">
+                <div class="view-btns p-2" style="border-bottom:1px solid #f0f4f8">
+                    <button class="view-btn view-btn-all active" onclick="filterCellsInAcc(this,'all')">Tous</button>
+                    <button class="view-btn view-btn-lib"        onclick="filterCellsInAcc(this,'libre')">Libres</button>
+                    <button class="view-btn view-btn-occ"        onclick="filterCellsInAcc(this,'occupee')">Occupés</button>
+                </div>
+                ${buildGrilleTable(creneaux, grille)}
+            </div>
+        `;
+        container.appendChild(acc);
+    });
+}
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        AOS.init({
-            duration: 600,
-            once: true
+// ── CONSTRUIRE TABLEAU GRILLE ─────────────────────────────────────────────────
+
+function buildGrilleTable(creneaux, grille) {
+    if (!creneaux || !creneaux.length || !grille) return '<p class="p-3 text-muted">Aucune donnée.</p>';
+
+    let html = '<table class="grille-table"><thead><tr><th>Créneau</th>';
+    JOURS.forEach(j => { html += `<th>${j}</th>`; });
+    html += '</tr></thead><tbody>';
+
+    creneaux.forEach(cr => {
+        html += `<tr><td class="cell-heure"><i class="far fa-clock me-1"></i>${formatH(cr.heure_debut)} - ${formatH(cr.heure_fin)}</td>`;
+        JOURS.forEach(jour => {
+            const jourData = grille[jour];
+            if (!jourData) { html += '<td>—</td>'; return; }
+            const cell = jourData[cr.id_creneau];
+            if (!cell) { html += '<td class="cell-libre" data-statut="libre"><span class="badge-libre">Libre</span></td>'; return; }
+
+            if (cell.statut === 'occupee') {
+                html += `<td class="cell-occupee" data-statut="occupee">
+                    <span class="badge-occupee">Occupée</span>
+                    <div class="occ-detail">
+                        <div><i class="fas fa-book" style="color:#ef4444"></i> ${cell.module || '—'}</div>
+                        <div><i class="fas fa-graduation-cap" style="color:#f97316"></i> ${cell.filiere || '—'} Gr.${cell.group || '?'}</div>
+                        <div><i class="fas fa-user-tie" style="color:#6b7280"></i> ${cell.professeur || '—'}</div>
+                    </div>
+                </td>`;
+            } else {
+                html += `<td class="cell-libre" data-statut="libre">
+                    <span class="badge-libre">Libre</span>
+                    <div class="occ-detail" style="color:#166534"><i class="fas fa-check-circle"></i> Disponible</div>
+                </td>`;
+            }
         });
+        html += '</tr>';
+    });
 
-        function showAllOccupations() {
-            document.querySelectorAll('.time-slot-item').forEach(item => {
-                item.style.display = 'block';
-            });
-        }
+    html += '</tbody></table>';
+    return html;
+}
 
-        function showOccupied() {
-            document.querySelectorAll('.time-slot-item').forEach(item => {
-                if (item.classList.contains('occupied-slot')) {
-                    item.style.display = 'block';
-                } else {
-                    item.style.display = 'none';
-                }
-            });
-        }
+// ── HELPERS FILTRAGE ET ACCORDION ────────────────────────────────────────────
 
-        function showFree() {
-            document.querySelectorAll('.time-slot-item').forEach(item => {
-                if (item.classList.contains('free-slot')) {
-                    item.style.display = 'block';
-                } else {
-                    item.style.display = 'none';
-                }
-            });
-        }
-    </script>
+function toggleAcc(header) {
+    const body = header.nextElementSibling;
+    const icon = header.querySelector('[class*="fa-chevron"]');
+    body.classList.toggle('open');
+    if (icon) {
+        icon.classList.toggle('fa-chevron-down', !body.classList.contains('open'));
+        icon.classList.toggle('fa-chevron-up',    body.classList.contains('open'));
+    }
+}
+
+function filterCells(statut, btn) {
+    btn.closest('.schedule-card').querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('#resultsContainer td[data-statut]').forEach(td => {
+        td.style.display = (statut === 'all' || td.dataset.statut === statut) ? '' : 'none';
+    });
+}
+
+function filterCellsInAcc(btn, statut) {
+    const body = btn.closest('.sem-acc-body');
+    body.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    body.querySelectorAll('td[data-statut]').forEach(td => {
+        td.style.display = (statut === 'all' || td.dataset.statut === statut) ? '' : 'none';
+    });
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+window.addEventListener('load', () => {
+    loadRefData();
+    setMode('semaine');
+});
+</script>
 </body>
 </html>
