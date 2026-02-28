@@ -1,6 +1,6 @@
 AOS.init({ duration: 600, once: true });
 
-//utiliser bibliotheque Chart.js, pour afficer les diagramme de statistique 
+//utiliser bibliotheque Chart.js, pour afficer les diagramme de statistique
 
 
 document.getElementById('currentDate').textContent =
@@ -10,7 +10,8 @@ Chart.defaults.font.family = "'Segoe UI', sans-serif";
 Chart.defaults.color       = '#6b7280';
 Chart.defaults.borderColor = '#f0f4f8';
 
-const PALETTE = ['#1a236d','#2c75bd','#10b981','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#ec4899'];
+const PALETTE = ['#1a236d', '#2c75bd', '#4f46e5',
+  '#6d4fea', '#7c3aed', '#8b5cf6', '#a78bfa'];
 let charts = {};
 function destroyChart(id) { if (charts[id]) { charts[id].destroy(); delete charts[id]; } }
 

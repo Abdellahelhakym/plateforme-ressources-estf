@@ -1,4 +1,4 @@
- AOS.init();
+AOS.init({ duration: 600, once: true });
 
         let deleteType = null;
         let deleteId = null;
@@ -15,12 +15,14 @@
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td>${item.nom_filiere}</td>
+                    <td>${item.annee}</td>
                     <td>${item.niveau}</td>
                     <td>${item.nb_group}</td>
                     <td>
                         <button class="btn btn-sm btn-warning btn-edit edit-filier"
                             data-id="${item.id}"
                             data-nom="${item.nom_filiere}"
+                            data-annee="${item.annee}"
                             data-niveau="${item.niveau}"
                             data-groupes="${item.nb_group}">
                             <i class="fas fa-edit"></i>
@@ -36,7 +38,7 @@
                 tbody.appendChild(tr);
             });
 
-            // Mettre à jour les selects de filières dans les modals module
+            // Mettre à jour les selects de filières dans les modals module et professeur
             populateFiliereSelects(data);
         }
 
@@ -52,13 +54,15 @@
                     <td>${item.prenom}</td>
                     <td>${item.email}</td>
                     <td>${item.departement}</td>
+                    <td>${item.filier || '-'}</td>
                     <td>
-                        <button class="btn btn-sm btn-warning btn-edit edit-Professeurs "
+                        <button class="btn btn-sm btn-warning btn-edit edit-Professeurs"
                             data-id="${item.id}"
                             data-nom="${item.nom}"
                             data-prenom="${item.prenom}"
                             data-email="${item.email}"
-                            data-dept="${item.departement}">
+                            data-dept="${item.departement}"
+                            data-filiere="${item.id_filiere || ''}">
                             <i class="fas fa-edit"></i>
                         </button>
                         <button class="btn btn-sm btn-danger btn-delete"
@@ -102,18 +106,18 @@
             });
         }
 
-        // FIX: Peupler les selects filière dans les modals module
+        // Peupler les selects filière dans les modals module ET professeur (nom + année)
         function populateFiliereSelects(filieres) {
-            const selects = ['selectFiliereModule', 'editFiliereModule'];
+            const selects = ['selectFiliereModule', 'editFiliereModule', 'selectFiliereProf', 'editFiliereProf'];
             selects.forEach(selectId => {
                 const select = document.getElementById(selectId);
                 if (!select) return;
                 const currentVal = select.value;
-                select.innerHTML = '';
+                select.innerHTML = '<option value="">-- Aucune --</option>';
                 filieres.forEach(f => {
                     const opt = document.createElement('option');
                     opt.value = f.id;
-                    opt.textContent = f.nom_filiere;
+                    opt.textContent = `${f.nom_filiere} - ${f.annee}`;
                     select.appendChild(opt);
                 });
                 if (currentVal) select.value = currentVal;
@@ -194,7 +198,7 @@
         });
 
         // ────────────────────────────────────────────────
-        // SUPPRESSION - via délégation d'événements (FIX: boutons générés dynamiquement)
+        // SUPPRESSION - via délégation d'événements
         // ────────────────────────────────────────────────
         document.addEventListener('click', function(e) {
             const btn = e.target.closest('.btn-delete');
@@ -221,28 +225,30 @@
         });
 
         // ────────────────────────────────────────────────
-        // ÉDITION - via délégation d'événements (FIX: boutons générés dynamiquement)
+        // ÉDITION - via délégation d'événements
         // ────────────────────────────────────────────────
         document.addEventListener('click', function(e) {
 
             // Édition Filière
             const btnFiliere = e.target.closest('.edit-filier');
             if (btnFiliere) {
-                document.getElementById('editFiliereId').value    = btnFiliere.dataset.id;
-                document.getElementById('editNomFiliere').value   = btnFiliere.dataset.nom;
+                document.getElementById('editFiliereId').value     = btnFiliere.dataset.id;
+                document.getElementById('editNomFiliere').value    = btnFiliere.dataset.nom;
+                document.getElementById('editAnneeFiliere').value  = btnFiliere.dataset.annee;
                 document.getElementById('editNiveauFiliere').value = btnFiliere.dataset.niveau;
-                document.getElementById('editNbGroup').value      = btnFiliere.dataset.groupes;
+                document.getElementById('editNbGroup').value       = btnFiliere.dataset.groupes;
                 new bootstrap.Modal(document.getElementById('editFiliereModal')).show();
             }
 
             // Édition Professeur
             const btnProf = e.target.closest('.edit-Professeurs');
             if (btnProf) {
-                document.getElementById('editProfId').value      = btnProf.dataset.id;
-                document.getElementById('editNomProf').value     = btnProf.dataset.nom;
-                document.getElementById('editPrenomProf').value  = btnProf.dataset.prenom;
-                document.getElementById('editEmailProf').value   = btnProf.dataset.email;
-                document.getElementById('editDeptProf').value    = btnProf.dataset.dept;
+                document.getElementById('editProfId').value        = btnProf.dataset.id;
+                document.getElementById('editNomProf').value       = btnProf.dataset.nom;
+                document.getElementById('editPrenomProf').value    = btnProf.dataset.prenom;
+                document.getElementById('editEmailProf').value     = btnProf.dataset.email;
+                document.getElementById('editDeptProf').value      = btnProf.dataset.dept;
+                document.getElementById('editFiliereProf').value   = btnProf.dataset.filiere;
                 new bootstrap.Modal(document.getElementById('editProfModal')).show();
             }
 
@@ -251,7 +257,6 @@
             if (btnModule) {
                 document.getElementById('editModuleId').value      = btnModule.dataset.id;
                 document.getElementById('editNomModule').value     = btnModule.dataset.nom;
-                // Sélectionner la bonne filière dans le select
                 document.getElementById('editFiliereModule').value = btnModule.dataset.filiere;
                 new bootstrap.Modal(document.getElementById('editModuleModal')).show();
             }

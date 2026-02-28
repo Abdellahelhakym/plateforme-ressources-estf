@@ -59,9 +59,7 @@
             </div>
         </div>
 
-        <!-- ══════════════════════════════════════════ -->
-        <!-- SECTION 1: ANNÉES UNIVERSITAIRES          -->
-        <!-- ══════════════════════════════════════════ -->
+        <!-- SECTION 1: ANNÉES -->
         <div id="annees"></div>
         <div class="section-container" data-aos="fade-up">
             <div class="section-header">
@@ -78,9 +76,7 @@
             </div>
         </div>
 
-        <!-- ══════════════════════════════════════════ -->
-        <!-- SECTION 2: SEMESTRES                      -->
-        <!-- ══════════════════════════════════════════ -->
+        <!-- SECTION 2: SEMESTRES -->
         <div id="semestre"></div>
         <div class="section-container" data-aos="fade-up">
             <div class="section-header">
@@ -107,9 +103,7 @@
             </div>
         </div>
 
-        <!-- ══════════════════════════════════════════ -->
-        <!-- SECTION 3: SEMAINES                       -->
-        <!-- ══════════════════════════════════════════ -->
+        <!-- SECTION 3: SEMAINES -->
         <div id="semaines"></div>
         <div class="section-container" data-aos="fade-up">
             <div class="section-header">
@@ -122,13 +116,18 @@
                 </button>
             </div>
             <div class="section-content">
+                <!-- Filtre par semestre -->
+                <div class="mb-3 d-flex align-items-center gap-3">
+                    <label class="form-label mb-0 fw-semibold"><i class="fas fa-filter"></i> Filtrer par semestre :</label>
+                    <select class="form-select w-auto" id="filterSemestre">
+                        <option value="">Tous les semestres</option>
+                    </select>
+                </div>
                 <div class="row" id="rowSemaines"></div>
             </div>
         </div>
 
-        <!-- ══════════════════════════════════════════ -->
-        <!-- SECTION 4: CRÉNEAUX                       -->
-        <!-- ══════════════════════════════════════════ -->
+        <!-- SECTION 4: CRÉNEAUX -->
         <div id="creneau"></div>
         <div class="section-container" data-aos="fade-up">
             <div class="section-header">
@@ -211,7 +210,7 @@
         </div>
     </div>
 
-    <!-- Modal Add Semaine -->
+    <!-- Modal Add Semaine — avec select Semestre -->
     <div class="modal fade" id="addSemaineModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -221,9 +220,16 @@
                 </div>
                 <div class="modal-body">
                     <form id="formAddSemaine">
+                        <!-- Semestre -->
+                        <div class="mb-3">
+                            <label class="form-label"><i class="fas fa-calendar-check"></i> Semestre</label>
+                            <select class="form-select" name="id_semestre" id="addSemaineSemestre" required>
+                                <option value="">-- Choisir un semestre --</option>
+                            </select>
+                        </div>
                         <div class="mb-3">
                             <label class="form-label">Nom de la Semaine</label>
-                            <input type="text" class="form-control" name="nom_semaine" placeholder="Ex:  S1" required>
+                            <input type="text" class="form-control" name="nom_semaine" placeholder="Ex: S1-W01" required>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Date Début</label>
@@ -329,7 +335,7 @@
         </div>
     </div>
 
-    <!-- Modal Edit Semaine -->
+    <!-- Modal Edit Semaine — avec select Semestre -->
     <div class="modal fade" id="editSemaineModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -340,6 +346,13 @@
                 <div class="modal-body">
                     <form id="formEditSemaine">
                         <input type="hidden" id="editSemaineId">
+                        <!-- Semestre -->
+                        <div class="mb-3">
+                            <label class="form-label"><i class="fas fa-calendar-check"></i> Semestre</label>
+                            <select class="form-select" id="editSemaineSemestre" name="id_semestre" required>
+                                <option value="">-- Choisir un semestre --</option>
+                            </select>
+                        </div>
                         <div class="mb-3">
                             <label class="form-label">Nom de la Semaine</label>
                             <input type="text" class="form-control" id="editNomSemaine" name="nom_semaine" required>

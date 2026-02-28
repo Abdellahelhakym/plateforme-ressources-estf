@@ -8,7 +8,7 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(to bottom, #f8f9fa 0%, #e9ecef 100%);
+            background: linear-gradient(160deg, #e8f0fb 0%, #ffffff 50%, #d0e4f7 100%);
         }
 
         .navbar {
@@ -28,6 +28,15 @@
         .navbar-brand i {
             font-size: 1.8rem;
         }
+        .titre{
+            font-weight: bold;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+        }
+       
 
         .nav-link {
             font-weight: 500;
@@ -560,3 +569,220 @@
                     display: none;
                 }
          }
+
+         /* ═══ MODAL OVERLAY ═══════════════════════════════════════════════════ */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.55);
+            z-index: 9000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(3px);
+        }
+        .modal-overlay.show { display: flex; }
+
+        .modal-box {
+            background: #fff;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 640px;
+            max-height: 88vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+            animation: popIn .22s ease;
+        }
+        .modal-box.modal-wide { max-width: 850px; }
+
+        @keyframes popIn {
+            from { transform: scale(.88); opacity: 0; }
+            to   { transform: scale(1);  opacity: 1; }
+        }
+
+        .modal-head {
+            background: var(--gradient-primary);
+            color: #fff;
+            padding: 1.3rem 1.6rem;
+            border-radius: 20px 20px 0 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .modal-head h5 { margin: 0; font-weight: 700; font-size: 1.05rem; display: flex; align-items: center; gap: 9px; }
+        .btn-modal-close {
+            background: rgba(255,255,255,.15);
+            border: none;
+            color: #fff;
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: .2s;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .btn-modal-close:hover { background: rgba(255,255,255,.3); }
+
+        .modal-body-inner { padding: 1.6rem; }
+
+        /* ═══ FORMULAIRE MODIFIER ═════════════════════════════════════════════ */
+        .form-group-modal { margin-bottom: 1rem; }
+        .form-group-modal label {
+            display: block;
+            font-size: .82rem;
+            font-weight: 700;
+            color: #374151;
+            margin-bottom: .3rem;
+        }
+        .form-group-modal input,
+        .form-group-modal select,
+        .form-group-modal textarea {
+            width: 100%;
+            padding: .55rem .85rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: .9rem;
+            transition: border-color .2s;
+            font-family: inherit;
+            background: #fff;
+        }
+        .form-group-modal input:focus,
+        .form-group-modal select:focus,
+        .form-group-modal textarea:focus {
+            outline: none;
+            border-color: #2c75bd;
+            box-shadow: 0 0 0 .2rem rgba(44,117,189,.15);
+        }
+        .form-group-modal textarea { resize: vertical; min-height: 70px; }
+
+        /* Aperçu image */
+        #mod_img_preview {
+            display: none;
+            width: 100%;
+            max-height: 130px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-top: .5rem;
+            border: 2px solid #e0e0e0;
+        }
+
+        /* Boutons modal footer */
+        .modal-footer-btns {
+            display: flex;
+            gap: .75rem;
+            justify-content: flex-end;
+            padding: 0 1.6rem 1.4rem;
+        }
+        .btn-cancel-modal {
+            background: #f3f4f6;
+            color: #374151;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: .6rem 1.4rem;
+            font-weight: 700;
+            font-size: .88rem;
+            cursor: pointer;
+            transition: .2s;
+        }
+        .btn-cancel-modal:hover { background: #e5e7eb; }
+        .btn-save-modal {
+            background: var(--gradient-primary);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            padding: .6rem 1.6rem;
+            font-weight: 700;
+            font-size: .88rem;
+            cursor: pointer;
+            transition: .2s;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            box-shadow: 0 4px 12px rgba(26,35,109,.25);
+        }
+        .btn-save-modal:hover { box-shadow: 0 6px 18px rgba(26,35,109,.35); transform: translateY(-1px); }
+        .btn-save-modal:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+
+        /* ═══ TABLEAU MATÉRIEL ════════════════════════════════════════════════ */
+        .mat-stats {
+            display: flex;
+            gap: .7rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.2rem;
+        }
+        .mat-stat-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: .35rem .9rem;
+            border-radius: 20px;
+            font-size: .78rem;
+            font-weight: 700;
+        }
+        .chip-blue  { background: linear-gradient(135deg,#e0e7ff,#c7d2fe); color: #1a236d; }
+        .chip-green { background: linear-gradient(135deg,#d1fae5,#a7f3d0); color: #065f46; }
+        .chip-red   { background: linear-gradient(135deg,#fee2e2,#fecaca); color: #991b1b; }
+        .chip-warn  { background: linear-gradient(135deg,#fef3c7,#fde68a); color: #92400e; }
+
+        .mat-table { width: 100%; border-collapse: collapse; font-size: .85rem; }
+        .mat-table th {
+            background: #f8f9fa;
+            color: #6c757d;
+            font-size: .72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            padding: .6rem .85rem;
+            border-bottom: 2px solid #e5e7eb;
+            text-align: left;
+        }
+        .mat-table td {
+            padding: .6rem .85rem;
+            border-bottom: 1px solid #f0f0f0;
+            color: #374151;
+            vertical-align: middle;
+        }
+        .mat-table tr:last-child td { border-bottom: none; }
+        .mat-table tr:hover td { background: #f8f9fa; }
+
+        /* Badges état matériel */
+        .badge-mat {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: .7rem;
+            font-weight: 700;
+        }
+        .badge-mat.dispo { background: linear-gradient(135deg,#d1fae5,#a7f3d0); color: #065f46; }
+        .badge-mat.occup { background: linear-gradient(135deg,#fee2e2,#fecaca); color: #991b1b; }
+        .badge-mat.maint { background: linear-gradient(135deg,#fef3c7,#fde68a); color: #92400e; }
+
+        /* ═══ TOAST ═══════════════════════════════════════════════════════════ */
+        #toastContainer {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            z-index: 99999;
+            display: flex;
+            flex-direction: column;
+            gap: .5rem;
+        }
+        .toast-notif {
+            padding: .75rem 1.2rem;
+            border-radius: 12px;
+            color: #fff;
+            font-weight: 600;
+            font-size: .87rem;
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            box-shadow: 0 4px 20px rgba(0,0,0,.2);
+            min-width: 240px;
+            animation: slideIn .3s ease;
+        }
+        .toast-notif.success { background: linear-gradient(135deg,#22c55e,#16a34a); }
+        .toast-notif.error   { background: linear-gradient(135deg,#ef4444,#b91c1c); }
+        @keyframes slideIn {
+            from { transform: translateX(110%); opacity: 0; }
+            to   { transform: translateX(0);    opacity: 1; }
+        }

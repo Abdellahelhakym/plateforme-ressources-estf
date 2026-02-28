@@ -3,427 +3,304 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestion des Salles - ESTF</title>
+    <title>ESTF - Gestion des Salles</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <style>
         :root {
-            --gradient-primary: linear-gradient(135deg, #1a236d 0%, #2c75bd 100%);
-            --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-          
-            --gradient-info: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-            --gradient-warning: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
-            --primary-color: #1a236d;
-            --secondary-color: #2c75bd;
+            --blue-dark:  #1a236d;
+            --blue-mid:   #2c75bd;
+            --blue-light: #e8f0fb;
+            --blue-pale:  #f0f5ff;
+            --primary: linear-gradient(135deg, #1a236d 0%, #2c75bd 100%);
         }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--blue-pale); min-height: 100vh; display: flex; flex-direction: column; }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: var(--gradient-primary);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
+        /* ── NAVBAR ── */
+        .navbar { background: var(--primary) !important; box-shadow: 0 4px 20px rgba(26,35,109,.25); padding: 0.7rem 0; }
+        .estf-logo { display: flex; align-items: center; gap: 14px; }
+        .estf-img  { border-radius: 4px; height: 55px; width: 90px; background: url(./img/estf.png) center/cover; }
+        .estf-text { display: flex; flex-direction: column; }
+        .estf-text-ar, .estf-text-fr { font-size: .85rem; font-weight: 700; color: #fff; }
+        .nav-tagline { font-size: .8rem; font-weight: 600; color: rgba(255,255,255,.7); letter-spacing: .5px; }
 
-        .navbar {
-            background: var(--gradient-primary) !important;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-        }
+        /* ── HERO ── */
+        .hero { background: var(--primary); padding: 5.5rem 0 8rem; position: relative; overflow: hidden; }
+        .hero-circle-1 { position: absolute; width: 520px; height: 520px; border-radius: 50%; background: rgba(255,255,255,.06); top: -160px; right: -100px; }
+        .hero-circle-2 { position: absolute; width: 300px; height: 300px; border-radius: 50%; background: rgba(255,255,255,.05); bottom: -80px; left: -60px; }
+        .hero-circle-3 { position: absolute; width: 180px; height: 180px; border-radius: 50%; background: rgba(255,255,255,.04); top: 40px; left: 40%; }
+        .hero-wave { position: absolute; bottom: -2px; left: 0; width: 100%; height: 80px; background: var(--blue-pale); clip-path: ellipse(55% 100% at 50% 100%); }
 
-        .navbar-brand {
-            font-weight: bold;
-            color: white !important;
-            font-size: 1.2rem;
-        }
+        .hero-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.22); color: rgba(255,255,255,.9); border-radius: 100px; padding: .4rem 1.1rem; font-size: .78rem; font-weight: 700; letter-spacing: .5px; margin-bottom: 1.6rem; }
+        .hero-title { font-size: 3rem; font-weight: 800; color: #fff; line-height: 1.15; letter-spacing: -.5px; margin-bottom: 1.2rem; }
+        .hero-title em { font-style: normal; background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.25); border-radius: 8px; padding: 2px 10px; }
+        .hero-subtitle { color: rgba(255,255,255,.78); font-size: 1rem; line-height: 1.75; max-width: 460px; margin-bottom: 2rem; }
 
-        .navbar-brand img {
-            height: 50px;
-            margin-right: 15px;
-        }
+        /* Card flottante côté droit */
+        .hero-card { background: rgb(255, 255, 255); border: 1px solid rgba(255,255,255,.18); border-radius: 24px; backdrop-filter: blur(12px); padding: 1em; text-align: center; display: flex; justify-content: center; align-items: center;}
+        .hero-card img{width: 100%;}
+        .hero-card-icon { font-size: 4.5rem; color: rgba(255,255,255,.9); margin-bottom: 1rem; }
+        .hero-card p { color: rgba(255,255,255,.65); font-size: .85rem; margin: 0; }
+        .hero-card strong { display: block; color: #fff; font-size: 1rem; font-weight: 700; margin-bottom: .3rem; }
 
-         .estf-logo {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            border-radius: 5px;
-        }
+        /* ── STATS STRIP ── */
+        .stats-strip { background: #fff; border-radius: 18px; box-shadow: 0 10px 40px rgba(26,35,109,.12); padding: 1.6rem 2rem; margin-top: -3.5rem; position: relative; z-index: 10; }
+        .stat-item { text-align: center; }
+        .stat-item h3 { font-size: 2rem; font-weight: 800; color: var(--blue-dark); margin: 0; }
+        .stat-item p  { font-size: .72rem; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; margin: 0; }
+        .stat-sep { width: 1px; background: #e2e8f0; align-self: stretch; }
 
-        .estf-img{
-           border-radius: 3px;
-            height: 9vh;
-            width: 15vh;
-           background-image: url(./img/estf.png);
-           background-size: cover;
+        /* ── ACCÈS SECTION ── */
+        .section-label { font-size: .75rem; font-weight: 700; color: var(--blue-mid); text-transform: uppercase; letter-spacing: 1px; text-align: center; margin-bottom: .5rem; }
+        .section-title { font-size: 1.65rem; font-weight: 800; color: var(--blue-dark); text-align: center; margin-bottom: .6rem; }
+        .section-line { width: 48px; height: 4px; background: var(--primary); border-radius: 99px; margin: 0 auto 2.5rem; }
 
-        }
-     
+        .mode-card { background: #fff; border: 2px solid #dde6f5; border-radius: 22px; padding: 3rem 2rem 2.5rem; text-align: center; transition: all .3s; position: relative; overflow: hidden; height: 100%; }
+        .mode-card::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: var(--primary); transform: scaleX(0); transition: transform .3s; transform-origin: left; }
+        .mode-card:hover { transform: translateY(-8px); border-color: var(--blue-mid); box-shadow: 0 20px 50px rgba(26,35,109,.14); }
+        .mode-card:hover::after { transform: scaleX(1); }
 
-        .estf-text {
-            display: flex;
-            flex-direction: column;
-           
-          
-        }
+        .mode-icon-wrap { width: 76px; height: 76px; border-radius: 20px; background: var(--blue-light); display: flex; align-items: center; justify-content: center; font-size: 1.9rem; color: var(--blue-dark); margin: 0 auto 1.5rem; transition: .3s; }
+        .mode-card:hover .mode-icon-wrap { background: var(--primary); color: #fff; }
+        .mode-title { font-size: 1.3rem; font-weight: 800; color: var(--blue-dark); margin-bottom: .75rem; }
+        .mode-desc { color: #64748b; font-size: .87rem; line-height: 1.75; margin-bottom: 2rem; }
 
-       
+        .btn-solid { display: inline-flex; align-items: center; gap: 8px; background: var(--primary); color: #fff; border: none; border-radius: 12px; padding: .75rem 2rem; font-size: .9rem; font-weight: 700; cursor: pointer; text-decoration: none; transition: all .2s; }
+        .btn-solid:hover { color: #fff; box-shadow: 0 8px 22px rgba(44,117,189,.4); transform: translateY(-2px); }
+        .btn-outline { display: inline-flex; align-items: center; gap: 8px; background: #fff; color: var(--blue-mid); border: 2px solid var(--blue-mid); border-radius: 12px; padding: .7rem 2rem; font-size: .9rem; font-weight: 700; cursor: pointer; text-decoration: none; transition: all .2s; }
+        .btn-outline:hover { background: var(--blue-light); color: var(--blue-dark); border-color: var(--blue-dark); transform: translateY(-2px); box-shadow: 0 4px 16px rgba(44,117,189,.15); }
 
-       .estf-text-fr {
-    font-family: 'Segoe UI', sans-serif;
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: var(--estf-red);
-    letter-spacing: 0.5px;
-    white-space: normal;
-   
-}
-        .estf-text-ar {
-            font-family: 'Segoe UI', sans-serif;
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: var(--estf-red);
-            letter-spacing: 0.5px;
-            white-space: normal;
-        }
+        /* ── FEATURES ── */
+        .features-bg { background: #fff; padding: 4.5rem 0; }
+        .feat-card { background: var(--blue-pale); border: 1px solid #dde6f5; border-radius: 18px; padding: 2rem 1.5rem; text-align: center; height: 100%; transition: .25s; }
+        .feat-card:hover { transform: translateY(-5px); box-shadow: 0 10px 28px rgba(26,35,109,.1); border-color: var(--blue-mid); }
+        .feat-icon { width: 54px; height: 54px; border-radius: 14px; background: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 1.25rem; color: #fff; margin: 0 auto .9rem; }
+        .feat-title { font-size: .93rem; font-weight: 700; color: var(--blue-dark); margin-bottom: .4rem; }
+        .feat-desc  { font-size: .79rem; color: #64748b; line-height: 1.65; margin: 0; }
 
-        .main-container {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-           
-        }
-
-        .welcome-card {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 50px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            width: 100%;
-            
-           
-        }
-
-      
-
-        .welcome-title {
-            color: var(--primary-color);
-            font-size: 2.5rem;
-            font-weight: bold;
-            margin-bottom: 15px;
-            text-align: center;
-        }
-
-        .welcome-subtitle {
-            color: #6b7280;
-            text-align: center;
-            font-size: 1.1rem;
-            margin-bottom: 40px;
-        }
-
-        .mode-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 30px;
-            margin-top: 40px;
-        }
-
-        .mode-card {
-            background: white;
-            border: 2px solid #e5e7eb;
-            border-radius: 15px;
-            padding: 40px 30px;
-            text-align: center;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .mode-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.1), transparent);
-            transition: left 0.5s ease;
-        }
-
-        .mode-card:hover::before {
-            left: 100%;
-        }
-
-        .mode-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 40px rgba(42, 117, 189, 0.4);
-            border-color: var(--secondary-color);
-        }
-
-        .mode-icon {
-            font-size: 4rem;
-            margin-bottom: 20px;
-            transition: transform 0.3s ease;
-        }
-
-        .mode-card:hover .mode-icon {
-            transform: scale(1.1);
-        }
-
-        .admin-card .mode-icon {
-            background: var(--gradient-secondary);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .consultation-card .mode-icon {
-            background: var(--gradient-info);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .mode-title {
-            font-size: 1.5rem;
-            font-weight: bold;
-            margin-bottom: 15px;
-            color: var(--primary-color);
-        }
-
-        .mode-description {
-            color: #6b7280;
-            margin-bottom: 25px;
-            line-height: 1.6;
-        }
-
-        .btn-mode {
-            padding: 12px 40px;
-            border-radius: 25px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            transition: all 0.3s ease;
-            border: none;
-        }
-
-        .btn-admin {
-            background: var(--gradient-secondary);
-            color: white;
-        }
-
-        .btn-admin:hover {
-            background: linear-gradient(135deg, #e082ea 0%, #e4465b 100%);
-            transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(245, 87, 108, 0.5);
-        }
-
-        .btn-consultation {
-            background: var(--gradient-info);
-            color: white;
-        }
-
-        .btn-consultation:hover {
-            background: linear-gradient(135deg, #32d86b 0%, #28e8c7 100%);
-            transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(56, 249, 215, 0.5);
-        }
-
-        .features {
-            display: flex;
-            justify-content: center;
-            gap: 40px;
-            margin-top: 50px;
-            flex-wrap: wrap;
-        }
-
-        .feature-item {
-            text-align: center;
-            color: var(--primary-color);
-        }
-
-        .feature-item i {
-            font-size: 2rem;
-            background: var(--gradient-success);
-            -webkit-background-clip: text;
-           
-            background-clip: text;
-            margin-bottom: 10px;
-        }
-
-        
-        footer {
-            background: var(--gradient-primary);
-           
-        }
-
-        footer h5 {
-            font-weight: bold;
-            margin-bottom: 1rem;
-            position: relative;
-            padding-bottom: 0.5rem;
-        }
-
-        footer h5::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 50px;
-            height: 3px;
-            background: white;
-        }
-
-        footer a {
-            text-decoration: none;
-            transition: all 0.3s;
-        }
-
-        footer a:hover {
-            opacity: 0.8;
-            padding-left: 5px;
-        }
-
-        .mb-4 {
-            margin-bottom: 2rem !important;
-        }
-
-        h5 {
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 1.5rem;
-        }
+        /* ── FOOTER ── */
+        footer { background: var(--primary); margin-top: auto; }
+        footer h5 { font-weight: 700; font-size: .85rem; text-transform: uppercase; letter-spacing: .6px; margin-bottom: 1rem; padding-bottom: .5rem; position: relative; }
+        footer h5::after { content: ''; position: absolute; bottom: 0; left: 0; width: 36px; height: 3px; background: rgba(255,255,255,.4); border-radius: 99px; }
+        footer p, footer li { font-size: .82rem; color: rgba(255,255,255,.72); line-height: 1.8; }
+        footer a { text-decoration: none; color: rgba(255,255,255,.72); transition: .2s; }
+        footer a:hover { color: #fff; padding-left: 4px; }
 
         @media (max-width: 768px) {
-            .welcome-card {
-                padding: 30px 20px;
-            }
-
-            .welcome-title {
-                font-size: 2rem;
-            }
-
-            .mode-container {
-                grid-template-columns: 1fr;
-            }
+            .hero-title { font-size: 2rem; }
+            .hero { padding: 4rem 0 6rem; }
         }
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark">
-       <div class="container">
-            <a class="navbar-brand" href="#">
-                <div class="estf-logo" >
-                    <div  class="estf-img">
-                    </div>
-               <div class="estf-text" >
-                        <div class="estf-text-ar"> المدرسة العليا للتكنولوجيا </div>
-                        <div class="estf-text-fr">ECOLE SUPERIEURE DE TECHNOLOGIE</div>
-                    </div>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container d-flex justify-content-between align-items-center">
+        <a class="navbar-brand" href="#">
+            <div class="estf-logo">
+                <div class="estf-img"></div>
+                <div class="estf-text">
+                    <div class="estf-text-ar">المدرسة العليا للتكنولوجيا</div>
+                    <div class="estf-text-fr">ECOLE SUPERIEURE DE TECHNOLOGIE</div>
                 </div>
-            </a>
-            <span class="navbar-text text-white">
-                ESTF - Gestion des Salles
-            </span>
-        </div>
-    </nav>
-
-    <div class="main-container">
-        <div class="welcome-card">
-            <div class="text-center mb-4">
-                <i class="fas fa-door-open" style="font-size: 4rem; background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;"></i>
             </div>
-            
-            <h1 class="welcome-title">Bienvenue</h1>
-            <p class="welcome-subtitle">
-                Système de Gestion des Salles - Département Génie Informatique
-            </p>
+        </a>
+        <span class="nav-tagline d-none d-md-block">Gestion des Salles</span>
+    </div>
+</nav>
 
-            <div class="mode-container">
-                <!-- Mode Administration -->
-                <div class="mode-card admin-card">
-                    <div class="mode-icon">
+<!-- HERO -->
+<section class="hero">
+    <div class="hero-circle-1"></div>
+    <div class="hero-circle-2"></div>
+    <div class="hero-circle-3"></div>
+
+    <div class="container position-relative" style="z-index:2">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6" data-aos="fade-right">
+                <div class="hero-badge">
+                    <i class="fas fa-university"></i>
+                    Département Génie Informatique — ESTF
+                </div>
+                <h1 class="hero-title">
+                    Système de Gestion<br>des Salles
+                </h1>
+                <p class="hero-subtitle">
+                    Planifiez, consultez et gérez l'occupation des salles de l'ESTF
+                    en toute simplicité. Une solution complète pour l'administration
+                    et la consultation publique.
+                </p>
+            </div>
+         
+        </div>
+    </div>
+    <div class="hero-wave"></div>
+</section>
+
+<!-- STATS STRIP -->
+<div class="container" style="position:relative;z-index:10;margin-top:-3.5rem">
+    <div class="stats-strip" data-aos="fade-up">
+        <div class="row g-2 align-items-center justify-content-center text-center">
+           <div class="col stat-item">
+    <h3>10+</h3>
+    <p>Salles</p>
+</div>
+<div class="col-auto stat-sep d-none d-md-flex" style="height:50px"></div>
+
+<div class="col stat-item">
+    <h3>100+</h3>
+    <p>Materiel</p>
+</div>
+<div class="col-auto stat-sep d-none d-md-flex" style="height:50px"></div>
+
+<div class="col stat-item">
+    <h3>95%</h3>
+    <p>Fonction</p>
+</div>
+<div class="col-auto stat-sep d-none d-md-flex" style="height:50px"></div>
+
+<div class="col stat-item">
+    <h3>20+</h3>
+    <p>Partenaires académiques & professionnels</p>
+</div>
+        </div>
+    </div>
+</div>
+
+<!-- MODE CARDS -->
+<section class="py-5 mt-4">
+    <div class="container">
+        <p class="section-label" data-aos="fade-up">Votre accès</p>
+        <h2 class="section-title" data-aos="fade-up">Choisissez votre mode</h2>
+        <div class="section-line" data-aos="fade-up" data-aos-delay="50"></div>
+
+        <div class="row g-4 justify-content-center">
+            <div class="col-md-5" data-aos="fade-up" data-aos-delay="100">
+                <div class="mode-card">
+                    <div class="mode-icon-wrap">
                         <i class="fas fa-user-shield"></i>
                     </div>
                     <h3 class="mode-title">Administration</h3>
-                    <p class="mode-description">
-                        Accès complet pour gérer les salles, les réservations et les configurations
+                    <p class="mode-desc">
+                        Accès complet à la gestion des salles, à la planification des
+                        occupations, aux statistiques et à l'administration des ressources.
                     </p>
-                    <a href="./login.html">
-                    <button class="btn btn-mode btn-admin">
-                       <i class="fas fa-sign-in-alt me-2"></i>Accéder
-                    </button>
-                    </a>
-                </div>
-
-                <!-- Mode Consultation -->
-                <div class="mode-card consultation-card">
-                    <div class="mode-icon">
-                        <i class="fas fa-eye"></i>
-                    </div>
-                    <h3 class="mode-title">Consultation</h3>
-                    <p class="mode-description">
-                        Consulter les disponibilités des salles et les emplois du temps
-                    </p>
-                     <a href="./accueilPublic.html">
-                    <button class="btn btn-mode btn-consultation">
-                        <i class="fas fa-search me-2"></i>Consulter
-                    </button>
+                    <a href="./login.html" class="btn-solid">
+                        <i class="fas fa-sign-in-alt"></i> Se connecter
                     </a>
                 </div>
             </div>
-
-            <div class="features">
-                <div class="feature-item">
-                    <i class="fas fa-calendar-check"></i>
-                    <p>Réservation Simple</p>
-                </div>
-                <div class="feature-item">
-                    <i class="fas fa-clock"></i>
-                    <p>Temps Réel</p>
-                </div>
-                <div class="feature-item">
-                    <i class="fas fa-chart-line"></i>
-                    <p>Statistiques</p>
+           <div class="col-md-5" data-aos="fade-up" data-aos-delay="100">
+    <div class="mode-card">
+        <div class="mode-icon-wrap">
+            <i class="fas fa-chalkboard-teacher"></i>
+        </div>
+        <h3 class="mode-title">Enseignement</h3>
+        <p class="mode-desc">
+            Accès dédié aux enseignants pour consulter les emplois du temps,
+            réserver des salles, gérer les séances de cours et suivre
+            l’occupation des espaces pédagogiques.
+        </p>
+        <a href="./login.html" class="btn-solid">
+            <i class="fas fa-sign-in-alt"></i> Se connecter
+        </a>
+    </div>
+</div>
+            <div class="col-md-5" data-aos="fade-up" data-aos-delay="200">
+                <div class="mode-card">
+                    <div class="mode-icon-wrap">
+                        <i class="fas fa-eye"></i>
+                    </div>
+                    <h3 class="mode-title">Consultation</h3>
+                    <p class="mode-desc">
+                        Consultez librement les disponibilités des salles et les emplois
+                        du temps sans compte requis. Accès public et instantané.
+                    </p>
+                    <a href="./accueilPublic.html" class="btn-outline">
+                        <i class="fas fa-search"></i> Consulter
+                    </a>
                 </div>
             </div>
         </div>
     </div>
+</section>
 
-     <footer class="text-white py-5">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-4 mb-4" >
-                    <h5 class="text-light "><i class="fas fa-info-circle "></i> À Propos</h5>
-                    <p>Le Département Génie Informatique de l'ESTF offre une formation de qualité en informatique et technologies de l'information.</p>
-                </div>
-                <div class="col-md-4 mb-4">
-                    <h5 class="text-light "><i class="fas fa-envelope"></i> Contact</h5>
-                    <p>
-                        <i class="fas fa-map-marker-alt"></i>  BP 2427 Route d’Imouzzer, 30000 Fès<br>
-                        <i class="fas fa-phone"></i> (+212) 6 66 21 46 30<br>
-                        <i class="fas fa-at"></i> support.est@usmba.ac.ma
-                    </p>
-                </div>
-                <div class="col-md-4 mb-4">
-                    <h5 class="text-light "><i class="fas fa-link"></i> Liens Utiles</h5>
-                    <ul class="list-unstyled">
-                        <li><a href="https://www.est-usmba.ac.ma/" class="text-white"><i class="fas fa-globe"></i> Site ESTF</a></li>
-                        <li><a href="https://www.facebook.com/est.fes01" class="text-white"><i class="fab fa-facebook"></i> Facebook</a></li>
-                        <li><a href="https://www.instagram.com/est.fes.usmba/" class="text-white"><i class="fab fa-instagram"></i> instagram</a></li>
-                        
-                    </ul>
+<!-- FEATURES -->
+<section class="features-bg">
+    <div class="container">
+        <p class="section-label" data-aos="fade-up">Ce que nous offrons</p>
+        <h2 class="section-title" data-aos="fade-up">Fonctionnalités clés</h2>
+        <div class="section-line" data-aos="fade-up" data-aos-delay="50"></div>
+        <div class="row g-3">
+            <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="100">
+                <div class="feat-card">
+                    <div class="feat-icon"><i class="fas fa-calendar-check"></i></div>
+                    <div class="feat-title">Réservation Simple</div>
+                    <p class="feat-desc">Planifiez des occupations en quelques clics avec gestion des semestres et semaines.</p>
                 </div>
             </div>
-            <hr class="bg-white">
-            <p class="text-center mb-0">
-                <i class="fas fa-copyright"></i> 2025 Département Génie Informatique - ESTF. Tous droits réservés. Créé par Abdellah El hakym
-            </p>
+            <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="150">
+                <div class="feat-card">
+                    <div class="feat-icon"><i class="fas fa-clock"></i></div>
+                    <div class="feat-title">Temps Réel</div>
+                    <p class="feat-desc">Les disponibilités sont mises à jour instantanément pour éviter tout conflit.</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="200">
+                <div class="feat-card">
+                    <div class="feat-icon"><i class="fas fa-chart-bar"></i></div>
+                    <div class="feat-title">Tableau de Bord</div>
+                    <p class="feat-desc">Statistiques détaillées sur le taux d'occupation et l'utilisation des salles.</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="250">
+                <div class="feat-card">
+                    <div class="feat-icon"><i class="fas fa-shield-alt"></i></div>
+                    <div class="feat-title">Accès Sécurisé</div>
+                    <p class="feat-desc">Interface d'administration protégée par authentification avec gestion des rôles.</p>
+                </div>
+            </div>
         </div>
-    </footer>
+    </div>
+</section>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-     
-    </script>
+<!-- FOOTER -->
+<footer class="text-white py-5">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-md-4">
+                <h5 class="text-white"><i class="fas fa-info-circle me-2"></i>À Propos</h5>
+                <p>Le Département Génie Informatique de l'ESTF offre une formation de qualité en informatique et technologies de l'information.</p>
+            </div>
+            <div class="col-md-4">
+                <h5 class="text-white"><i class="fas fa-envelope me-2"></i>Contact</h5>
+                <p>
+                    <i class="fas fa-map-marker-alt me-1"></i> BP 2427 Route d'Imouzzer, 30000 Fès<br>
+                    <i class="fas fa-phone me-1"></i> (+212) 6 66 21 46 30<br>
+                    <i class="fas fa-at me-1"></i> support.est@usmba.ac.ma
+                </p>
+            </div>
+            <div class="col-md-4">
+                <h5 class="text-white"><i class="fas fa-link me-2"></i>Liens Utiles</h5>
+                <ul class="list-unstyled">
+                    <li><a href="https://www.est-usmba.ac.ma/"><i class="fas fa-globe me-1"></i> Site ESTF</a></li>
+                    <li><a href="https://www.facebook.com/est.fes01"><i class="fab fa-facebook me-1"></i> Facebook</a></li>
+                    <li><a href="https://www.instagram.com/est.fes.usmba/"><i class="fab fa-instagram me-1"></i> Instagram</a></li>
+                </ul>
+            </div>
+        </div>
+        <hr style="border-color:rgba(255,255,255,.18)">
+        <p class="text-center mb-0" style="font-size:.77rem;color:rgba(255,255,255,.55)">
+            <i class="fas fa-copyright me-1"></i> 2025 Département Génie Informatique — ESTF. Tous droits réservés.
+        </p>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>AOS.init({ duration: 650, once: true });</script>
 </body>
 </html>

@@ -17,8 +17,17 @@ consultation.get('/data/salles', (req, res) => {
     });
 });
 
+// Semaines filtrées par semestre si id_semestre fourni
 consultation.get('/data/semaines', (req, res) => {
-    connection.query('SELECT id_semaine, nom_semaine, date_debut, date_fin FROM semaine ORDER BY date_debut', (err, r) => {
+    const { id_semestre } = req.query;
+    let sql = 'SELECT id_semaine, nom_semaine, date_debut, date_fin FROM semaine';
+    const params = [];
+    if (id_semestre) {
+        sql += ' WHERE id_semestre = ?';
+        params.push(id_semestre);
+    }
+    sql += ' ORDER BY date_debut';
+    connection.query(sql, params, (err, r) => {
         if (err) return res.status(500).json({ error: err.message });
         res.json(r);
     });
@@ -40,16 +49,13 @@ consultation.get('/data/semestres', (req, res) => {
 
 // =============================================================================
 // SUPPRIMER UNE OCCUPATION  (+ ses semaines liées)
-// DELETE /consultation/occupation/:id
 // =============================================================================
 consultation.delete('/occupation/:id', (req, res) => {
     const id = parseInt(req.params.id, 10);
     if (isNaN(id)) return res.status(400).json({ error: 'id_occupation invalide' });
 
-    // D'abord supprimer les lignes dans occupation_semain (FK)
     connection.query('DELETE FROM occupation_semain WHERE id_occupation = ?', [id], (err1) => {
         if (err1) return res.status(500).json({ error: err1.message });
-
         connection.query('DELETE FROM occupation WHERE id_occupation = ?', [id], (err2, result) => {
             if (err2) return res.status(500).json({ error: err2.message });
             if (result.affectedRows === 0) return res.status(404).json({ error: 'Occupation non trouvée' });
@@ -77,7 +83,7 @@ consultation.get('/salle', (req, res) => {
     let sqlOcc = `
         SELECT o.id_occupation, o.jour, o.id_creneau, o.\`group\`,
                cr.heure_debut, cr.heure_fin,
-               f.nom_filiere  AS filiere,
+               CONCAT(f.nom_filiere, ' - ', f.annee) AS filiere,
                m.nom_module   AS module,
                CONCAT(p.nom,' ',p.prenom) AS professeur,
                sd.nom_semaine AS semaine_debut,
@@ -133,7 +139,7 @@ consultation.get('/salle', (req, res) => {
 });
 
 // =============================================================================
-// DÉTAIL COMPLET : toutes semaines pour une salle
+// DÉTAIL COMPLET : semaines du semestre sélectionné pour une salle
 // GET /consultation/salle/detail?id_salle=X[&id_annee=Y&id_semestre=Z]
 // =============================================================================
 consultation.get('/salle/detail', (req, res) => {
@@ -143,13 +149,21 @@ consultation.get('/salle/detail', (req, res) => {
 
     if (isNaN(id_salle)) return res.status(400).json({ error: 'id_salle est obligatoire' });
 
-    const sqlSem = 'SELECT id_semaine, nom_semaine, date_debut, date_fin FROM semaine ORDER BY date_debut';
-    const sqlCr  = 'SELECT id_creneau, heure_debut, heure_fin FROM creneau ORDER BY heure_debut';
+    // Filtrer les semaines par semestre si fourni
+    let sqlSem = 'SELECT id_semaine, nom_semaine, date_debut, date_fin FROM semaine';
+    const paramsSem = [];
+    if (id_semestre) {
+        sqlSem += ' WHERE id_semestre = ?';
+        paramsSem.push(id_semestre);
+    }
+    sqlSem += ' ORDER BY date_debut';
+
+    const sqlCr = 'SELECT id_creneau, heure_debut, heure_fin FROM creneau ORDER BY heure_debut';
 
     let sqlOcc = `
         SELECT o.id_occupation, o.jour, o.id_creneau, o.\`group\`, o.sD, o.sF,
                cr.heure_debut, cr.heure_fin,
-               f.nom_filiere  AS filiere,
+               CONCAT(f.nom_filiere, ' - ', f.annee) AS filiere,
                m.nom_module   AS module,
                CONCAT(p.nom,' ',p.prenom) AS professeur
         FROM occupation o
@@ -163,7 +177,7 @@ consultation.get('/salle/detail', (req, res) => {
     if (id_annee)    { sqlOcc += ' AND o.id_annee = ?';    paramsOcc.push(id_annee); }
     if (id_semestre) { sqlOcc += ' AND o.id_semestre = ?'; paramsOcc.push(id_semestre); }
 
-    connection.query(sqlSem, (errS, semaines) => {
+    connection.query(sqlSem, paramsSem, (errS, semaines) => {
         if (errS) return res.status(500).json({ error: errS.message });
         const semainesSafe = semaines || [];
 

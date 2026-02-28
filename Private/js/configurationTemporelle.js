@@ -2,8 +2,26 @@ AOS.init({ duration: 800, once: true });
 
         // ── Variables suppression ──────────────────────────────────
         let deleteEndpoint = null;
-        let deleteId = null;
-        let deleteReload = null;
+        let deleteId       = null;
+        let deleteReload   = null;
+
+        // ── Données semestres en mémoire ───────────────────────────
+        let semestresData = [];
+        // ── Toutes les semaines en mémoire (pour le filtre) ────────
+        let seminesAllData = [];
+
+        // ══════════════════════════════════════════════════════════
+        // UTILITAIRE : peupler un <select> depuis un tableau
+        // ══════════════════════════════════════════════════════════
+        function fillSelect(selectEl, data, valKey, labelKey, placeholder = '-- Choisir --') {
+            selectEl.innerHTML = `<option value="">${placeholder}</option>`;
+            data.forEach(item => {
+                const opt = document.createElement('option');
+                opt.value       = item[valKey];
+                opt.textContent = item[labelKey];
+                selectEl.appendChild(opt);
+            });
+        }
 
         // ══════════════════════════════════════════════════════════
         // CHARGEMENT DES DONNÉES
@@ -49,6 +67,9 @@ AOS.init({ duration: 800, once: true });
         async function loadSemestres() {
             const res  = await fetch('/config/semestre');
             const data = await res.json();
+            semestresData = data;
+
+            // Table
             const tbody = document.getElementById('tbodySemestres');
             tbody.innerHTML = '';
             data.forEach(item => {
@@ -71,33 +92,64 @@ AOS.init({ duration: 800, once: true });
                 `;
                 tbody.appendChild(tr);
             });
+
+            // Peupler les selects semestre dans modals semaine + filtre
+            const selects = [
+                document.getElementById('addSemaineSemestre'),
+                document.getElementById('editSemaineSemestre'),
+                document.getElementById('filterSemestre')
+            ];
+            selects.forEach(sel => {
+                if (!sel) return;
+                const isFilter = sel.id === 'filterSemestre';
+                fillSelect(sel, data, 'id_semestre', 'nom_semestre',
+                    isFilter ? 'Tous les semestres' : '-- Choisir un semestre --');
+            });
         }
 
-        async function loadSemaines() {
+        async function loadSemaines(filterIdSemestre = '') {
             const res  = await fetch('/config/semaine');
             const data = await res.json();
+            seminesAllData = data;
+            renderSemaines(filterIdSemestre);
+        }
+
+        function renderSemaines(filterIdSemestre = '') {
             const row  = document.getElementById('rowSemaines');
             row.innerHTML = '';
-            if (data.length === 0) {
+
+            const filtered = filterIdSemestre
+                ? seminesAllData.filter(s => String(s.id_semestre) === String(filterIdSemestre))
+                : seminesAllData;
+
+            if (filtered.length === 0) {
                 row.innerHTML = '<p class="text-muted">Aucune semaine enregistrée.</p>';
                 return;
             }
-            data.forEach((item, index) => {
-                const col = document.createElement('div');
+
+            filtered.forEach((item, index) => {
+                const col   = document.createElement('div');
                 col.className = 'col-md-3 col-sm-6 mb-3';
                 const debut = item.date_debut ? item.date_debut.substring(0, 10) : '-';
                 const fin   = item.date_fin   ? item.date_fin.substring(0, 10)   : '-';
+
+                // Badge couleur semestre
+                const semLabel = item.nom_semestre
+                    ? `<span class="badge bg-primary ms-1">${item.nom_semestre}</span>`
+                    : '';
+
                 col.innerHTML = `
                     <div class="week-card">
                         <div class="week-number">${index + 1}</div>
-                        <h6>${item.nom_semaine}</h6>
-                        <p><i class="fas fa-calendar"></i> ${debut} - ${fin}</p>
+                        <h6>${item.nom_semaine} ${semLabel}</h6>
+                        <p><i class="fas fa-calendar"></i> ${debut} → ${fin}</p>
                         <div class="card-actions mt-2">
                             <button class="btn btn-sm btn-edit btn-edit-semaine"
                                 data-id="${item.id_semaine}"
                                 data-nom="${item.nom_semaine}"
                                 data-debut="${debut}"
-                                data-fin="${fin}">
+                                data-fin="${fin}"
+                                data-semestre="${item.id_semestre || ''}">
                                 <i class="fas fa-edit"></i>
                             </button>
                             <button class="btn btn-sm btn-delete btn-del"
@@ -146,11 +198,16 @@ AOS.init({ duration: 800, once: true });
         }
 
         // Charger tout au démarrage
-        window.addEventListener('load', () => {
+        window.addEventListener('load', async () => {
+            await loadSemestres(); // en premier pour peupler les selects
             loadAnnees();
-            loadSemestres();
             loadSemaines();
             loadCreneaux();
+        });
+
+        // ── Filtre semaines par semestre ───────────────────────────
+        document.getElementById('filterSemestre').addEventListener('change', function () {
+            renderSemaines(this.value);
         });
 
         // ══════════════════════════════════════════════════════════
@@ -179,7 +236,7 @@ AOS.init({ duration: 800, once: true });
         }
 
         saveItem('btnSaveAnnee',    'formAddAnnee',    'addAnneeModal',    'annee',    loadAnnees);
-        saveItem('btnSaveSemestre', 'formAddSemestre', 'addSemestreModal', 'semestre', loadSemestres);
+        saveItem('btnSaveSemestre', 'formAddSemestre', 'addSemestreModal', 'semestre', async () => { await loadSemestres(); });
         saveItem('btnSaveSemaine',  'formAddSemaine',  'addSemaineModal',  'semaine',  loadSemaines);
         saveItem('btnSaveCreneau',  'formAddCreneau',  'addCreneauModal',  'creneau',  loadCreneaux);
 
@@ -236,13 +293,15 @@ AOS.init({ duration: 800, once: true });
                 new bootstrap.Modal(document.getElementById('editSemestreModal')).show();
             }
 
-            // Édition Semaine
+            // Édition Semaine — pré-sélectionner le semestre
             const btnW = e.target.closest('.btn-edit-semaine');
             if (btnW) {
                 document.getElementById('editSemaineId').value        = btnW.dataset.id;
                 document.getElementById('editNomSemaine').value       = btnW.dataset.nom;
                 document.getElementById('editDateDebutSemaine').value = btnW.dataset.debut;
                 document.getElementById('editDateFinSemaine').value   = btnW.dataset.fin;
+                // Sélectionner le semestre actuel
+                document.getElementById('editSemaineSemestre').value  = btnW.dataset.semestre || '';
                 new bootstrap.Modal(document.getElementById('editSemaineModal')).show();
             }
 

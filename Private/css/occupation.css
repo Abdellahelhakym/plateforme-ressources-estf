@@ -1,12 +1,12 @@
 :root {
     --gradient-primary: linear-gradient(135deg, #1a236d 0%, #2c75bd 100%);
-    --color-lundi: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --color-lundi: linear-gradient(135deg, #1a236d 0%, #2c75bd 100%);
    
 }
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(to bottom, #f8f9fa 0%, #e9ecef 100%);
+    background: linear-gradient(160deg, #e8f0fb 0%, #ffffff 50%, #d0e4f7 100%);
 }
 
 .navbar {

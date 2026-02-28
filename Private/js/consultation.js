@@ -1,6 +1,5 @@
 AOS.init({ duration: 600, once: true });
 
-// JOURS avec leur index de colonne dans le tableau (0 = colonne Créneau, 1 = Lundi, ...)
 const JOURS = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'];
 let currentMode = 'semaine';
 let pendingDelete = null;
@@ -42,20 +41,50 @@ function showToast(msg, type = 'success') {
 
 async function loadRefData() {
     try {
-        const [salles, semaines, annees, semestres] = await Promise.all([
+        const [salles, annees, semestres] = await Promise.all([
             fetch('/consultation/data/salles').then(r => r.json()),
-            fetch('/consultation/data/semaines').then(r => r.json()),
             fetch('/consultation/data/annees').then(r => r.json()),
             fetch('/consultation/data/semestres').then(r => r.json()),
         ]);
         fillSelect(document.getElementById('filtSalle'),    salles,    'id_salle',    'nom_salle');
-        fillSelect(document.getElementById('filtSemaine'),  semaines,  'id_semaine',  'nom_semaine');
         fillSelect(document.getElementById('filtAnnee'),    annees,    'id_annee',    'libelle');
         fillSelect(document.getElementById('filtSemestre'), semestres, 'id_semestre', 'nom_semestre');
+
+        // Semaines vides au départ — chargées après choix du semestre
+        const selSemaine = document.getElementById('filtSemaine');
+        selSemaine.innerHTML = '<option value="">-- Choisir d\'abord un semestre --</option>';
     } catch(e) {
         console.error('Erreur chargement référence :', e);
     }
 }
+
+// =============================================================================
+// SEMESTRE → RECHARGER LES SEMAINES
+// =============================================================================
+
+document.getElementById('filtSemestre').addEventListener('change', async function () {
+    const id_semestre = this.value;
+    const selSemaine  = document.getElementById('filtSemaine');
+
+    // Vider
+    selSemaine.innerHTML = '<option value="">-- Choisir --</option>';
+
+    if (!id_semestre) {
+        selSemaine.innerHTML = '<option value="">-- Choisir d\'abord un semestre --</option>';
+        return;
+    }
+
+    try {
+        const semaines = await fetch(`/consultation/data/semaines?id_semestre=${id_semestre}`).then(r => r.json());
+        fillSelect(selSemaine, semaines, 'id_semaine', 'nom_semaine');
+        if (semaines.length === 0) {
+            selSemaine.innerHTML = '<option value="">Aucune semaine pour ce semestre</option>';
+        }
+    } catch(e) {
+        console.error('Erreur chargement semaines :', e);
+        selSemaine.innerHTML = '<option value="">Erreur de chargement</option>';
+    }
+});
 
 // =============================================================================
 // MODE
@@ -199,7 +228,7 @@ function renderDetail(data) {
     </h5>`;
 
     if (!semaines.length) {
-        container.innerHTML += '<div class="empty-state"><i class="fas fa-inbox"></i><p>Aucune semaine trouvée.</p></div>';
+        container.innerHTML += '<div class="empty-state"><i class="fas fa-inbox"></i><p>Aucune semaine trouvée pour ce semestre.</p></div>';
         return;
     }
 
@@ -252,14 +281,11 @@ function renderDetail(data) {
 
 // =============================================================================
 // CONSTRUIRE TABLEAU GRILLE
-// Chaque th et td de jour reçoit data-col-index="N" (1..7)
-// La colonne "Créneau" a index 0 et ne se cache jamais
 // =============================================================================
 
 function buildGrilleTable(creneaux, grille) {
     if (!creneaux?.length || !grille) return '<p class="p-3 text-muted">Aucune donnée.</p>';
 
-    // En-tête
     let html = '<table class="grille-table"><thead><tr>';
     html += '<th data-col-index="0">Créneau</th>';
     JOURS.forEach((j, i) => {
@@ -324,26 +350,16 @@ function buildGrilleTable(creneaux, grille) {
 }
 
 // =============================================================================
-// ── FILTRE PRINCIPAL ──
-// Logique :
-//   1. Mettre à jour les boutons actifs
-//   2. Afficher / cacher les cellules td selon data-statut
-//   3. Pour chaque colonne jour (index 1..7) :
-//      vérifier si au moins 1 td visible existe dans cette colonne
-//      → si non : cacher le th ET tous les td de cet index
-//      → si oui  : montrer  le th ET tous les td de cet index
+// FILTRE COLONNES
 // =============================================================================
 
 function applyFilter(btn, statut, scope) {
-    // 1. Boutons actifs
     scope.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
 
     const table = scope.querySelector('.grille-table');
     if (!table) return;
 
-    // ── Réinitialisation complète ────────────────────────────────────────────
-    // Retirer tous les styles inline et col-hidden pour repartir d'un état propre
     table.querySelectorAll('th, td').forEach(el => {
         el.classList.remove('col-hidden');
         el.style.visibility = '';
@@ -352,17 +368,14 @@ function applyFilter(btn, statut, scope) {
     });
     table.querySelectorAll('tbody tr').forEach(tr => tr.style.display = '');
 
-    if (statut === 'all') return;   // mode "Tous" → tout visible, terminé
+    if (statut === 'all') return;
 
-    // ── ÉTAPE 1 : Quelles colonnes ont au moins 1 cellule du bon statut ? ────
-    // On utilise les DATA-STATUT originaux dans le DOM (jamais modifiés).
     const visibleCols = new Set();
     for (let col = 1; col <= 7; col++) {
         if (table.querySelector('td[data-statut="' + statut + '"][data-col-index="' + col + '"]'))
             visibleCols.add(col);
     }
 
-    // ── ÉTAPE 2 : Cacher entièrement les colonnes sans aucune cellule utile ──
     for (let col = 1; col <= 7; col++) {
         if (!visibleCols.has(col)) {
             const th = table.querySelector('th[data-col-index="' + col + '"]');
@@ -372,33 +385,24 @@ function applyFilter(btn, statut, scope) {
         }
     }
 
-    // ── ÉTAPE 3 : Dans les colonnes visibles, traiter chaque ligne ───────────
-    // Stratégie : visibility:hidden (garde l'espace) sur les cellules qui ne
-    // correspondent pas → aucun décalage de colonnes, pas de contenu à sauver.
     table.querySelectorAll('tbody tr').forEach(tr => {
-        // Y a-t-il au moins 1 cellule du bon statut dans une colonne visible ?
         const hasGood = Array.from(
             tr.querySelectorAll('td[data-statut="' + statut + '"]')
         ).some(td => visibleCols.has(parseInt(td.dataset.colIndex)));
 
         if (!hasGood) {
-            // Aucune bonne cellule dans cette ligne → cacher toute la ligne
             tr.style.display = 'none';
             return;
         }
 
-        // Ligne utile → rendre invisibles (mais présentes) les mauvaises cellules
         tr.querySelectorAll('td[data-statut]').forEach(td => {
             const colIdx = parseInt(td.dataset.colIndex);
-            if (!visibleCols.has(colIdx)) return; // déjà cachée via col-hidden
-
+            if (!visibleCols.has(colIdx)) return;
             if (td.dataset.statut !== statut) {
-                // Cellule du mauvais type : invisible mais garde son espace
                 td.style.visibility = 'hidden';
                 td.style.background = 'transparent';
                 td.style.border     = 'none';
             }
-            // Cellule du bon type : déjà visible après réinitialisation
         });
     });
 }
@@ -418,7 +422,7 @@ function toggleAcc(header) {
 }
 
 // =============================================================================
-// SUPPRESSION — MODAL
+// SUPPRESSION
 // =============================================================================
 
 function openDelModal(id_occupation, cellElement, infoHtml) {
@@ -451,7 +455,6 @@ async function confirmDelete() {
         const result = await resp.json();
         if (!resp.ok) throw new Error(result.error || 'Erreur serveur');
 
-        // Transformer la cellule en libre
         const colIdx = cellElement.dataset.colIndex;
         cellElement.className = 'cell-libre';
         cellElement.dataset.statut = 'libre';
@@ -473,7 +476,7 @@ async function confirmDelete() {
     }
 }
 
-// ===========================================================================================================================
+// =============================================================================
 // INIT
 // =============================================================================
 window.addEventListener('load', () => {

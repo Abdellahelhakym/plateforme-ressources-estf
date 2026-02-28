@@ -93,14 +93,14 @@
         </div>
 
         <div id="filiere"></div>
-       <!-- SECTION Filières -->
+        <!-- SECTION Filières -->
         <div class="section-container" data-aos="fade-up">
             <div class="section-header">
                 <div class="section-title">
                     <i class="fas fa-graduation-cap"></i>
                     <h3>Gestion des Filières</h3>
                 </div>
-                <button class="btn  btn-add" data-bs-toggle="modal" data-bs-target="#addFiliereModal">
+                <button class="btn btn-add" data-bs-toggle="modal" data-bs-target="#addFiliereModal">
                     <i class="fas fa-plus"></i> Ajouter Filière
                 </button>
             </div>
@@ -110,6 +110,7 @@
                         <thead>
                             <tr>
                                 <th>Nom de la Filière</th>
+                                <th>Année</th>
                                 <th>Niveau</th>
                                 <th>Nb Groupes</th>
                                 <th>Actions</th>
@@ -142,6 +143,7 @@
                                 <th>Prénom</th>
                                 <th>Email</th>
                                 <th>Département</th>
+                                <th>Filière</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -179,6 +181,8 @@
             </div>
         </div>
 
+        <!-- ===================== MODALS AJOUT ===================== -->
+
         <!-- Modal Add Filière -->
         <div class="modal fade" id="addFiliereModal" tabindex="-1">
             <div class="modal-dialog">
@@ -192,6 +196,14 @@
                             <div class="mb-3">
                                 <label class="form-label">Nom de la Filière</label>
                                 <input type="text" class="form-control" name="nom_filiere" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Année</label>
+                                <select class="form-select" name="annee" required>
+                                    <option value="1ere annee">1ère année</option>
+                                    <option value="2eme annee">2ème année</option>
+                                    <option value="3eme annee">3ème année</option>
+                                </select>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Niveau</label>
@@ -231,7 +243,13 @@
                                 <label>Département</label>
                                 <select class="form-select" name="departement" required>
                                     <option value="Génie Informatique">Génie Informatique</option>
-                                    <!-- autres options... -->
+                                </select>
+                            </div>
+                            <!-- NEW: Filière select populated dynamically -->
+                            <div class="mb-3">
+                                <label>Filière</label>
+                                <select class="form-select" name="id_filiere" id="selectFiliereProf">
+                                    <option value="">-- Aucune --</option>
                                 </select>
                             </div>
                         </form>
@@ -258,7 +276,6 @@
                                 <input type="text" class="form-control" name="nom_module" required></div>
                             <div class="mb-3">
                                 <label>Filière</label>
-                                <!-- FIX: populated dynamically from DB using id_filiere -->
                                 <select class="form-select" name="id_filiere" id="selectFiliereModule" required>
                                 </select>
                             </div>
@@ -271,6 +288,8 @@
                 </div>
             </div>
         </div>
+
+        <!-- ===================== MODALS SUPPRESSION ===================== -->
 
         <!-- Modal Confirmation Suppression -->
         <div class="modal fade" id="confirmDeleteModal" tabindex="-1">
@@ -291,6 +310,8 @@
             </div>
         </div>
 
+        <!-- ===================== MODALS ÉDITION ===================== -->
+
         <!-- Modal Edition Filière -->
         <div class="modal fade" id="editFiliereModal" tabindex="-1">
             <div class="modal-dialog">
@@ -302,14 +323,29 @@
                     <div class="modal-body">
                         <form id="formEditFiliere">
                             <input type="hidden" id="editFiliereId" name="id">
-                            <div class="mb-3"><label>Nom</label><input type="text" class="form-control" id="editNomFiliere" name="nom_filiere" required></div>
-                            <div class="mb-3"><label>Niveau</label>
+                            <div class="mb-3">
+                                <label>Nom de la Filière</label>
+                                <input type="text" class="form-control" id="editNomFiliere" name="nom_filiere" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Année</label>
+                                <select class="form-select" id="editAnneeFiliere" name="annee" required>
+                                    <option value="1ere annee">1ère année</option>
+                                    <option value="2eme annee">2ème année</option>
+                                    <option value="3eme annee">3ème année</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label>Niveau</label>
                                 <select class="form-select" id="editNiveauFiliere" name="niveau" required>
                                     <option value="DUT">DUT</option>
                                     <option value="Bachelor">Bachelor</option>
                                 </select>
                             </div>
-                            <div class="mb-3"><label>Nb Groupes</label><input type="number" class="form-control" id="editNbGroup" name="nb_group" min="1" required></div>
+                            <div class="mb-3">
+                                <label>Nb Groupes</label>
+                                <input type="number" class="form-control" id="editNbGroup" name="nb_group" min="1" required>
+                            </div>
                         </form>
                     </div>
                     <div class="modal-footer">
@@ -334,9 +370,17 @@
                             <div class="mb-3"><label>Nom</label><input type="text" class="form-control" id="editNomProf" name="nom" required></div>
                             <div class="mb-3"><label>Prénom</label><input type="text" class="form-control" id="editPrenomProf" name="prenom" required></div>
                             <div class="mb-3"><label>Email</label><input type="email" class="form-control" id="editEmailProf" name="email" required></div>
-                            <div class="mb-3"><label>Département</label>
+                            <div class="mb-3">
+                                <label>Département</label>
                                 <select class="form-select" id="editDeptProf" name="departement" required>
                                     <option value="Génie Informatique">Génie Informatique</option>
+                                </select>
+                            </div>
+                            <!-- NEW: Filière select populated dynamically -->
+                            <div class="mb-3">
+                                <label>Filière</label>
+                                <select class="form-select" id="editFiliereProf" name="id_filiere">
+                                    <option value="">-- Aucune --</option>
                                 </select>
                             </div>
                         </form>

@@ -37,17 +37,7 @@ occupation.get('/data/salles', (req, res) => {
 });
 
 // =============================================================================
-// SALLES LIBRES — VERSION CORRIGÉE
-//
-// Logique de chevauchement d'intervalles :
-//   Deux périodes [A,B] et [C,D] se CHEVAUCHENT si et seulement si :
-//       A <= D  ET  B >= C
-//
-//   Donc une occupation [o.sD, o.sF] chevauche la demande [sd, sf] si :
-//       o.sD <= sf  ET  o.sF >= sd
-//
-//   Une salle est LIBRE si AUCUNE occupation ne répond à cette condition
-//   pour le même jour + créneau + année + semestre.
+// SALLES LIBRES
 // =============================================================================
 occupation.get('/data/salles_libres', (req, res) => {
     const { annee, semestre, jour, creneau, sd, sf } = req.query;
@@ -56,7 +46,6 @@ occupation.get('/data/salles_libres', (req, res) => {
         return res.status(400).json({ error: "Paramètres manquants : annee, semestre, jour, creneau, sd, sf" });
     }
 
-    // Convertir en entiers pour éviter les comparaisons de strings
     const sdInt = parseInt(sd, 10);
     const sfInt = parseInt(sf, 10);
 
@@ -64,12 +53,6 @@ occupation.get('/data/salles_libres', (req, res) => {
         return res.status(400).json({ error: "sd et sf doivent être des entiers valides avec sd <= sf" });
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // Requête : retourne toutes les salles qui n'ont PAS d'occupation
-    // qui chevauche [sd, sf] pour ce jour + créneau + année + semestre.
-    //
-    // Chevauchement : o.sD <= sf  AND  o.sF >= sd
-    // ─────────────────────────────────────────────────────────────────────────
     const sql = `
         SELECT s.id_salle, s.nom_salle
         FROM salles s
@@ -87,9 +70,7 @@ occupation.get('/data/salles_libres', (req, res) => {
         ORDER BY s.nom_salle
     `;
 
-    // Paramètres dans l'ordre : annee, semestre, jour, creneau, sf, sd
     const params = [annee, semestre, jour, creneau, sfInt, sdInt];
-
     console.log(`[salles_libres] jour=${jour} creneau=${creneau} sd=${sdInt} sf=${sfInt} annee=${annee} semestre=${semestre}`);
 
     connection.query(sql, params, (err, results) => {
@@ -103,15 +84,52 @@ occupation.get('/data/salles_libres', (req, res) => {
 });
 
 // =============================================================================
-// FILIÈRES, MODULES, PROFESSEURS, SEMAINES
+// FILIÈRES — affichées avec nom + année
 // =============================================================================
 
 occupation.get('/data/filieres', (req, res) => {
-    connection.query('SELECT id_filiere AS id_filier, nom_filiere, nb_group FROM filiere ORDER BY nom_filiere', (err, r) => {
-        if (err) return res.status(500).json({ error: err.message });
-        res.json(r);
-    });
+    const { id_semestre } = req.query;
+
+    // Mapping : nom_semestre -> annee filiere
+    // S1,S2 -> 1ere annee | S3,S4 -> 2eme annee | S5,S6 -> 3eme annee
+    const semestreAnneeMap = {
+        'S1': '1ere annee', 'S2': '1ere annee',
+        'S3': '2eme annee', 'S4': '2eme annee',
+        'S5': '3eme annee', 'S6': '3eme annee',
+    };
+
+    const buildQuery = (anneeFiliere) => {
+        let sql = "SELECT id_filiere AS id_filier, CONCAT(nom_filiere, ' - ', annee) AS nom_filiere, annee, nb_group FROM filiere";
+        const params = [];
+        if (anneeFiliere) {
+            sql += ' WHERE annee = ?';
+            params.push(anneeFiliere);
+        }
+        sql += ' ORDER BY nom_filiere';
+        connection.query(sql, params, (err, r) => {
+            if (err) return res.status(500).json({ error: err.message });
+            res.json(r);
+        });
+    };
+
+    if (id_semestre) {
+        connection.query(
+            'SELECT nom_semestre FROM semestre WHERE id_semestre = ?',
+            [id_semestre],
+            (err, rows) => {
+                if (err) return res.status(500).json({ error: err.message });
+                const nomSem = rows[0]?.nom_semestre;
+                buildQuery(semestreAnneeMap[nomSem] || null);
+            }
+        );
+    } else {
+        buildQuery(null);
+    }
 });
+
+// =============================================================================
+// MODULES, PROFESSEURS, SEMAINES
+// =============================================================================
 
 occupation.get('/data/modules', (req, res) => {
     const { id_filier } = req.query;
@@ -126,17 +144,30 @@ occupation.get('/data/modules', (req, res) => {
 });
 
 occupation.get('/data/professeurs', (req, res) => {
-    connection.query(
-        'SELECT id_prof, CONCAT(nom, " ", prenom) AS nom_complet FROM professeur ORDER BY nom',
-        (err, r) => {
-            if (err) return res.status(500).json({ error: err.message });
-            res.json(r);
-        }
-    );
+    const { id_filier } = req.query;
+    let sql = 'SELECT id_prof, CONCAT(nom, " ", prenom) AS nom_complet FROM professeur';
+    const params = [];
+    if (id_filier) {
+        sql += ' WHERE id_filiere = ?';
+        params.push(id_filier);
+    }
+    sql += ' ORDER BY nom';
+    connection.query(sql, params, (err, r) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json(r);
+    });
 });
 
 occupation.get('/data/semaines', (req, res) => {
-    connection.query('SELECT id_semaine, nom_semaine, date_debut, date_fin FROM semaine ORDER BY date_debut', (err, r) => {
+    const { id_semestre } = req.query;
+    let sql = 'SELECT id_semaine, nom_semaine, date_debut, date_fin FROM semaine';
+    const params = [];
+    if (id_semestre) {
+        sql += ' WHERE id_semestre = ?';
+        params.push(id_semestre);
+    }
+    sql += ' ORDER BY date_debut';
+    connection.query(sql, params, (err, r) => {
         if (err) return res.status(500).json({ error: err.message });
         res.json(r);
     });
@@ -146,7 +177,6 @@ occupation.get('/data/semaines', (req, res) => {
 // CRUD OCCUPATION
 // =============================================================================
 
-// POST — créer 1 occupation + lier ses semaines dans occupation_semain
 occupation.post('/', (req, res) => {
     console.log("BODY REÇU :", req.body);
     const {
@@ -194,7 +224,6 @@ occupation.post('/', (req, res) => {
     );
 });
 
-// GET toutes les occupations
 occupation.get('/', (req, res) => {
     const sql = `
         SELECT 
@@ -203,7 +232,7 @@ occupation.get('/', (req, res) => {
             se.nom_semestre      AS semestre,
             cr.heure_debut, cr.heure_fin,
             sa.nom_salle         AS salle,
-            f.nom_filiere        AS filiere,
+            CONCAT(f.nom_filiere, ' - ', f.annee) AS filiere,
             m.nom_module         AS module,
             CONCAT(p.nom, ' ', p.prenom) AS professeur,
             sd.nom_semaine       AS semaine_debut,
@@ -226,7 +255,6 @@ occupation.get('/', (req, res) => {
     });
 });
 
-// DELETE occupation + ses semaines liées
 occupation.delete('/:id', (req, res) => {
     const { id } = req.params;
     connection.query('DELETE FROM occupation_semain WHERE id_occupation = ?', [id], (err) => {
@@ -239,7 +267,6 @@ occupation.delete('/:id', (req, res) => {
     });
 });
 
-// GET filtré
 occupation.get('/filter', (req, res) => {
     const { id_filier, id_semestre, id_annee } = req.query;
     const conditions = [], params = [];
@@ -253,7 +280,8 @@ occupation.get('/filter', (req, res) => {
             o.id_occupation, o.jour, o.group,
             a.libelle AS annee, se.nom_semestre AS semestre,
             cr.heure_debut, cr.heure_fin,
-            sa.nom_salle AS salle, f.nom_filiere AS filiere,
+            sa.nom_salle AS salle,
+            CONCAT(f.nom_filiere, ' - ', f.annee) AS filiere,
             m.nom_module AS module,
             CONCAT(p.nom, ' ', p.prenom) AS professeur,
             sd.nom_semaine AS semaine_debut, sf.nom_semaine AS semaine_fin

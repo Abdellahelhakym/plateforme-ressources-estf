@@ -8,15 +8,15 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --gradient-primary: linear-gradient(135deg, #141c5a 20%, #4793df 100%);
-            --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
             --primary-color: #1a236d;
             --secondary-color: #2c75bd;
+            --light-blue: #e8f0fb;
+            --mid-blue: #3a86d4;
         }
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: var(--gradient-primary);
+            background: linear-gradient(135deg, #1a236d 0%, #2c75bd 60%, #a8c8f0 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -30,10 +30,11 @@
         }
 
         .login-card {
-            background: white;
+            background: #ffffff;
             border-radius: 16px;
             padding: 40px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 10px 40px rgba(26, 35, 109, 0.35);
+            border-top: 4px solid var(--secondary-color);
         }
 
         .login-header {
@@ -45,7 +46,7 @@
             width: 70px;
             height: 70px;
             margin: 0 auto 20px;
-            background: var(--gradient-secondary);
+            background: linear-gradient(135deg, #1a236d 0%, #2c75bd 100%);
             border-radius: 16px;
             display: flex;
             align-items: center;
@@ -65,7 +66,7 @@
         }
 
         .login-subtitle {
-            color: #6b7280;
+            color: var(--secondary-color);
             font-size: 0.9rem;
         }
 
@@ -89,21 +90,28 @@
             left: 14px;
             top: 50%;
             transform: translateY(-50%);
-            color: #9ca3af;
+            color: var(--secondary-color);
         }
 
         .form-control {
             padding: 12px 14px 12px 42px;
-            border: 1px solid #e5e7eb;
+            border: 1.5px solid #c5d8f0;
             border-radius: 10px;
             font-size: 0.95rem;
-            transition: border-color 0.3s;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            background: #f5f9ff;
+            color: var(--primary-color);
+        }
+
+        .form-control::placeholder {
+            color: #a0b4cc;
         }
 
         .form-control:focus {
             border-color: var(--secondary-color);
-            box-shadow: 0 0 0 3px rgba(44, 117, 189, 0.1);
+            box-shadow: 0 0 0 3px rgba(44, 117, 189, 0.15);
             outline: none;
+            background: #fff;
         }
 
         .password-toggle {
@@ -113,7 +121,7 @@
             transform: translateY(-50%);
             background: none;
             border: none;
-            color: #9ca3af;
+            color: #a0b4cc;
             cursor: pointer;
             padding: 5px;
         }
@@ -134,38 +142,33 @@
             display: flex;
             align-items: center;
             gap: 6px;
-            color: #6b7280;
+            color: var(--primary-color);
         }
 
         .remember-me input {
             width: 16px;
             height: 16px;
             cursor: pointer;
-        }
-
-        .forgot-link {
-            color: var(--secondary-color);
-            text-decoration: none;
-        }
-
-        .forgot-link:hover {
-            text-decoration: underline;
+            accent-color: var(--secondary-color);
         }
 
         .btn-login {
             width: 100%;
             padding: 12px;
-            background: var(--gradient-secondary);
+            background: linear-gradient(135deg, #1a236d 0%, #2c75bd 100%);
             color: white;
             border: none;
             border-radius: 10px;
             font-weight: 600;
             cursor: pointer;
-            transition: transform 0.2s;
+            transition: transform 0.2s, box-shadow 0.2s;
+            font-size: 1rem;
+            letter-spacing: 0.3px;
         }
 
         .btn-login:hover {
             transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(44, 117, 189, 0.4);
         }
 
         .btn-login:disabled {
@@ -177,17 +180,19 @@
             width: 100%;
             padding: 10px;
             background: transparent;
-            color: var(--primary-color);
-            border: 1px solid #e5e7eb;
+            color: var(--secondary-color);
+            border: 1.5px solid #c5d8f0;
             border-radius: 10px;
             font-weight: 500;
             cursor: pointer;
             margin-top: 12px;
-            transition: background-color 0.2s;
+            transition: background-color 0.2s, border-color 0.2s;
+            font-size: 0.95rem;
         }
 
         .btn-back:hover {
-            background: #f9fafb;
+            background: var(--light-blue);
+            border-color: var(--secondary-color);
         }
 
         .alert {
@@ -199,9 +204,9 @@
         }
 
         .alert-danger {
-            background: #fee2e2;
-            color: #991b1b;
-            border: 1px solid #fecaca;
+            background: #ddeeff;
+            color: var(--primary-color);
+            border: 1px solid #a0c4e8;
         }
 
         @media (max-width: 576px) {
@@ -266,7 +271,7 @@
                         <input type="checkbox" id="rememberMe">
                         <span>Se souvenir</span>
                     </label>
-                    <a id="error" style="color:red"></a>
+                    <a id="error" style="color:#2c75bd; font-size:0.85rem;"></a>
                 </div>
 
                 <button type="submit" class="btn-login" id="loginBtn">
@@ -274,33 +279,32 @@
                     <span id="btnText">Se connecter</span>
                 </button>
                 <a href="./index.html">
-                <button type="button" class="btn-back" >
-                    <i class="fas fa-arrow-left me-2"></i>
-                    Retour à l'accueil
-                </button>
+                    <button type="button" class="btn-back">
+                        <i class="fas fa-arrow-left me-2"></i>
+                        Retour à l'accueil
+                    </button>
                 </a>
             </form>
         </div>
     </div>
 
     <script>
-       fetch('/login/error')
-  .then(res => res.text())
-  .then(msg => {
-    if (msg) {
-      document.getElementById('error').innerText = msg;
-    }
-  });
+        fetch('/login/error')
+            .then(res => res.text())
+            .then(msg => {
+                if (msg) {
+                    document.getElementById('error').innerText = msg;
+                }
+            });
 
- function  togglePassword(){
-    const input = document.getElementById("password");
-
-    if(input.type === "password"){
-        input.type="text";
-    }else{
-        input.type="password";
-    }
- }
+        function togglePassword() {
+            const input = document.getElementById("password");
+            if (input.type === "password") {
+                input.type = "text";
+            } else {
+                input.type = "password";
+            }
+        }
     </script>
 </body>
 </html>

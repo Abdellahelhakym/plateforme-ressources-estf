@@ -11,7 +11,7 @@ ressource.use(express.json());
 
 ressource.get('/filiere', (req, res) => {
     connection.query(
-        'SELECT id_filiere AS id, nom_filiere, niveau, nb_group FROM filiere ORDER BY nom_filiere ASC',
+        'SELECT id_filiere AS id, nom_filiere, annee, niveau, nb_group FROM filiere ORDER BY nom_filiere ASC',
         (err, results) => {
             if (err) return res.status(500).json({ error: err.message });
             res.json(results);
@@ -20,14 +20,14 @@ ressource.get('/filiere', (req, res) => {
 });
 
 ressource.post('/filiere', (req, res) => {
-    const { nom_filiere, niveau, nb_group } = req.body;
-    if (!nom_filiere || !niveau || !nb_group) {
+    const { nom_filiere, annee, niveau, nb_group } = req.body;
+    if (!nom_filiere || !annee || !niveau || !nb_group) {
         return res.status(400).json({ error: "Champs obligatoires manquants" });
     }
 
     connection.query(
-        'INSERT INTO filiere (nom_filiere, niveau, nb_group) VALUES (?, ?, ?)',
-        [nom_filiere, niveau, nb_group],
+        'INSERT INTO filiere (nom_filiere, annee, niveau, nb_group) VALUES (?, ?, ?, ?)',
+        [nom_filiere, annee, niveau, nb_group],
         (err, result) => {
             if (err) return res.status(500).json({ error: err.message });
             res.status(201).json({ id: result.insertId });
@@ -37,11 +37,11 @@ ressource.post('/filiere', (req, res) => {
 
 ressource.put('/filiere/:id', (req, res) => {
     const { id } = req.params;
-    const { nom_filiere, niveau, nb_group } = req.body;
+    const { nom_filiere, annee, niveau, nb_group } = req.body;
 
     connection.query(
-        'UPDATE filiere SET nom_filiere = ?, niveau = ?, nb_group = ? WHERE id_filiere = ?',
-        [nom_filiere, niveau, nb_group, id],
+        'UPDATE filiere SET nom_filiere = ?, annee = ?, niveau = ?, nb_group = ? WHERE id_filiere = ?',
+        [nom_filiere, annee, niveau, nb_group, id],
         (err, result) => {
             if (err) return res.status(500).json({ error: err.message });
             if (result.affectedRows === 0) return res.status(404).json({ error: "Non trouvé" });
@@ -65,7 +65,11 @@ ressource.delete('/filiere/:id', (req, res) => {
 
 ressource.get('/professeur', (req, res) => {
     connection.query(
-        'SELECT id_prof AS id, nom, prenom, email, departement FROM professeur ORDER BY nom, prenom',
+        `SELECT p.id_prof AS id, p.nom, p.prenom, p.email, p.departement, p.id_filiere,
+                CONCAT(f.nom_filiere, ' - ', f.annee) AS filier
+         FROM professeur p
+         LEFT JOIN filiere f ON p.id_filiere = f.id_filiere
+         ORDER BY p.nom, p.prenom`,
         (err, results) => {
             if (err) return res.status(500).json({ error: err.message });
             res.json(results);
@@ -74,14 +78,14 @@ ressource.get('/professeur', (req, res) => {
 });
 
 ressource.post('/professeur', (req, res) => {
-    const { nom, prenom, email, departement } = req.body;
+    const { nom, prenom, email, departement, id_filiere } = req.body;
     if (!nom || !prenom || !email || !departement) {
         return res.status(400).json({ error: "Champs obligatoires manquants" });
     }
 
     connection.query(
-        'INSERT INTO professeur (nom, prenom, email, departement) VALUES (?, ?, ?, ?)',
-        [nom, prenom, email, departement],
+        'INSERT INTO professeur (nom, prenom, email, departement, id_filiere) VALUES (?, ?, ?, ?, ?)',
+        [nom, prenom, email, departement, id_filiere || null],
         (err, result) => {
             if (err) return res.status(500).json({ error: err.message });
             res.status(201).json({ id: result.insertId });
@@ -91,11 +95,11 @@ ressource.post('/professeur', (req, res) => {
 
 ressource.put('/professeur/:id', (req, res) => {
     const { id } = req.params;
-    const { nom, prenom, email, departement } = req.body;
+    const { nom, prenom, email, departement, id_filiere } = req.body;
 
     connection.query(
-        'UPDATE professeur SET nom = ?, prenom = ?, email = ?, departement = ? WHERE id_prof = ?',
-        [nom, prenom, email, departement, id],
+        'UPDATE professeur SET nom = ?, prenom = ?, email = ?, departement = ?, id_filiere = ? WHERE id_prof = ?',
+        [nom, prenom, email, departement, id_filiere || null, id],
         (err, result) => {
             if (err) return res.status(500).json({ error: err.message });
             if (result.affectedRows === 0) return res.status(404).json({ error: "Non trouvé" });
@@ -122,7 +126,7 @@ ressource.get('/module', (req, res) => {
         SELECT 
             m.id_module,
             m.nom_module,
-            f.nom_filiere AS filiere,
+            CONCAT(f.nom_filiere, ' - ', f.annee) AS filiere,
             m.id_filiere
         FROM module_tp m
         LEFT JOIN filiere f ON m.id_filiere = f.id_filiere
