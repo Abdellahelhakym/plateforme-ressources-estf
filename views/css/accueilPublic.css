@@ -1,4 +1,4 @@
- :root {
+:root {
             --gradient-primary: linear-gradient(135deg, #1a236d 0%, #2c75bd 100%);
             --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
             --gradient-success: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
@@ -11,14 +11,11 @@
             background: linear-gradient(to bottom, #f8f9fa 0%, #e9ecef 100%);
         }
 
-        
-
         .navbar {
             background: var(--gradient-primary) !important;
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
             padding: 0.4rem 0;
             border: 1px solid;
-           
         }
 
         .navbar-brand {
@@ -56,40 +53,72 @@
         .nav-link.active::after {
             width: 80%;
         }
-         .estf-logo {
+
+        /* ── BOUTON ESPACE ADMIN ── */
+        .btn-retour {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            background: rgba(255, 255, 255, 0.15);
+            color: #fff !important;
+            border: 1px solid rgba(255, 255, 255, 0.271);
+            border-radius: 25px;
+            padding: 0.4rem 1.1rem;
+            font-size: 0.88rem;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(4px);
+        }
+
+        .btn-retour:hover {
+            background: rgba(255, 255, 255, 0.95);
+            color: #1a236d !important;
+            border-color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-retour i {
+            font-size: 0.9rem;
+            transition: transform 0.3s;
+        }
+
+        .btn-retour:hover i {
+            transform: translateX(3px);
+        }
+
+        /* ── LOGO ── */
+        .estf-logo {
             display: flex;
             align-items: center;
             gap: 15px;
             border-radius: 5px;
         }
 
-        .estf-img{
-           border-radius: 3px;
+        .estf-img {
+            border-radius: 3px;
             height: 9vh;
             width: 15vh;
-           background-image: url(./../img/estf.png);
-           background-size: cover;
-
+            background-image: url(./../img/estf.png);
+            background-size: cover;
         }
-     
 
         .estf-text {
             display: flex;
             flex-direction: column;
-          
         }
 
-       
-
-       .estf-text-fr {
+        .estf-text-fr {
             font-family: 'Segoe UI', sans-serif;
             font-size: 0.9rem;
             font-weight: 600;
             color: var(--estf-red);
             letter-spacing: 0.5px;
             white-space: normal;
-   
-}
+        }
+
         .estf-text-ar {
             font-family: 'Segoe UI', sans-serif;
             font-size: 0.9rem;
@@ -98,10 +127,6 @@
             letter-spacing: 0.5px;
             white-space: normal;
         }
-       
-     
-      
-
 
         .hero-card {
             background: var(--gradient-primary);
@@ -139,7 +164,6 @@
             to { transform: scale(1); }
         }
 
-
         .stat-card {
             border: none;
             border-radius: 15px;
@@ -154,16 +178,11 @@
             box-shadow: 0 15px 35px rgba(0,0,0,0.2);
         }
 
-      
-
         .stat-card.gradient-2 {
             background: rgba(255, 255, 255, 0.818);
-           
             color: #1a236d;
             box-shadow: 0 0 10px #1a246d42;
         }
-
-        
 
         .stat-card h3 {
             font-size: 3rem;
@@ -314,56 +333,49 @@
             margin-bottom: 1.5rem;
         }
 
-         @media screen and (max-width: 980px) {
-                 .navbar-collapse {
-                   
-                    background: rgba(255, 255, 255, 0.05);
-                    border-radius: 8px;
-                    
-                    
-                }
-                
-                
-                
-                .nav-link {
-                    padding: 0.75rem 1rem;
-                    border-radius: 6px;
-                    margin: 0.25rem 0;
-                }
-                
-                .nav-link:hover {
-                    background: rgba(255, 255, 255, 0.1);
-                    transform: translateX(5px);
-                }
-                
-                .nav-link::after {
-                    display: none;
-                }
-         }
+        @media screen and (max-width: 980px) {
+            .navbar-collapse {
+                background: rgba(255, 255, 255, 0.05);
+                border-radius: 8px;
+            }
 
-       @media screen and (max-width: 500px) {
-         
-                .estf-text {
-                    display: flex;
-                    flex-direction: column;
-                    width: 150px;
-                    
-                
-                }
-               .estf-text-ar, .estf-text-fr {
-               font-size: 0.8rem;
-                    }
-      
-                .hero-card h2 {
-                  
-                    font-size: 1.5rem;
-                }
+            .nav-link {
+                padding: 0.75rem 1rem;
+                border-radius: 6px;
+                margin: 0.25rem 0;
+            }
 
-                .hero-card i {
-                   
-                    font-size: 2rem;
-                }
-}
+            .nav-link:hover {
+                background: rgba(255, 255, 255, 0.1);
+                transform: translateX(5px);
+            }
 
+            .nav-link::after {
+                display: none;
+            }
 
-      
+            .btn-retour {
+                margin: 0.4rem 0 0.4rem 1rem;
+                width: fit-content;
+            }
+        }
+
+        @media screen and (max-width: 500px) {
+            .estf-text {
+                display: flex;
+                flex-direction: column;
+                width: 150px;
+            }
+
+            .estf-text-ar, .estf-text-fr {
+                font-size: 0.8rem;
+            }
+
+            .hero-card h2 {
+                font-size: 1.5rem;
+            }
+
+            .hero-card i {
+                font-size: 2rem;
+            }
+        }

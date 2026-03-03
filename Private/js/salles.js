@@ -4,7 +4,7 @@
 let salles = [];
 
 // ─────────────────────────────────────────────────────────────────────────────
-// CHARGER LES SALLES (même logique qu'avant)
+// CHARGER LES SALLES
 // ─────────────────────────────────────────────────────────────────────────────
 async function getNombreInfoSalles() {
     try {
@@ -23,7 +23,7 @@ async function getNombreInfoSalles() {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// FILTRES (identique à l'original)
+// FILTRES
 // ─────────────────────────────────────────────────────────────────────────────
 function afficherFilter() {
     salles.forEach(ele => {
@@ -33,25 +33,24 @@ function afficherFilter() {
 }
 
 document.getElementById("roomFilter").addEventListener("change", filtrer);
-document.getElementById("statusFilter").addEventListener("change", filtrer);
+document.getElementById("typeFilter").addEventListener("change", filtrer);  // ✅ typeFilter
 
 function filtrer() {
     const salle = document.getElementById("roomFilter").value;
-    const etat  = document.getElementById("statusFilter").value;
-    afficherSalles(salle, etat);
+    const type  = document.getElementById("typeFilter").value;  // ✅ type
+    afficherSalles(salle, type);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// AFFICHER LES CARTES — même structure HTML que l'original
-// Ajouts : classe badge dynamique + bouton Matériel + onclick modifier
+// AFFICHER LES CARTES
 // ─────────────────────────────────────────────────────────────────────────────
-function afficherSalles(filtreSalle = "", filtreEtat = "") {
+function afficherSalles(filtreSalle = "", filtreType = "") {   // ✅ filtreType
     document.getElementById("roomsContainer").innerHTML = "";
 
     const sallesFiltrees = salles.filter(ele => {
         const okSalle = filtreSalle === "" || "Salle " + ele.nom_salle === filtreSalle;
-        const okEtat  = filtreEtat  === "" || ele.etat === filtreEtat;
-        return okSalle && okEtat;
+        const okType  = filtreType  === "" || ele.type_salle === filtreType;  // ✅ type_salle
+        return okSalle && okType;
     });
 
     if (sallesFiltrees.length === 0) {
@@ -63,7 +62,6 @@ function afficherSalles(filtreSalle = "", filtreEtat = "") {
         return;
     }
 
-    // Classe CSS du badge selon l'état
     const badgeClass = (etat) => {
         if (etat === 'Disponible')     return 'status-libre';
         if (etat === 'Occupée')        return 'status-occupee';
@@ -71,7 +69,6 @@ function afficherSalles(filtreSalle = "", filtreEtat = "") {
         return 'status-libre';
     };
 
-    // Image ou placeholder si pas d'image
     const imgHtml = (ele) => {
         if (ele.img) {
             return `<img src="${ele.img}" alt="Salle ${ele.nom_salle}">`;
@@ -137,7 +134,7 @@ function afficherSalles(filtreSalle = "", filtreEtat = "") {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// SUPPRIMER (même logique + toast au lieu de reload)
+// SUPPRIMER
 // ─────────────────────────────────────────────────────────────────────────────
 async function suprimer(x) {
     if (!confirm('Supprimer cette salle définitivement ?')) return;
@@ -152,7 +149,6 @@ async function suprimer(x) {
 
         if (result.success) {
             showToast('Salle supprimée avec succès.', 'success');
-            // Supprimer du tableau local et réafficher sans reload
             salles = salles.filter(s => s.id_salle !== x);
             filtrer();
         } else {
@@ -165,7 +161,7 @@ async function suprimer(x) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// OUVRIR MODAL MODIFIER — pré-remplir avec les données de la salle
+// OUVRIR MODAL MODIFIER
 // ─────────────────────────────────────────────────────────────────────────────
 async function ouvrirModifier(id) {
     try {
@@ -173,7 +169,6 @@ async function ouvrirModifier(id) {
         if (!resp.ok) throw new Error('Salle introuvable');
         const s = await resp.json();
 
-        // Remplir les champs
         document.getElementById('mod_id').value        = s.id_salle;
         document.getElementById('mod_nom').value       = s.nom_salle    || '';
         document.getElementById('mod_batiment').value  = s.batiment     || '';
@@ -183,10 +178,9 @@ async function ouvrirModifier(id) {
         document.getElementById('mod_remarques').value = s.Remarques    || '';
         document.getElementById('mod_image').value     = '';
 
-        // Aperçu image actuelle
         const prev = document.getElementById('mod_img_preview');
         if (s.img) {
-            prev.src          = s.img;
+            prev.src           = s.img;
             prev.style.display = 'block';
         } else {
             prev.style.display = 'none';
@@ -198,17 +192,15 @@ async function ouvrirModifier(id) {
     }
 }
 
-// Aperçu de la nouvelle image sélectionnée
 document.getElementById('mod_image').addEventListener('change', function () {
     const file = this.files[0];
     const prev = document.getElementById('mod_img_preview');
     if (file) {
-        prev.src          = URL.createObjectURL(file);
+        prev.src           = URL.createObjectURL(file);
         prev.style.display = 'block';
     }
 });
 
-// Soumission formulaire modifier
 document.getElementById('formModifier').addEventListener('submit', async function (e) {
     e.preventDefault();
 
@@ -237,7 +229,6 @@ document.getElementById('formModifier').addEventListener('submit', async functio
         showToast('Salle modifiée avec succès !', 'success');
         closeModal('modalModifier');
 
-        // Mettre à jour le tableau local sans rechargement
         const idx = salles.findIndex(s => s.id_salle == id);
         if (idx !== -1) {
             salles[idx].nom_salle  = document.getElementById('mod_nom').value;
@@ -249,7 +240,6 @@ document.getElementById('formModifier').addEventListener('submit', async functio
             if (result.img) salles[idx].img = result.img;
         }
 
-        // Reconstruire le filtre et réafficher
         document.getElementById('roomFilter').innerHTML = '<option value="">Toutes les salles</option>';
         afficherFilter();
         filtrer();
@@ -290,13 +280,11 @@ async function ouvrirMateriel(id, nomSalle) {
             return;
         }
 
-        // Compteurs
-        const total      = mat.length;
-        const dispo      = mat.filter(m => m.etat === 'Disponible').length;
-        const occupe     = mat.filter(m => m.etat === 'Occupee' || m.etat === 'Occupée').length;
-        const maint      = mat.filter(m => m.etat === 'En Maintenance').length;
+        const total  = mat.length;
+        const dispo  = mat.filter(m => m.etat === 'Disponible').length;
+        const occupe = mat.filter(m => m.etat === 'Occupee' || m.etat === 'Occupée').length;
+        const maint  = mat.filter(m => m.etat === 'En Maintenance').length;
 
-        // Badge état
         const etatBadge = (etat) => {
             if (etat === 'Disponible')     return `<span class="badge-mat dispo">${etat}</span>`;
             if (etat === 'Occupee' || etat === 'Occupée') return `<span class="badge-mat occup">${etat}</span>`;
@@ -305,7 +293,6 @@ async function ouvrirMateriel(id, nomSalle) {
         };
 
         document.getElementById('modalMatBody').innerHTML = `
-            <!-- Chips résumé -->
             <div class="mat-stats">
                 <span class="mat-stat-chip chip-blue">
                     <i class="fas fa-boxes"></i> ${total} élément${total > 1 ? 's' : ''}
@@ -320,8 +307,6 @@ async function ouvrirMateriel(id, nomSalle) {
                     <i class="fas fa-tools"></i> ${maint} en maintenance
                 </span>` : ''}
             </div>
-
-            <!-- Tableau -->
             <div style="overflow-x:auto">
                 <table class="mat-table">
                     <thead>
@@ -363,7 +348,6 @@ async function ouvrirMateriel(id, nomSalle) {
 function openModal(id)  { document.getElementById(id).classList.add('show'); }
 function closeModal(id) { document.getElementById(id).classList.remove('show'); }
 
-// Fermer en cliquant sur l'overlay
 document.querySelectorAll('.modal-overlay').forEach(el => {
     el.addEventListener('click', function (e) {
         if (e.target === this) closeModal(this.id);

@@ -9,7 +9,6 @@
     <link rel="stylesheet" href="./css/salle.css">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-
 </head>
 <body>
 
@@ -25,7 +24,6 @@
                 <i class="fas fa-times"></i>
             </button>
         </div>
-
         <form id="formModifier">
             <input type="hidden" id="mod_id">
             <div class="modal-body-inner">
@@ -158,13 +156,11 @@
 <!-- ═══ MAIN CONTENT ══════════════════════════════════════════════════════════ -->
 <div class="container">
 
-    <!-- Header Banner -->
     <div class="header-banner">
         <h2><i class="fas fa-door-open"></i> Gestion des Salles</h2>
         <p>Département Génie Informatique — ESTF</p>
     </div>
 
-    <!-- Filters -->
     <div class="filters-section">
         <div class="row g-3">
             <div class="col-md-5">
@@ -172,12 +168,16 @@
                     <option value="">Toutes les salles</option>
                 </select>
             </div>
+            <!-- ✅ Filtre TYPE à la place de l'ancien filtre ÉTAT -->
             <div class="col-md-3">
-                <select class="filter-select w-100" id="statusFilter">
-                    <option value="">Tous les états</option>
-                    <option>Disponible</option>
-                    <option>Occupée</option>
-                    <option>En Maintenance</option>
+                <select class="filter-select w-100" id="typeFilter">
+                    <option value="">Tous les types</option>
+                    <option value="TP">TP</option>
+                    <option value="Cours">Cours</option>
+                    <option value="Amphi">Amphi</option>
+                    <option value="Reseaux">Réseaux</option>
+                    <option value="Salle info">Salle info</option>
+                    <option value="Autre">Autre</option>
                 </select>
             </div>
             <div class="col-md-2">
@@ -193,7 +193,6 @@
         </div>
     </div>
 
-    <!-- Rooms Grid -->
     <div class="row g-4" id="roomsContainer"></div>
 
 </div>
@@ -231,9 +230,7 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    AOS.init();
-</script>
+<script>AOS.init();</script>
 <script src="./js/salles.js"></script>
 </body>
 </html>

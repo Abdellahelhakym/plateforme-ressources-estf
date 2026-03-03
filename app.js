@@ -8,23 +8,16 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('views'));
 
-
-//route 
-const loginRouter = require('./login'); 
+// Routes
+const loginRouter = require('./login');
+const loginEnseignementRouter = require('./loginEnseignement'); 
 const salles = require('./salles');
-
 const materiel = require('./materiel');
 const ressource = require('./ressource');
-
 const config = require('./configurationTemporelle');
-
 const occupation = require('./occupation');
-
 const consultation = require('./consultation');
-
 const dashboard = require('./dashboard');
-
-
 
 app.use(session({
     secret: '1234',
@@ -32,7 +25,7 @@ app.use(session({
     saveUninitialized: false
 }));
 
-// Middleware pour vérifier si connecté
+// ─── Middleware Admin ────────────────────────────────────────────────────────
 function isLoggedIn(req, res, next) {
     if (req.session.user) {
         next();
@@ -41,11 +34,20 @@ function isLoggedIn(req, res, next) {
     }
 }
 
+// ─── Middleware Enseignant ───────────────────────────────────────────────────
+function isEnseignantLoggedIn(req, res, next) {
+    if (req.session.enseignant) {
+        next();
+    } else {
+        res.redirect('/loginEnseignement.html');
+    }
+}
 
-
-// Routes
+// ─── Routes Auth ─────────────────────────────────────────────────────────────
 app.use('/login', loginRouter);
+app.use('/loginEnseignement', loginEnseignementRouter); // ← NOUVEAU
 
+// ─── Routes Private Admin ─────────────────────────────────────────────────────
 app.get('/private/:page', isLoggedIn, (req, res) => {
     const page = req.params.page;
     res.sendFile(path.join(__dirname, 'Private', page));
@@ -58,39 +60,46 @@ app.get('/private/css/:file', isLoggedIn, (req, res) => {
 app.get('/private/img/:file', isLoggedIn, (req, res) => {
     res.sendFile(path.join(__dirname, 'Private', 'img', req.params.file));
 });
+
 app.get('/private/js/:file', isLoggedIn, (req, res) => {
     res.sendFile(path.join(__dirname, 'Private', 'js', req.params.file));
 });
 
-//logout
-app.get('/logout', (req, res) => {
-    req.session.destroy(err => {
-        res.redirect('/login.html');
-    });
+// ─── Routes Private Enseignement ─────────────────────────────────────────────
+app.get('/private/Enseignement/:page', isEnseignantLoggedIn, (req, res) => {
+    res.sendFile(path.join(__dirname, 'Private', 'Enseignement', req.params.page));
 });
 
+app.get('/private/Enseignement/css/:file', isEnseignantLoggedIn, (req, res) => {
+    res.sendFile(path.join(__dirname, 'Private', 'Enseignement', 'css', req.params.file));
+});
 
-// Routes salles 
+app.get('/private/Enseignement/js/:file', isEnseignantLoggedIn, (req, res) => {
+    res.sendFile(path.join(__dirname, 'Private', 'Enseignement', 'js', req.params.file));
+});
+
+app.get('/private/Enseignement/img/:file', isEnseignantLoggedIn, (req, res) => {
+    res.sendFile(path.join(__dirname, 'Private', 'Enseignement', 'img', req.params.file));
+});
+
+// ─── Logout Admin ─────────────────────────────────────────────────────────────
+app.get('/logout', (req, res) => {
+    req.session.destroy(() => res.redirect('/login.html'));
+});
+
+// ─── Logout Enseignant ────────────────────────────────────────────────────────
+app.get('/logoutEnseignement', (req, res) => {
+    req.session.enseignant = null;
+    res.redirect('/loginEnseignement.html');
+});
+
+// ─── Autres routes ────────────────────────────────────────────────────────────
 app.use('/Salles', salles);
-
-
-// Routes materiel 
 app.use('/materiel', materiel);
-
-//routes ressource 
 app.use('/ressource', ressource);
-
-//routes configTemporale
 app.use('/config', config);
-
-//routes occupation
 app.use('/occupation', occupation);
-
-//routes consultation
 app.use('/consultation', consultation);
-
-//routes dashboard
 app.use('/dashboard', dashboard);
-
 
 app.listen(3000, () => console.log('Server running on http://localhost:3000'));

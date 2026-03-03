@@ -12,9 +12,6 @@
     <style>
         :root { --primary: linear-gradient(135deg, #1a236d 0%, #2c75bd 100%); }
         body { background: #f0f4f8; font-family: 'Segoe UI', sans-serif; }
-
-        
-
     </style>
 </head>
 <body>
@@ -79,20 +76,25 @@
 <div class="container">
 
     <div class="page-header" data-aos="fade-down">
-        <h1><i class="fas fa-search"></i> Consultation des Salles</h1>
-        <p>Visualisez et gérez l'emploi du temps d'une salle — créneaux libres et occupés</p>
+        <h1><i class="fas fa-search"></i> Consultation</h1>
+        <p>Visualisez et gérez l'emploi du temps — par salle ou par filière</p>
     </div>
 
+    <!-- ONGLETS MODE -->
     <div class="mode-tabs" data-aos="fade-up">
         <button class="mode-btn active" id="modeSemaine" onclick="setMode('semaine')">
             <i class="fas fa-calendar-week"></i> Par Semaine
         </button>
         <button class="mode-btn" id="modeDetail" onclick="setMode('detail')">
-            <i class="fas fa-list-alt"></i> Détail Complet (toutes semaines)
+            <i class="fas fa-list-alt"></i> Détail Complet
+        </button>
+        <button class="mode-btn" id="modeFiliere" onclick="setMode('filiere')">
+            <i class="fas fa-graduation-cap"></i> Par Filière
         </button>
     </div>
 
-    <div class="filters-card" data-aos="fade-up">
+    <!-- FILTRES COMMUNS (salle + semaine) -->
+    <div class="filters-card" id="filtersSalle" data-aos="fade-up">
         <div class="row g-3 align-items-end">
             <div class="col-md-3">
                 <label class="filter-label"><i class="fas fa-calendar-alt"></i> Année Univ.</label>
@@ -118,6 +120,34 @@
         </div>
     </div>
 
+    <!-- FILTRES FILIÈRE -->
+    <div class="filters-card" id="filtersFiliere" style="display:none;" data-aos="fade-up">
+        <div class="row g-3 align-items-end">
+            <div class="col-md-3">
+                <label class="filter-label"><i class="fas fa-calendar-alt"></i> Année Univ.</label>
+                <select class="form-select" id="filtAnneeF"><option value="">-- Toutes --</option></select>
+            </div>
+            <div class="col-md-2">
+                <label class="filter-label"><i class="fas fa-calendar-check"></i> Semestre</label>
+                <select class="form-select" id="filtSemestreF"><option value="">-- Tous --</option></select>
+            </div>
+            <div class="col-md-3">
+                <label class="filter-label"><i class="fas fa-graduation-cap"></i> Filière <span style="color:red">*</span></label>
+                <select class="form-select" id="filtFiliere"><option value="">-- Choisir --</option></select>
+            </div>
+            <div class="col-md-2">
+                <label class="filter-label"><i class="fas fa-calendar-week"></i> Semaine <span style="color:red">*</span></label>
+                <select class="form-select" id="filtSemaineF"><option value="">-- Choisir --</option></select>
+            </div>
+            <div class="col-md-2">
+                <button class="btn-search" onclick="rechercherFiliere()">
+                    <i class="fas fa-search"></i> Afficher
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- STATS -->
     <div id="statsRow" style="display:none; grid-template-columns:repeat(4,1fr); gap:1rem; margin-bottom:1.5rem;">
         <div class="stat-card stat-total">
             <div class="stat-icon"><i class="fas fa-th"></i></div>
@@ -139,7 +169,8 @@
 
     <div id="resultsContainer"></div>
 
-    <div class="legend-card" data-aos="fade-up">
+    <!-- LÉGENDE SALLE -->
+    <div class="legend-card" id="legendeSalle" data-aos="fade-up">
         <strong><i class="fas fa-info-circle" style="color:#2c75bd"></i> Légende :</strong>
         <div class="legend-item"><span class="ldot" style="background:#22c55e"></span> Libre — salle disponible</div>
         <div class="legend-item"><span class="ldot" style="background:#ef4444"></span> Occupée — cours planifié</div>
@@ -149,6 +180,13 @@
             </span>
             Cliquez pour supprimer l'occupation
         </div>
+    </div>
+
+    <!-- LÉGENDE FILIÈRE -->
+    <div class="legend-card" id="legendeFiliere" style="display:none;" data-aos="fade-up">
+        <strong><i class="fas fa-info-circle" style="color:#2c75bd"></i> Légende :</strong>
+        <div class="legend-item"><span class="ldot" style="background:#22c55e"></span> Libre — aucun cours planifié</div>
+        <div class="legend-item"><span class="ldot" style="background:#3b82f6"></span> Cours — module planifié pour cette filière</div>
     </div>
 </div>
 
@@ -165,7 +203,7 @@
                 <p>
                     <i class="fas fa-map-marker-alt"></i> BP 2427 Route d'Imouzzer, 30000 Fès<br>
                     <i class="fas fa-phone"></i> (+212) 6 66 21 46 30<br>
-                    <i class="fas fa-at"></i> <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="88fbfdf8f8e7fafca6edfbfcc8fdfbe5eae9a6e9eba6e5e9">[email&#160;protected]</a>
+                    <i class="fas fa-at"></i> contact@estf.ac.ma
                 </p>
             </div>
             <div class="col-md-4 mb-4">
@@ -182,7 +220,7 @@
     </div>
 </footer>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 <script src="./js/consultation.js"></script>
 </body>

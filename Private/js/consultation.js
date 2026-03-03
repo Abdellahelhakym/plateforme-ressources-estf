@@ -1,8 +1,21 @@
 AOS.init({ duration: 600, once: true });
 
-const JOURS = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'];
-let currentMode = 'semaine';
+const JOURS = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+let currentMode   = 'semaine';
 let pendingDelete = null;
+let allFilieres   = [];   // cache de toutes les filières
+
+// Détermine l'année universitaire (1, 2 ou 3) à partir du nom du semestre
+// S1/S2 → 1   |   S3/S4 → 2   |   S5/S6 → 3
+function anneeFromSemestre(nomSemestre) {
+    if (!nomSemestre) return null;
+    const m = nomSemestre.match(/\d+/);
+    if (!m) return null;
+    const n = parseInt(m[0], 10);
+    if (n <= 2) return '1';
+    if (n <= 4) return '2';
+    return '3';
+}
 
 // =============================================================================
 // UTILITAIRES
@@ -41,50 +54,88 @@ function showToast(msg, type = 'success') {
 
 async function loadRefData() {
     try {
-        const [salles, annees, semestres] = await Promise.all([
+        const [salles, annees, semestres, filieres] = await Promise.all([
             fetch('/consultation/data/salles').then(r => r.json()),
             fetch('/consultation/data/annees').then(r => r.json()),
             fetch('/consultation/data/semestres').then(r => r.json()),
+            fetch('/consultation/data/filieres').then(r => r.json()),
         ]);
+        // Stocker toutes les filières en mémoire pour le filtrage dynamique
+        allFilieres = filieres;
+
         fillSelect(document.getElementById('filtSalle'),    salles,    'id_salle',    'nom_salle');
         fillSelect(document.getElementById('filtAnnee'),    annees,    'id_annee',    'libelle');
         fillSelect(document.getElementById('filtSemestre'), semestres, 'id_semestre', 'nom_semestre');
 
-        // Semaines vides au départ — chargées après choix du semestre
-        const selSemaine = document.getElementById('filtSemaine');
-        selSemaine.innerHTML = '<option value="">-- Choisir d\'abord un semestre --</option>';
+        // Cloner les listes annee/semestre dans les filtres filière
+        fillSelect(document.getElementById('filtAnneeF'),    annees,    'id_annee',    'libelle');
+        fillSelect(document.getElementById('filtSemestreF'), semestres, 'id_semestre', 'nom_semestre');
+
+        // Filière : vide au départ — se remplit après choix du semestre
+        document.getElementById('filtFiliere').innerHTML  = '<option value="">-- Choisir d\'abord un semestre --</option>';
+        document.getElementById('filtSemaine').innerHTML  = '<option value="">-- Choisir d\'abord un semestre --</option>';
+        document.getElementById('filtSemaineF').innerHTML = '<option value="">-- Choisir d\'abord un semestre --</option>';
     } catch(e) {
         console.error('Erreur chargement référence :', e);
     }
 }
 
 // =============================================================================
-// SEMESTRE → RECHARGER LES SEMAINES
+// SEMESTRE → SEMAINES (salle)
 // =============================================================================
 
 document.getElementById('filtSemestre').addEventListener('change', async function () {
-    const id_semestre = this.value;
-    const selSemaine  = document.getElementById('filtSemaine');
+    await reloadSemaines(this.value, document.getElementById('filtSemaine'));
+});
 
-    // Vider
+// =============================================================================
+// SEMESTRE → SEMAINES + FILIÈRES (mode filière)
+// =============================================================================
+
+document.getElementById('filtSemestreF').addEventListener('change', async function () {
+    const nomSemestre = this.selectedOptions[0]?.text || '';
+    const annee       = anneeFromSemestre(nomSemestre);
+    const selFiliere  = document.getElementById('filtFiliere');
+
+    // Recharger semaines
+    await reloadSemaines(this.value, document.getElementById('filtSemaineF'));
+
+    // Filtrer les filières selon l'année universitaire déduite du semestre
+    selFiliere.innerHTML = '<option value="">-- Choisir --</option>';
+    if (!this.value) {
+        selFiliere.innerHTML = '<option value="">-- Choisir d\'abord un semestre --</option>';
+        return;
+    }
+
+    // Filtrer selon le champ `annee` de la filière (supporte "1", "2", "3" ou "1ère", "2ème", etc.)
+    const filtered = annee
+        ? allFilieres.filter(f => {
+            const a = String(f.annee || '');
+            return a.startsWith(annee);
+          })
+        : allFilieres;
+
+    if (filtered.length === 0) {
+        selFiliere.innerHTML = `<option value="">Aucune filière pour ce semestre</option>`;
+    } else {
+        fillSelect(selFiliere, filtered, 'id_filiere', 'label');
+    }
+});
+
+async function reloadSemaines(id_semestre, selSemaine) {
     selSemaine.innerHTML = '<option value="">-- Choisir --</option>';
-
     if (!id_semestre) {
         selSemaine.innerHTML = '<option value="">-- Choisir d\'abord un semestre --</option>';
         return;
     }
-
     try {
         const semaines = await fetch(`/consultation/data/semaines?id_semestre=${id_semestre}`).then(r => r.json());
         fillSelect(selSemaine, semaines, 'id_semaine', 'nom_semaine');
-        if (semaines.length === 0) {
-            selSemaine.innerHTML = '<option value="">Aucune semaine pour ce semestre</option>';
-        }
+        if (!semaines.length) selSemaine.innerHTML = '<option value="">Aucune semaine pour ce semestre</option>';
     } catch(e) {
-        console.error('Erreur chargement semaines :', e);
         selSemaine.innerHTML = '<option value="">Erreur de chargement</option>';
     }
-});
+}
 
 // =============================================================================
 // MODE
@@ -92,15 +143,32 @@ document.getElementById('filtSemestre').addEventListener('change', async functio
 
 function setMode(mode) {
     currentMode = mode;
+
+    // Onglets actifs
     document.getElementById('modeSemaine').classList.toggle('active', mode === 'semaine');
-    document.getElementById('modeDetail').classList.toggle('active', mode === 'detail');
+    document.getElementById('modeDetail').classList.toggle('active',  mode === 'detail');
+    document.getElementById('modeFiliere').classList.toggle('active', mode === 'filiere');
+
+    // Blocs filtres
+    const isSalle   = mode === 'semaine' || mode === 'detail';
+    const isFiliere = mode === 'filiere';
+    document.getElementById('filtersSalle').style.display   = isSalle   ? '' : 'none';
+    document.getElementById('filtersFiliere').style.display = isFiliere ? '' : 'none';
+
+    // Semaine visible uniquement en mode semaine (salle)
     document.getElementById('filtSemaineWrap').style.display = mode === 'semaine' ? '' : 'none';
+
+    // Légendes
+    document.getElementById('legendeSalle').style.display   = isFiliere ? 'none' : '';
+    document.getElementById('legendeFiliere').style.display = isFiliere ? ''     : 'none';
+
+    // Réinitialiser résultats
     document.getElementById('resultsContainer').innerHTML = '';
     document.getElementById('statsRow').style.display = 'none';
 }
 
 // =============================================================================
-// RECHERCHE
+// RECHERCHE — SALLE
 // =============================================================================
 
 async function rechercher() {
@@ -112,11 +180,7 @@ async function rechercher() {
     if (!id_salle) return alert('Veuillez choisir une salle.');
     if (currentMode === 'semaine' && !id_semaine) return alert('Veuillez choisir une semaine.');
 
-    document.getElementById('resultsContainer').innerHTML = `
-        <div class="text-center py-5">
-            <div class="spinner-border text-primary"></div>
-            <p class="mt-2 text-muted">Chargement...</p>
-        </div>`;
+    showLoader();
 
     try {
         if (currentMode === 'semaine') {
@@ -139,13 +203,60 @@ async function rechercher() {
             renderDetail(data);
         }
     } catch (e) {
-        console.error(e);
-        document.getElementById('resultsContainer').innerHTML = `
-            <div class="empty-state">
-                <i class="fas fa-exclamation-triangle" style="color:#ef4444"></i>
-                <p style="color:#ef4444; font-weight:600;">Erreur : ${e.message}</p>
-            </div>`;
+        showError(e.message);
     }
+}
+
+// =============================================================================
+// RECHERCHE — FILIÈRE
+// =============================================================================
+
+async function rechercherFiliere() {
+    const id_filiere  = document.getElementById('filtFiliere').value;
+    const id_semaine  = document.getElementById('filtSemaineF').value;
+    const id_annee    = document.getElementById('filtAnneeF').value;
+    const id_semestre = document.getElementById('filtSemestreF').value;
+
+    if (!id_filiere) return alert('Veuillez choisir une filière.');
+    if (!id_semaine) return alert('Veuillez choisir une semaine.');
+
+    showLoader();
+
+    try {
+        const qs = new URLSearchParams({ id_filiere, id_semaine });
+        if (id_annee)    qs.set('id_annee',    id_annee);
+        if (id_semestre) qs.set('id_semestre', id_semestre);
+        const resp = await fetch('/consultation/filiere?' + qs);
+        if (!resp.ok) throw new Error((await resp.json()).error || resp.statusText);
+        const data = await resp.json();
+        if (!data?.creneaux || !data?.grille || !data?.stats) throw new Error('Réponse serveur invalide');
+        const nomFiliere = document.getElementById('filtFiliere').selectedOptions[0].text;
+        const nomSem     = document.getElementById('filtSemaineF').selectedOptions[0].text;
+        renderFiliere(data, nomFiliere, nomSem);
+    } catch (e) {
+        showError(e.message);
+    }
+}
+
+// =============================================================================
+// HELPERS AFFICHAGE
+// =============================================================================
+
+function showLoader() {
+    document.getElementById('resultsContainer').innerHTML = `
+        <div class="text-center py-5">
+            <div class="spinner-border text-primary"></div>
+            <p class="mt-2 text-muted">Chargement...</p>
+        </div>`;
+}
+
+function showError(msg) {
+    console.error(msg);
+    document.getElementById('resultsContainer').innerHTML = `
+        <div class="empty-state">
+            <i class="fas fa-exclamation-triangle" style="color:#ef4444"></i>
+            <p style="color:#ef4444; font-weight:600;">Erreur : ${msg}</p>
+        </div>`;
 }
 
 // =============================================================================
@@ -170,7 +281,7 @@ function updateStats(delta) {
 }
 
 // =============================================================================
-// RENDER MODE SEMAINE
+// RENDER MODE SEMAINE (salle)
 // =============================================================================
 
 function renderSemaine(data, semNom) {
@@ -204,14 +315,14 @@ function renderSemaine(data, semNom) {
             </div>
         </div>
         <div style="overflow-x:auto">
-            ${buildGrilleTable(creneaux, grille)}
+            ${buildGrilleTable(creneaux, grille, true)}
         </div>
     `;
     container.appendChild(card);
 }
 
 // =============================================================================
-// RENDER MODE DÉTAIL
+// RENDER MODE DÉTAIL (salle)
 // =============================================================================
 
 function renderDetail(data) {
@@ -228,7 +339,7 @@ function renderDetail(data) {
     </h5>`;
 
     if (!semaines.length) {
-        container.innerHTML += '<div class="empty-state"><i class="fas fa-inbox"></i><p>Aucune semaine trouvée pour ce semestre.</p></div>';
+        container.innerHTML += '<div class="empty-state"><i class="fas fa-inbox"></i><p>Aucune semaine trouvée.</p></div>';
         return;
     }
 
@@ -272,7 +383,7 @@ function renderDetail(data) {
                         <i class="fas fa-door-closed"></i> Occupés seulement
                     </button>
                 </div>
-                ${buildGrilleTable(creneaux, grille)}
+                ${buildGrilleTable(creneaux, grille, true)}
             </div>
         `;
         container.appendChild(acc);
@@ -280,39 +391,88 @@ function renderDetail(data) {
 }
 
 // =============================================================================
-// CONSTRUIRE TABLEAU GRILLE
+// RENDER MODE FILIÈRE
 // =============================================================================
 
-function buildGrilleTable(creneaux, grille) {
+function renderFiliere(data, nomFiliere, nomSem) {
+    const { creneaux, grille, stats, groupes } = data;
+    showStats(stats.total, stats.occupes, stats.libres, stats.taux);
+
+    const container = document.getElementById('resultsContainer');
+    container.innerHTML = '';
+
+    if (!creneaux.length) {
+        container.innerHTML = '<div class="empty-state"><i class="fas fa-inbox"></i><p>Aucun créneau trouvé.</p></div>';
+        return;
+    }
+
+    // Sélecteur de groupe si plusieurs groupes
+    let groupHtml = '';
+    if (groupes && groupes.length > 1) {
+        groupHtml = `
+            <div class="d-flex align-items-center gap-2 mb-0" style="flex-wrap:wrap">
+                <span style="font-size:.85rem; color:#6b7280"><i class="fas fa-users"></i> Groupe :</span>
+                <button class="view-btn view-btn-all active" onclick="filterGroupe(this, 'all', card)">
+                    <i class="fas fa-border-all"></i> Tous
+                </button>
+                ${groupes.map(g => `
+                    <button class="view-btn" onclick="filterGroupe(this, '${g}', card)" style="background:#3b82f6; color:#fff">
+                        <i class="fas fa-users"></i> Gr. ${g}
+                    </button>
+                `).join('')}
+            </div>`;
+    }
+
+    const card = document.createElement('div');
+    card.className = 'schedule-card';
+    card.innerHTML = `
+        <div class="schedule-card-header">
+            <h5><i class="fas fa-graduation-cap me-2" style="color:#3b82f6"></i>${nomFiliere} — ${nomSem}</h5>
+            <div class="view-btns" id="filiereViewBtns">
+                <button class="view-btn view-btn-all active" onclick="applyFilter(this,'all',this.closest('.schedule-card'))">
+                    <i class="fas fa-border-all"></i> Tous
+                </button>
+                <button class="view-btn view-btn-lib" onclick="applyFilter(this,'libre',this.closest('.schedule-card'))">
+                    <i class="fas fa-door-open"></i> Libres
+                </button>
+                <button class="view-btn view-btn-occ" onclick="applyFilter(this,'occupee',this.closest('.schedule-card'))">
+                    <i class="fas fa-door-closed"></i> Occupés
+                </button>
+            </div>
+        </div>
+        ${groupes && groupes.length > 1 ? `<div class="px-3 py-2 border-bottom" style="background:#f8fafc">${groupHtml}</div>` : ''}
+        <div style="overflow-x:auto">
+            ${buildGrilleFiliere(creneaux, grille)}
+        </div>
+    `;
+    container.appendChild(card);
+}
+
+// =============================================================================
+// CONSTRUIRE TABLEAU GRILLE — SALLE (avec bouton supprimer)
+// =============================================================================
+
+function buildGrilleTable(creneaux, grille, withDelete = false) {
     if (!creneaux?.length || !grille) return '<p class="p-3 text-muted">Aucune donnée.</p>';
 
     let html = '<table class="grille-table"><thead><tr>';
     html += '<th data-col-index="0">Créneau</th>';
-    JOURS.forEach((j, i) => {
-        html += `<th data-col-index="${i + 1}">${j}</th>`;
-    });
+    JOURS.forEach((j, i) => { html += `<th data-col-index="${i + 1}">${j}</th>`; });
     html += '</tr></thead><tbody>';
 
     creneaux.forEach(cr => {
-        html += `<tr>`;
+        html += '<tr>';
         html += `<td class="cell-heure" data-col-index="0"><i class="far fa-clock me-1"></i>${formatH(cr.heure_debut)} - ${formatH(cr.heure_fin)}</td>`;
 
         JOURS.forEach((jour, i) => {
-            const colIdx = i + 1;
+            const colIdx  = i + 1;
             const jourData = grille[jour];
-            if (!jourData) {
-                html += `<td data-col-index="${colIdx}">—</td>`;
-                return;
-            }
+            if (!jourData) { html += `<td data-col-index="${colIdx}">—</td>`; return; }
+
             const cell = jourData[cr.id_creneau];
             if (!cell) {
-                html += `<td class="cell-libre" data-statut="libre" data-col-index="${colIdx}">
-                    <span class="badge-libre">Libre</span>
-                    <div class="occ-detail" style="color:#166534"><i class="fas fa-check-circle"></i> Disponible</div>
-                </td>`;
-                return;
+                html += libreCell(colIdx); return;
             }
-
             if (cell.statut === 'occupee') {
                 const infoHtml = `
                     <div><i class="fas fa-book"></i> <strong>Module :</strong> ${cell.module || '—'}</div>
@@ -323,6 +483,9 @@ function buildGrilleTable(creneaux, grille) {
                     <div><i class="fas fa-calendar-week"></i> <strong>Semaines :</strong> ${cell.semaine_debut || '?'} → ${cell.semaine_fin || '?'}</div>
                 `.trim();
                 const encoded = encodeURIComponent(infoHtml);
+                const delBtn  = withDelete ? `<button class="btn-del-cell"
+                    onclick="openDelModal(${cell.id_occupation}, this.closest('td'), decodeURIComponent('${encoded}'))"
+                ><i class="fas fa-trash-alt"></i> Supprimer</button>` : '';
 
                 html += `<td class="cell-occupee" data-statut="occupee" data-col-index="${colIdx}" data-id="${cell.id_occupation}">
                     <span class="badge-occupee">Occupée</span>
@@ -331,15 +494,10 @@ function buildGrilleTable(creneaux, grille) {
                         <div><i class="fas fa-graduation-cap" style="color:#f97316"></i> ${cell.filiere || '—'} Gr.${cell.group || '?'}</div>
                         <div><i class="fas fa-user-tie" style="color:#6b7280"></i> ${cell.professeur || '—'}</div>
                     </div>
-                    <button class="btn-del-cell"
-                        onclick="openDelModal(${cell.id_occupation}, this.closest('td'), decodeURIComponent('${encoded}'))"
-                    ><i class="fas fa-trash-alt"></i> Supprimer</button>
+                    ${delBtn}
                 </td>`;
             } else {
-                html += `<td class="cell-libre" data-statut="libre" data-col-index="${colIdx}">
-                    <span class="badge-libre">Libre</span>
-                    <div class="occ-detail" style="color:#166534"><i class="fas fa-check-circle"></i> Disponible</div>
-                </td>`;
+                html += libreCell(colIdx);
             }
         });
         html += '</tr>';
@@ -350,7 +508,67 @@ function buildGrilleTable(creneaux, grille) {
 }
 
 // =============================================================================
-// FILTRE COLONNES
+// CONSTRUIRE TABLEAU GRILLE — FILIÈRE
+// Colonnes = jours, lignes = créneaux
+// Chaque cellule occupée affiche : module, salle, prof, groupe
+// =============================================================================
+
+function buildGrilleFiliere(creneaux, grille) {
+    if (!creneaux?.length || !grille) return '<p class="p-3 text-muted">Aucune donnée.</p>';
+
+    let html = '<table class="grille-table"><thead><tr>';
+    html += '<th data-col-index="0">Créneau</th>';
+    JOURS.forEach((j, i) => { html += `<th data-col-index="${i + 1}">${j}</th>`; });
+    html += '</tr></thead><tbody>';
+
+    creneaux.forEach(cr => {
+        html += '<tr>';
+        html += `<td class="cell-heure" data-col-index="0"><i class="far fa-clock me-1"></i>${formatH(cr.heure_debut)} - ${formatH(cr.heure_fin)}</td>`;
+
+        JOURS.forEach((jour, i) => {
+            const colIdx   = i + 1;
+            const jourData = grille[jour];
+            if (!jourData) { html += `<td data-col-index="${colIdx}">—</td>`; return; }
+
+            const cell = jourData[cr.id_creneau];
+
+            // Plusieurs groupes possibles dans la même case
+            if (!cell || cell.statut === 'libre') {
+                html += libreCell(colIdx);
+            } else {
+                // cell peut être un tableau (multi-groupes) ou un seul objet
+                const items = Array.isArray(cell.items) ? cell.items : [cell];
+                html += `<td class="cell-filiere" data-statut="occupee" data-col-index="${colIdx}">
+                    <span class="badge-filiere">Cours</span>
+                    <div class="occ-detail">
+                        ${items.map(item => `
+                            <div class="filiere-item mb-1" style="border-bottom:1px dashed #bfdbfe; padding-bottom:4px">
+                                <div><i class="fas fa-book" style="color:#3b82f6"></i> <strong>${item.module || '—'}</strong></div>
+                                <div><i class="fas fa-door-open" style="color:#6b7280"></i> Salle : ${item.salle || '—'}</div>
+                                <div><i class="fas fa-user-tie" style="color:#6b7280"></i> ${item.professeur || '—'}</div>
+                                ${item.group ? `<div><i class="fas fa-users" style="color:#6b7280"></i> Gr. ${item.group}</div>` : ''}
+                            </div>
+                        `).join('')}
+                    </div>
+                </td>`;
+            }
+        });
+        html += '</tr>';
+    });
+
+    html += '</tbody></table>';
+    return html;
+}
+
+function libreCell(colIdx) {
+    return `<td class="cell-libre" data-statut="libre" data-col-index="${colIdx}">
+        <span class="badge-libre">Libre</span>
+        <div class="occ-detail" style="color:#166534"><i class="fas fa-check-circle"></i> Disponible</div>
+    </td>`;
+}
+
+// =============================================================================
+// FILTRE COLONNES (commun salle + filière)
 // =============================================================================
 
 function applyFilter(btn, statut, scope) {
@@ -372,28 +590,24 @@ function applyFilter(btn, statut, scope) {
 
     const visibleCols = new Set();
     for (let col = 1; col <= 7; col++) {
-        if (table.querySelector('td[data-statut="' + statut + '"][data-col-index="' + col + '"]'))
+        if (table.querySelector(`td[data-statut="${statut}"][data-col-index="${col}"]`))
             visibleCols.add(col);
     }
 
     for (let col = 1; col <= 7; col++) {
         if (!visibleCols.has(col)) {
-            const th = table.querySelector('th[data-col-index="' + col + '"]');
+            const th = table.querySelector(`th[data-col-index="${col}"]`);
             if (th) th.classList.add('col-hidden');
-            table.querySelectorAll('td[data-col-index="' + col + '"]')
+            table.querySelectorAll(`td[data-col-index="${col}"]`)
                  .forEach(td => td.classList.add('col-hidden'));
         }
     }
 
     table.querySelectorAll('tbody tr').forEach(tr => {
-        const hasGood = Array.from(
-            tr.querySelectorAll('td[data-statut="' + statut + '"]')
-        ).some(td => visibleCols.has(parseInt(td.dataset.colIndex)));
+        const hasGood = Array.from(tr.querySelectorAll(`td[data-statut="${statut}"]`))
+            .some(td => visibleCols.has(parseInt(td.dataset.colIndex)));
 
-        if (!hasGood) {
-            tr.style.display = 'none';
-            return;
-        }
+        if (!hasGood) { tr.style.display = 'none'; return; }
 
         tr.querySelectorAll('td[data-statut]').forEach(td => {
             const colIdx = parseInt(td.dataset.colIndex);
@@ -468,7 +682,6 @@ async function confirmDelete() {
         updateStats(-1);
         closeDelModal();
         showToast('Occupation supprimée avec succès', 'success');
-
     } catch (e) {
         btn.disabled = false;
         btn.innerHTML = '<i class="fas fa-trash-alt"></i> Supprimer';
