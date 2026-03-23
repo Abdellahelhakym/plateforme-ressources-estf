@@ -4,6 +4,16 @@ const connection = require('./db');
 
 config.use(express.json());
 
+// Migration légère : ajoute la colonne type_partit si elle n'existe pas encore.
+connection.query(
+    "ALTER TABLE semestre ADD COLUMN type_partit VARCHAR(20) NOT NULL DEFAULT 'partit 1'",
+    (err) => {
+        if (!err) return;
+        if (err.code === 'ER_DUP_FIELDNAME') return;
+        console.error('[config] Impossible d\'ajouter semestre.type_partit :', err.message);
+    }
+);
+
 // =============================================================================
 // 1. ANNÉES — table: annee (id_annee, libelle)
 // =============================================================================
@@ -48,12 +58,21 @@ config.delete('/annee/:id', (req, res) => {
 });
 
 // =============================================================================
-// 2. SEMESTRES — table: semestre (id_semestre, nom_semestre)
+// 2. SEMESTRES — table: semestre (id_semestre, nom_semestre, type_partit)
 // =============================================================================
+
+const SEMESTRE_TYPES = ['partit 1', 'partit 2'];
+
+function normalizeSemestreType(value) {
+    const v = String(value || '').trim().toLowerCase();
+    if (v === 'partit 1' || v === 'partie 1') return 'partit 1';
+    if (v === 'partit 2' || v === 'partie 2') return 'partit 2';
+    return null;
+}
 
 config.get('/semestre', (req, res) => {
     connection.query(
-        'SELECT id_semestre, nom_semestre FROM semestre ORDER BY nom_semestre ASC',
+        'SELECT id_semestre, nom_semestre, type_partit FROM semestre ORDER BY nom_semestre ASC',
         (err, results) => {
             if (err) return res.status(500).json({ error: err.message });
             res.json(results);
@@ -62,10 +81,12 @@ config.get('/semestre', (req, res) => {
 });
 
 config.post('/semestre', (req, res) => {
-    const { nom_semestre } = req.body;
+    const { nom_semestre, type_partit } = req.body;
+    const normalizedType = normalizeSemestreType(type_partit);
     if (!nom_semestre) return res.status(400).json({ error: "Le nom du semestre est obligatoire" });
+    if (!normalizedType) return res.status(400).json({ error: `Le type du semestre est obligatoire (${SEMESTRE_TYPES.join(', ')})` });
 
-    connection.query('INSERT INTO semestre (nom_semestre) VALUES (?)', [nom_semestre], (err, result) => {
+    connection.query('INSERT INTO semestre (nom_semestre, type_partit) VALUES (?, ?)', [nom_semestre, normalizedType], (err, result) => {
         if (err) return res.status(500).json({ error: err.message });
         res.status(201).json({ id_semestre: result.insertId });
     });
@@ -73,8 +94,12 @@ config.post('/semestre', (req, res) => {
 
 config.put('/semestre/:id', (req, res) => {
     const { id } = req.params;
-    const { nom_semestre } = req.body;
-    connection.query('UPDATE semestre SET nom_semestre = ? WHERE id_semestre = ?', [nom_semestre, id], (err, result) => {
+    const { nom_semestre, type_partit } = req.body;
+    const normalizedType = normalizeSemestreType(type_partit);
+    if (!nom_semestre) return res.status(400).json({ error: "Le nom du semestre est obligatoire" });
+    if (!normalizedType) return res.status(400).json({ error: `Le type du semestre est obligatoire (${SEMESTRE_TYPES.join(', ')})` });
+
+    connection.query('UPDATE semestre SET nom_semestre = ?, type_partit = ? WHERE id_semestre = ?', [nom_semestre, normalizedType, id], (err, result) => {
         if (err) return res.status(500).json({ error: err.message });
         if (result.affectedRows === 0) return res.status(404).json({ error: "Non trouvé" });
         res.json({ success: true });

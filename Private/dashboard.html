@@ -78,83 +78,124 @@
         <div class="col-lg-2 col-md-4 col-6"><div class="kpi-card kpi-purple" style="min-height:90px"><div class="skeleton" style="height:100%;border-radius:12px;width:100%"></div></div></div>
     </div>
 
-    <!-- ROW 1 : Occupation par Jour + Par Filière -->
-    <div class="row g-3 mb-3">
-        <div class="col-lg-8" data-aos="fade-up">
-            <div class="chart-card h-100">
-                <div class="chart-card-header">
-                    <div class="chart-card-title"><i class="fas fa-chart-bar"></i> Occupations par Jour</div>
-                    <span class="chart-card-subtitle">Toutes semaines confondues</span>
-                </div>
-                <div class="chart-card-body">
-                    <div class="chart-wrap"><canvas id="chartJour"></canvas></div>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-4" data-aos="fade-up" data-aos-delay="100">
-            <div class="chart-card h-100">
-                <div class="chart-card-header">
-                    <div class="chart-card-title"><i class="fas fa-chart-pie"></i> Répartition par Filière</div>
-                </div>
-                <div class="chart-card-body">
-                    <div class="chart-wrap"><canvas id="chartFiliere"></canvas></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ROW 2 : Évolution par Semaine + Créneaux -->
-    <div class="row g-3 mb-3">
-        <div class="col-lg-8" data-aos="fade-up">
-            <div class="chart-card h-100">
-                <div class="chart-card-header">
-                    <div class="chart-card-title"><i class="fas fa-chart-line"></i> Évolution par Semaine</div>
-                </div>
-                <div class="chart-card-body">
-                    <div class="chart-wrap"><canvas id="chartSemaine"></canvas></div>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-4" data-aos="fade-up" data-aos-delay="100">
-            <div class="chart-card h-100">
-                <div class="chart-card-header">
-                    <div class="chart-card-title"><i class="fas fa-clock"></i> Charge par Créneau</div>
-                </div>
-                <div class="chart-card-body" id="creneauxBody">
-                    <div class="skeleton" style="height:210px"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ROW 3 : Top Salles + Top Profs -->
+    <!-- ROW 1 : Salles / Profs par semestre -->
     <div class="row g-3 mb-3">
         <div class="col-lg-6" data-aos="fade-up">
             <div class="chart-card h-100">
-                <div class="chart-card-header">
-                    <div class="chart-card-title"><i class="fas fa-door-open"></i> Top 10 Salles Utilisées</div>
+                <div class="chart-card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
+                    <div class="chart-card-title"><i class="fas fa-door-open"></i> Salles les plus utilisées par semestre</div>
+                    <div class="d-flex align-items-center gap-2">
+                        <label for="semSallesSelect" class="mb-0 text-muted" style="font-size:14px">Les semestres</label>
+                        <select id="semSallesSelect" class="form-select form-select-sm" style="width:180px">
+                            <option value="">Toutes</option>
+                        </select>
+                    </div>
                 </div>
-                <div class="chart-card-body" id="topSallesBody">
-                    <div class="skeleton" style="height:230px"></div>
+                <div class="chart-card-body">
+                    <div class="chart-wrap"><canvas id="chartSallesSem"></canvas></div>
                 </div>
             </div>
         </div>
         <div class="col-lg-6" data-aos="fade-up" data-aos-delay="100">
             <div class="chart-card h-100">
-                <div class="chart-card-header">
-                    <div class="chart-card-title"><i class="fas fa-chalkboard-teacher"></i> Top Professeurs</div>
+                <div class="chart-card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
+                    <div class="chart-card-title"><i class="fas fa-chalkboard-teacher"></i> Professeurs les plus actifs par semestre</div>
+                    <div class="d-flex align-items-center gap-2">
+                        <label for="semProfsSelect" class="mb-0 text-muted" style="font-size:14px">Les semestres</label>
+                        <select id="semProfsSelect" class="form-select form-select-sm" style="width:180px">
+                            <option value="">Toutes</option>
+                        </select>
+                    </div>
                 </div>
-                <div class="chart-card-body" id="topProfsBody">
-                    <div class="skeleton" style="height:230px"></div>
+                <div class="chart-card-body">
+                    <div class="chart-wrap"><canvas id="chartProfsSem"></canvas></div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- ROW 2 : Occupation par salle -->
+    <div class="row g-3 mb-3">
+        <div class="col-lg-12" data-aos="fade-up">
+            <div class="chart-card h-100">
+                <div class="chart-card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
+                    <div>
+                        <div class="chart-card-title"><i class="fas fa-building"></i> Libre vs occupé par salle</div>
+                        <span class="chart-card-subtitle">Nombre de créneaux sur les semaines uniques des semestres choisis</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <label for="jourLibreSelect" class="mb-0 text-muted" style="font-size:14px">Jour</label>
+                        <select id="jourLibreSelect" class="form-select form-select-sm" style="width:150px">
+                            <option value="">Tous</option>
+                            <option value="Lundi">Lundi</option>
+                            <option value="Mardi">Mardi</option>
+                            <option value="Mercredi">Mercredi</option>
+                            <option value="Jeudi">Jeudi</option>
+                            <option value="Vendredi">Vendredi</option>
+                            <option value="Samedi">Samedi</option>
+                        </select>
+                        <label for="semLibreSelect" class="mb-0 text-muted" style="font-size:14px">Les semestres</label>
+                        <select id="semLibreSelect" class="form-select form-select-sm" style="width:180px">
+                            <option value="">Toutes</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="chart-card-body" id="sallesOccupeesBody">
+                    <div class="skeleton" style="height:260px"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ROW 3 : Vue rapide par jour (salle × semestre) -->
+    <div class="chart-card mb-3" data-aos="fade-up">
+        <div class="chart-card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
+            <div>
+                <div class="chart-card-title"><i class="fas fa-calendar-day"></i> Utilisations par jour · salle × semestre</div>
+                <span class="chart-card-subtitle">Choisissez un jour pour voir combien de fois chaque salle est utilisée par semestre.</span>
+            </div>
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+                <div class="d-flex align-items-center gap-2">
+                    <label for="jourSelect" class="mb-0 text-muted" style="font-size:14px">Jour</label>
+                    <select id="jourSelect" class="form-select form-select-sm" style="width:160px">
+                        <option value="Lundi">Lundi</option>
+                        <option value="Mardi">Mardi</option>
+                        <option value="Mercredi">Mercredi</option>
+                        <option value="Jeudi">Jeudi</option>
+                        <option value="Vendredi">Vendredi</option>
+                        <option value="Samedi">Samedi</option>
+                    </select>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <label for="semSelect" class="mb-0 text-muted" style="font-size:14px">Les semestres</label>
+                    <select id="semSelect" class="form-select form-select-sm" style="width:200px">
+                        <option value="">Toutes</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div style="overflow-x:auto">
+            <table class="recent-table">
+                <thead>
+                    <tr>
+                        <th>Salle</th>
+                        <th>Filières (détail)</th>
+                        <th>Nombre d'utilisations (semaines)</th>
+                    </tr>
+                </thead>
+                <tbody id="jourSalleBody">
+                    <tr><td colspan="3" style="text-align:center;padding:1.5rem;color:#9ca3af">
+                        <i class="fas fa-spinner fa-spin me-2"></i>Chargement...
+                    </td></tr>
+                </tbody>
+            </table>
         </div>
     </div>
 
     <!-- ROW 4 : Activité Récente -->
     <div class="chart-card mb-4" data-aos="fade-up">
         <div class="chart-card-header">
-            <div class="chart-card-title"><i class="fas fa-history"></i> Dernières Occupations Créées</div>
+            <div class="chart-card-title"><i class="fas fa-history"></i> Dernières Utilisations Créées</div>
             <span class="chart-card-subtitle">8 plus récentes</span>
         </div>
         <div style="overflow-x:auto">

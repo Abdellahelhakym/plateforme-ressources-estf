@@ -1,33 +1,37 @@
 // hashPassword.js
 // ─────────────────────────────────────────────────────────────────────────────
-// Script à exécuter UNE SEULE FOIS pour hacher le mot de passe existant
+// Script utilitaire pour hacher le mot de passe d'un professeur existant
 // en base de données.
 //
-// Usage :  node hashPassword.js
+// Usage :  node hashPassword.js professeur@exemple.com nouveauMotDePasse
 // ─────────────────────────────────────────────────────────────────────────────
 
 const bcrypt     = require('bcrypt');
 const connection = require('./db');
 
-const PLAIN_PASSWORD = '1234';   // ← mot de passe actuel en clair
-const SALT_ROUNDS    = 10;       // coût du hachage (recommandé : 10-12)
+const email = process.argv[2];
+const plainPassword = process.argv[3];
+const SALT_ROUNDS = 10;
 
 async function hashAndUpdate() {
+    if (!email || !plainPassword) {
+        console.error('Usage : node hashPassword.js professeur@exemple.com nouveauMotDePasse');
+        connection.end();
+        return;
+    }
+
     try {
-        // 1. Générer le hash
-        const hash = await bcrypt.hash(PLAIN_PASSWORD, SALT_ROUNDS);
+        const hash = await bcrypt.hash(plainPassword, SALT_ROUNDS);
         console.log('✅ Hash généré :', hash);
 
-        // 2. Mettre à jour TOUS les admins dont le mot de passe vaut encore '1234'
-        //    → Adaptez la clause WHERE si nécessaire
         connection.query(
-            "UPDATE Enseignement SET password = ? WHERE password = ?",
-            [hash, PLAIN_PASSWORD],
+            'UPDATE professeur SET password = ? WHERE email = ?',
+            [hash, email],
             (err, result) => {
                 if (err) {
                     console.error('❌ Erreur lors de la mise à jour :', err);
                 } else {
-                    console.log(`✅ ${result.affectedRows} compte(s) mis à jour avec le mot de passe haché.`);
+                    console.log(`✅ ${result.affectedRows} compte(s) professeur mis à jour.`);
                 }
                 connection.end();
             }

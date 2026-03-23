@@ -3,6 +3,7 @@ AOS.init({ duration: 600, once: true });
 const JOURS = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
 let currentMode = 'semaine';
 let allFilieres  = [];   // cache de toutes les filières
+let allSemestresSalle = []; // cache semestres pour filtre salle (semaine/detail)
 
 // Détermine l'année universitaire (1, 2 ou 3) à partir du nom du semestre
 // S1/S2 → 1   |   S3/S4 → 2   |   S5/S6 → 3
@@ -39,6 +40,56 @@ function formatDate(d) {
     return new Date(d).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' });
 }
 
+function semesterMetaLabel(nomSemestre) {
+    const n = parseInt(String(nomSemestre || '').replace(/\D+/g, ''), 10);
+    if (!Number.isInteger(n)) return nomSemestre || '—';
+    const annee = n <= 2 ? '1ere annee' : n <= 4 ? '2eme annee' : '3eme annee';
+    return `${annee} · S${n}`;
+}
+
+function semestreNumber(nom) {
+    const m = String(nom || '').match(/\d+/);
+    return m ? parseInt(m[0], 10) : 999;
+}
+
+function partieLabelFromSemestres(semestres) {
+    const names = [...semestres]
+        .map(s => s.nom_semestre)
+        .filter(Boolean)
+        .sort((a, b) => semestreNumber(a) - semestreNumber(b));
+    return names.join('-');
+}
+
+function populateSemestreFilterSalle() {
+    const sel = document.getElementById('filtSemestre');
+    if (!sel) return;
+
+    if (currentMode === 'semaine' || currentMode === 'detail') {
+        sel.innerHTML = '<option value="">-- Choisir une partie --</option>';
+
+        const grouped = {};
+        allSemestresSalle.forEach(s => {
+            const t = String(s.type_partit || '').trim().toLowerCase();
+            if (!t) return;
+            if (!grouped[t]) grouped[t] = [];
+            grouped[t].push(s);
+        });
+
+        Object.keys(grouped)
+            .sort()
+            .forEach(type => {
+                const label = partieLabelFromSemestres(grouped[type]);
+                const opt = document.createElement('option');
+                opt.value = type;
+                opt.textContent = label || type;
+                sel.appendChild(opt);
+            });
+        return;
+    }
+
+    sel.innerHTML = '<option value="">-- Choisir une partie --</option>';
+}
+
 // =============================================================================
 // CHARGEMENT RÉFÉRENCE
 // =============================================================================
@@ -54,17 +105,18 @@ async function loadRefData() {
 
         // Cache des filières pour le filtrage dynamique
         allFilieres = filieres;
+        allSemestresSalle = semestres;
 
         fillSelect(document.getElementById('filtSalle'),    salles,    'id_salle',    'nom_salle');
         fillSelect(document.getElementById('filtAnnee'),    annees,    'id_annee',    'libelle');
-        fillSelect(document.getElementById('filtSemestre'), semestres, 'id_semestre', 'nom_semestre');
+        populateSemestreFilterSalle();
 
         fillSelect(document.getElementById('filtAnneeF'),    annees,    'id_annee',    'libelle');
         fillSelect(document.getElementById('filtSemestreF'), semestres, 'id_semestre', 'nom_semestre');
 
         // Filière et semaines : vides au départ
         document.getElementById('filtFiliere').innerHTML  = '<option value="">-- Choisir d\'abord un semestre --</option>';
-        document.getElementById('filtSemaine').innerHTML  = '<option value="">-- Choisir d\'abord un semestre --</option>';
+        document.getElementById('filtSemaine').innerHTML  = '<option value="">-- Choisir d\'abord une partie --</option>';
         document.getElementById('filtSemaineF').innerHTML = '<option value="">-- Choisir d\'abord un semestre --</option>';
 
     } catch(e) {
@@ -77,7 +129,9 @@ async function loadRefData() {
 // =============================================================================
 
 document.getElementById('filtSemestre').addEventListener('change', async function () {
-    await reloadSemaines(this.value, document.getElementById('filtSemaine'));
+    if (currentMode === 'semaine') {
+        await reloadSemainesParPartie(this.value, document.getElementById('filtSemaine'));
+    }
 });
 
 // =============================================================================
@@ -132,6 +186,30 @@ async function reloadSemaines(id_semestre, selSemaine) {
     }
 }
 
+async function reloadSemainesParPartie(typePartit, selSemaine) {
+    selSemaine.innerHTML = '<option value="">-- Choisir --</option>';
+    if (!typePartit) {
+        selSemaine.innerHTML = '<option value="">-- Choisir d\'abord une partie --</option>';
+        return;
+    }
+    try {
+        const semaines = await fetch(`/consultation/data/semaines-par-partie?type_partit=${encodeURIComponent(typePartit)}`).then(r => r.json());
+        const first = selSemaine.options[0];
+        selSemaine.innerHTML = '';
+        selSemaine.appendChild(first);
+        (semaines || []).forEach(item => {
+            const opt = document.createElement('option');
+            opt.value = item.nom_semaine || '';
+            opt.dataset.weekName = item.nom_semaine || '';
+            opt.textContent = item.nom_semaine || '';
+            selSemaine.appendChild(opt);
+        });
+        if (!semaines.length) selSemaine.innerHTML = '<option value="">Aucune semaine pour cette partie</option>';
+    } catch(e) {
+        selSemaine.innerHTML = '<option value="">Erreur de chargement</option>';
+    }
+}
+
 // =============================================================================
 // MODE
 // =============================================================================
@@ -150,6 +228,13 @@ function setMode(mode) {
     document.getElementById('filtersFiliere').style.display = isFiliere ? '' : 'none';
     document.getElementById('filtSemaineWrap').style.display = mode === 'semaine' ? '' : 'none';
 
+    populateSemestreFilterSalle();
+    if (mode === 'semaine') {
+        document.getElementById('filtSemaine').innerHTML = '<option value="">-- Choisir d\'abord une partie --</option>';
+    } else {
+        document.getElementById('filtSemaine').innerHTML = '<option value="">-- Semaine non requise en mode détail --</option>';
+    }
+
     document.getElementById('legendeSalle').style.display   = isFiliere ? 'none' : '';
     document.getElementById('legendeFiliere').style.display = isFiliere ? ''     : 'none';
 
@@ -163,29 +248,34 @@ function setMode(mode) {
 
 async function rechercher() {
     const id_salle    = document.getElementById('filtSalle').value;
-    const id_semaine  = document.getElementById('filtSemaine').value;
+    const semaineSel  = document.getElementById('filtSemaine');
+    const semaineVal  = semaineSel.value;
     const id_annee    = document.getElementById('filtAnnee').value;
-    const id_semestre = document.getElementById('filtSemestre').value;
+    const typePartit  = document.getElementById('filtSemestre').value;
+
+    const nom_semaine = semaineSel.selectedOptions[0]?.dataset.weekName || '';
 
     if (!id_salle) return alert('Veuillez choisir une salle.');
-    if (currentMode === 'semaine' && !id_semaine) return alert('Veuillez choisir une semaine.');
+    if (currentMode === 'semaine' && !semaineVal) return alert('Veuillez choisir une semaine.');
+    if ((currentMode === 'semaine' || currentMode === 'detail') && !typePartit) {
+        return alert('Veuillez choisir une partie.');
+    }
 
     showLoader();
 
     try {
         if (currentMode === 'semaine') {
-            const qs = new URLSearchParams({ id_salle, id_semaine });
-            if (id_annee)    qs.set('id_annee',    id_annee);
-            if (id_semestre) qs.set('id_semestre', id_semestre);
-            const resp = await fetch('/consultation/salle?' + qs);
+            const qs = new URLSearchParams({ id_salle, type_partit: typePartit });
+            if (id_annee) qs.set('id_annee', id_annee);
+            if (nom_semaine) qs.set('nom_semaine', nom_semaine);
+            const resp = await fetch('/consultation/salle/partie?' + qs);
             if (!resp.ok) throw new Error((await resp.json()).error || resp.statusText);
             const data = await resp.json();
-            if (!data?.creneaux || !data?.grille || !data?.stats) throw new Error('Réponse serveur invalide');
-            renderSemaine(data, document.getElementById('filtSemaine').selectedOptions[0].text);
+            if (!data?.creneaux || !data?.semestres) throw new Error('Réponse serveur invalide');
+            renderDetailPartie(data);
         } else {
-            const qs = new URLSearchParams({ id_salle });
+            const qs = new URLSearchParams({ id_salle, type_partit: typePartit });
             if (id_annee)    qs.set('id_annee',    id_annee);
-            if (id_semestre) qs.set('id_semestre', id_semestre);
             const resp = await fetch('/consultation/salle/detail?' + qs);
             if (!resp.ok) throw new Error((await resp.json()).error || resp.statusText);
             const data = await resp.json();
@@ -309,6 +399,7 @@ function renderSemaine(data, semNom) {
 function renderDetail(data) {
     const { creneaux, semaines } = data;
     const nomSalle = document.getElementById('filtSalle').selectedOptions[0].text;
+    const nomPartie = document.getElementById('filtSemestre').selectedOptions[0]?.text || '';
 
     let totalAll = 0, occAll = 0;
     semaines.forEach(s => { if (s?.stats) { totalAll += s.stats.total; occAll += s.stats.occupes; } });
@@ -316,7 +407,7 @@ function renderDetail(data) {
 
     const container = document.getElementById('resultsContainer');
     container.innerHTML = `<h5 class="mb-3" style="color:#1a236d; font-weight:700;">
-        <i class="fas fa-building me-2"></i>${nomSalle} — Toutes les semaines
+        <i class="fas fa-building me-2"></i>${nomSalle} — ${nomPartie ? `Partie ${nomPartie}` : 'Toutes les parties'}
     </h5>`;
 
     if (!semaines.length) {
@@ -324,50 +415,120 @@ function renderDetail(data) {
         return;
     }
 
-    semaines.forEach((s, idx) => {
+    const groupedBySemestre = {};
+    semaines.forEach(s => {
         if (!s?.semaine || !s?.stats || !s?.grille) return;
-        const { semaine, grille, stats } = s;
-        const tauxColor = stats.taux > 70 ? '#ef4444' : stats.taux > 40 ? '#f59e0b' : '#22c55e';
+        const semLabel = s.semaine.nom_semestre || `S${s.semaine.id_semestre || '?'}`;
+        if (!groupedBySemestre[semLabel]) groupedBySemestre[semLabel] = [];
+        groupedBySemestre[semLabel].push(s);
+    });
 
-        const acc = document.createElement('div');
-        acc.className = 'sem-accordion';
-        acc.innerHTML = `
-            <div class="sem-acc-header" onclick="toggleAcc(this)">
-                <div>
-                    <div class="sem-title">
-                        <i class="fas fa-calendar-week" style="color:#2c75bd"></i>
-                        ${semaine.nom_semaine || ''}
+    Object.keys(groupedBySemestre).forEach(semLabel => {
+        const semTitle = document.createElement('h6');
+        semTitle.className = 'mb-2 mt-3';
+        semTitle.style.cssText = 'color:#1a236d; font-weight:700;';
+        semTitle.innerHTML = `<i class="fas fa-layer-group me-2"></i>${semLabel}`;
+        container.appendChild(semTitle);
+
+        groupedBySemestre[semLabel].forEach((s, idx) => {
+            const { semaine, grille, stats } = s;
+            const tauxColor = stats.taux > 70 ? '#ef4444' : stats.taux > 40 ? '#f59e0b' : '#22c55e';
+
+            const acc = document.createElement('div');
+            acc.className = 'sem-accordion';
+            acc.innerHTML = `
+                <div class="sem-acc-header" onclick="toggleAcc(this)">
+                    <div>
+                        <div class="sem-title">
+                            <i class="fas fa-calendar-week" style="color:#2c75bd"></i>
+                            ${semaine.nom_semaine || ''}
+                        </div>
+                        <div class="sem-dates">${formatDate(semaine.date_debut)} → ${formatDate(semaine.date_fin)}</div>
+                        <div class="taux-bar">
+                            <div class="taux-bar-fill" style="width:${stats.taux}%; background:${tauxColor}"></div>
+                        </div>
                     </div>
-                    <div class="sem-dates">${formatDate(semaine.date_debut)} → ${formatDate(semaine.date_fin)}</div>
-                    <div class="taux-bar">
-                        <div class="taux-bar-fill" style="width:${stats.taux}%; background:${tauxColor}"></div>
+                    <div class="text-end">
+                        <div style="font-size:.85rem; font-weight:700; color:${tauxColor}">${stats.taux}% occupé</div>
+                        <div style="font-size:.75rem; color:#6b7280; margin-top:4px;">
+                            <span style="color:#ef4444">${stats.occupes} occupés</span> ·
+                            <span style="color:#22c55e">${stats.libres} libres</span>
+                        </div>
+                        <i class="fas ${idx === 0 ? 'fa-chevron-up' : 'fa-chevron-down'} mt-1" style="color:#9ca3af; font-size:.8rem"></i>
                     </div>
                 </div>
-                <div class="text-end">
-                    <div style="font-size:.85rem; font-weight:700; color:${tauxColor}">${stats.taux}% occupé</div>
-                    <div style="font-size:.75rem; color:#6b7280; margin-top:4px;">
-                        <span style="color:#ef4444">${stats.occupes} occupés</span> ·
-                        <span style="color:#22c55e">${stats.libres} libres</span>
+                <div class="sem-acc-body ${idx === 0 ? 'open' : ''}">
+                    <div class="view-btns p-2" style="border-bottom:1px solid #f0f4f8">
+                        <button class="view-btn view-btn-all active" onclick="applyFilter(this,'all',this.closest('.sem-acc-body'))">
+                            <i class="fas fa-border-all"></i> Tous
+                        </button>
+                        <button class="view-btn view-btn-lib" onclick="applyFilter(this,'libre',this.closest('.sem-acc-body'))">
+                            <i class="fas fa-door-open"></i> Libres seulement
+                        </button>
+                        <button class="view-btn view-btn-occ" onclick="applyFilter(this,'occupee',this.closest('.sem-acc-body'))">
+                            <i class="fas fa-door-closed"></i> Occupés seulement
+                        </button>
                     </div>
-                    <i class="fas ${idx === 0 ? 'fa-chevron-up' : 'fa-chevron-down'} mt-1" style="color:#9ca3af; font-size:.8rem"></i>
+                    ${buildGrilleTable(creneaux, grille)}
                 </div>
-            </div>
-            <div class="sem-acc-body ${idx === 0 ? 'open' : ''}">
-                <div class="view-btns p-2" style="border-bottom:1px solid #f0f4f8">
-                    <button class="view-btn view-btn-all active" onclick="applyFilter(this,'all',this.closest('.sem-acc-body'))">
+            `;
+            container.appendChild(acc);
+        });
+    });
+}
+
+function renderDetailPartie(data) {
+    const { creneaux, semestres, nom_semaine } = data;
+    const nomSalle = document.getElementById('filtSalle').selectedOptions[0].text;
+    const partieLabel = document.getElementById('filtSemestre').selectedOptions[0]?.text || '';
+
+    let totalAll = 0;
+    let occAll = 0;
+    (semestres || []).forEach(s => {
+        if (s?.stats) {
+            totalAll += s.stats.total;
+            occAll += s.stats.occupes;
+        }
+    });
+    showStats(totalAll, occAll, totalAll - occAll, totalAll ? Math.round(occAll / totalAll * 100) : 0);
+
+    const container = document.getElementById('resultsContainer');
+    container.innerHTML = `<h5 class="mb-3" style="color:#1a236d; font-weight:700;">
+        <i class="fas fa-building me-2"></i>${nomSalle} — Partie ${partieLabel} — ${nom_semaine || ''}
+    </h5>`;
+
+    if (!semestres?.length) {
+        container.innerHTML += '<div class="empty-state"><i class="fas fa-inbox"></i><p>Aucun semestre pour cette partie.</p></div>';
+        return;
+    }
+
+    semestres.forEach(s => {
+        if (!s?.semestre || !s?.grille || !s?.stats) return;
+        const card = document.createElement('div');
+        card.className = 'schedule-card';
+        card.innerHTML = `
+            <div class="schedule-card-header">
+                <h5>
+                    <i class="fas fa-calendar-check me-2"></i>${s.semestre.nom_semestre}
+                    ${!s.hasSemaine ? '<span style="font-size:.8rem; margin-left:8px; opacity:.9;">(semaine non définie)</span>' : ''}
+                </h5>
+                <div class="view-btns">
+                    <button class="view-btn view-btn-all active" onclick="applyFilter(this,'all',this.closest('.schedule-card'))">
                         <i class="fas fa-border-all"></i> Tous
                     </button>
-                    <button class="view-btn view-btn-lib" onclick="applyFilter(this,'libre',this.closest('.sem-acc-body'))">
+                    <button class="view-btn view-btn-lib" onclick="applyFilter(this,'libre',this.closest('.schedule-card'))">
                         <i class="fas fa-door-open"></i> Libres seulement
                     </button>
-                    <button class="view-btn view-btn-occ" onclick="applyFilter(this,'occupee',this.closest('.sem-acc-body'))">
+                    <button class="view-btn view-btn-occ" onclick="applyFilter(this,'occupee',this.closest('.schedule-card'))">
                         <i class="fas fa-door-closed"></i> Occupés seulement
                     </button>
                 </div>
-                ${buildGrilleTable(creneaux, grille)}
+            </div>
+            <div style="overflow-x:auto">
+                ${buildGrilleTable(creneaux, s.grille)}
             </div>
         `;
-        container.appendChild(acc);
+        container.appendChild(card);
     });
 }
 
@@ -441,13 +602,17 @@ function buildGrilleTable(creneaux, grille) {
                 return;
             }
 
-            // Cellule occupée — affichage info uniquement, pas de bouton supprimer
+            const items = Array.isArray(cell.items) ? cell.items : [cell];
+
             html += `<td class="cell-occupee" data-statut="occupee" data-col-index="${colIdx}">
                 <span class="badge-occupee">Occupée</span>
                 <div class="occ-detail">
-                    <div><i class="fas fa-book" style="color:#ef4444"></i> ${cell.module || '—'}</div>
-                    <div><i class="fas fa-graduation-cap" style="color:#f97316"></i> ${cell.filiere || '—'} Gr.${cell.group || '?'}</div>
-                    <div><i class="fas fa-user-tie" style="color:#6b7280"></i> ${cell.professeur || '—'}</div>
+                    ${items.map(item => `
+                        <div><i class="fas fa-book" style="color:#ef4444"></i> ${item.module || '—'}</div>
+                        <div><i class="fas fa-graduation-cap" style="color:#f97316"></i> ${item.filiere || '—'} Gr.${item.group || '?'}</div>
+                        <div><i class="fas fa-layer-group" style="color:#0ea5e9"></i> ${semesterMetaLabel(item.nom_semestre)}</div>
+                        <div><i class="fas fa-user-tie" style="color:#6b7280"></i> ${item.professeur || '—'}</div>
+                    `).join('<hr style="margin:4px 0; border-color:#fecaca">')}
                 </div>
             </td>`;
         });

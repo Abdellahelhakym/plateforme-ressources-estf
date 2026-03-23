@@ -143,7 +143,7 @@
                                 <th>Prénom</th>
                                 <th>Email</th>
                                 <th>Département</th>
-                                <th>Filière</th>
+                                <th>Filières</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -239,6 +239,7 @@
                             <div class="mb-3"><label>Nom</label><input type="text" class="form-control" name="nom" required></div>
                             <div class="mb-3"><label>Prénom</label><input type="text" class="form-control" name="prenom" required></div>
                             <div class="mb-3"><label>Email</label><input type="email" class="form-control" name="email" required></div>
+                            <div class="mb-3"><label>Mot de passe</label><input type="password" class="form-control" name="password" minlength="4" required></div>
                             <div class="mb-3">
                                 <label>Département</label>
                                 <select class="form-select" name="departement" required>
@@ -247,10 +248,11 @@
                             </div>
                             <!-- NEW: Filière select populated dynamically -->
                             <div class="mb-3">
-                                <label>Filière</label>
-                                <select class="form-select" name="id_filiere" id="selectFiliereProf">
+                                <label>Filières</label>
+                                <select class="form-select" name="id_filieres" id="selectFiliereProf" multiple size="6">
                                     <option value="">-- Aucune --</option>
                                 </select>
+                                <small class="text-muted">Utilisez Ctrl (ou Cmd) pour sélectionner plusieurs filières.</small>
                             </div>
                         </form>
                     </div>
@@ -370,6 +372,7 @@
                             <div class="mb-3"><label>Nom</label><input type="text" class="form-control" id="editNomProf" name="nom" required></div>
                             <div class="mb-3"><label>Prénom</label><input type="text" class="form-control" id="editPrenomProf" name="prenom" required></div>
                             <div class="mb-3"><label>Email</label><input type="email" class="form-control" id="editEmailProf" name="email" required></div>
+                            <div class="mb-3"><label>Nouveau mot de passe</label><input type="password" class="form-control" id="editPasswordProf" name="password" minlength="4" placeholder="Laisser vide pour conserver l'ancien"></div>
                             <div class="mb-3">
                                 <label>Département</label>
                                 <select class="form-select" id="editDeptProf" name="departement" required>
@@ -378,10 +381,11 @@
                             </div>
                             <!-- NEW: Filière select populated dynamically -->
                             <div class="mb-3">
-                                <label>Filière</label>
-                                <select class="form-select" id="editFiliereProf" name="id_filiere">
+                                <label>Filières</label>
+                                <select class="form-select" id="editFiliereProf" name="id_filieres" multiple size="6">
                                     <option value="">-- Aucune --</option>
                                 </select>
+                                <small class="text-muted">Utilisez Ctrl (ou Cmd) pour sélectionner plusieurs filières.</small>
                             </div>
                         </form>
                     </div>

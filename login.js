@@ -29,7 +29,7 @@ router.post('/', (req, res) => {
 
             if (result.length === 0) {
                 // Utilisateur introuvable
-                req.session.error = "Nom d'utilisateur ou mot de passe incorrect.";
+                req.session.error = "user ou mot de passe incorrect.";
                 return res.redirect('/login.html');
             }
 

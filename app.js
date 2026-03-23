@@ -18,12 +18,15 @@ const config = require('./configurationTemporelle');
 const occupation = require('./occupation');
 const consultation = require('./consultation');
 const dashboard = require('./dashboard');
+const { runSchemaIntegrityMigrations } = require('./schemaIntegrity');
 
 app.use(session({
     secret: '1234',
     resave: false,
     saveUninitialized: false
 }));
+
+runSchemaIntegrityMigrations();
 
 // ─── Middleware Admin ────────────────────────────────────────────────────────
 function isLoggedIn(req, res, next) {

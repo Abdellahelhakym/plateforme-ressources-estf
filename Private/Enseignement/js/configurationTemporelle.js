@@ -42,11 +42,14 @@ async function loadSemestres() {
     tbody.innerHTML = '';
 
     if (data.length === 0) {
-        tbody.innerHTML = '<tr><td class="text-center text-muted">Aucun semestre enregistré.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="2" class="text-center text-muted">Aucun semestre enregistré.</td></tr>';
     } else {
         data.forEach(item => {
             const tr = document.createElement('tr');
-            tr.innerHTML = `<td>${item.nom_semestre}</td>`;
+            tr.innerHTML = `
+                <td>${item.nom_semestre}</td>
+                <td><span class="badge bg-secondary">${item.type_partit || '—'}</span></td>
+            `;
             tbody.appendChild(tr);
         });
     }

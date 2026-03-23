@@ -28,46 +28,60 @@ materiel.post('/', upload.single('image_materiel'), (req, res) => {
     const { nom_materiel, type_materiel, quantite, etat, Remarques, salle } = req.body;
     console.log(salle);
 
- 
-    connection.execute(
-        'INSERT INTO materiel (nom_materiel, type_materiel, quantite, etat, Remarques, salle) VALUES (?, ?, ?, ?, ?, ?)',
-        [nom_materiel, type_materiel, quantite, etat, Remarques, salle],
-        (err, result) => {
-            if (err) return res.status(500).send("Erreur SQL");
+    connection.execute('SELECT id_salle FROM salles WHERE nom_salle = ? LIMIT 1', [salle], (roomErr, roomRows) => {
+        if (roomErr) return res.status(500).send("Erreur SQL");
 
-            const idMateriel = result.insertId;
+        const idSalle = roomRows.length ? roomRows[0].id_salle : null;
 
-          
-            if (req.file) {
-                const ext = path.extname(req.file.originalname);
-                const newFilename = `img-${idMateriel}${ext}`;
-                const newPath = path.join(req.file.destination, newFilename);
+        connection.execute(
+            'INSERT INTO materiel (nom_materiel, type_materiel, quantite, etat, Remarques, salle, id_salle) VALUES (?, ?, ?, ?, ?, ?, ?)',
+            [nom_materiel, type_materiel, quantite, etat, Remarques, salle, idSalle],
+            (err, result) => {
+                if (err) return res.status(500).send("Erreur SQL");
 
-                fs.rename(req.file.path, newPath, (err) => {
-                    if (err) console.error(err);
+                const idMateriel = result.insertId;
 
-                   
-                    const imgPath = `/img/materiel/${newFilename}`;
-                    connection.execute(
-                        'UPDATE materiel SET img = ? WHERE id_materiel = ?',
-                        [imgPath, idMateriel],
-                        (err2) => {
-                            if (err2) console.error(err2);
-                            res.redirect('/private/materiel.html');
-                        }
-                    );
-                });
-            } else {
-                res.redirect('/private/materiel.html'); 
+                if (req.file) {
+                    const ext = path.extname(req.file.originalname);
+                    const newFilename = `img-${idMateriel}${ext}`;
+                    const newPath = path.join(req.file.destination, newFilename);
+
+                    fs.rename(req.file.path, newPath, (errRename) => {
+                        if (errRename) console.error(errRename);
+
+                        const imgPath = `/img/materiel/${newFilename}`;
+                        connection.execute(
+                            'UPDATE materiel SET img = ? WHERE id_materiel = ?',
+                            [imgPath, idMateriel],
+                            (err2) => {
+                                if (err2) console.error(err2);
+                                res.redirect('/private/materiel.html');
+                            }
+                        );
+                    });
+                } else {
+                    res.redirect('/private/materiel.html');
+                }
             }
-        }
-    );
+        );
+    });
 });
 
 // recuperer les materiel avec sont img
 materiel.get('/Info', (req, res) => {
 
-    connection.query("SELECT   id_materiel,nom_materiel, type_materiel, quantite, etat, Remarques, salle, img FROM materiel", function(err, materielResult){
+        connection.query(
+            `SELECT m.id_materiel,
+                            m.nom_materiel,
+                            m.type_materiel,
+                            m.quantite,
+                            m.etat,
+                            m.Remarques,
+                            COALESCE(s.nom_salle, m.salle) AS salle,
+                            m.img
+             FROM materiel m
+             LEFT JOIN salles s ON s.id_salle = m.id_salle`,
+            function(err, materielResult){
       if (err) {
         return res.status(500).json({ error: err });
       }
@@ -75,7 +89,7 @@ materiel.get('/Info', (req, res) => {
       res.json({
         materiel: materielResult
       });
-    });
+        });
   });
 
 

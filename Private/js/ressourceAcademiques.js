@@ -3,6 +3,23 @@ AOS.init({ duration: 600, once: true });
         let deleteType = null;
         let deleteId = null;
 
+        function getMultiSelectValues(selectId) {
+            const el = document.getElementById(selectId);
+            if (!el) return [];
+            return Array.from(el.selectedOptions)
+                .map(o => parseInt(o.value, 10))
+                .filter(v => Number.isInteger(v) && v > 0);
+        }
+
+        function setMultiSelectValues(selectId, values) {
+            const el = document.getElementById(selectId);
+            if (!el) return;
+            const wanted = new Set((values || []).map(v => String(v)));
+            Array.from(el.options).forEach(opt => {
+                opt.selected = wanted.has(String(opt.value));
+            });
+        }
+
         // ────────────────────────────────────────────────
         // CHARGEMENT DES DONNÉES
         // ────────────────────────────────────────────────
@@ -48,13 +65,14 @@ AOS.init({ duration: 600, once: true });
             const tbody = document.querySelector('#tableProfesseurs tbody');
             tbody.innerHTML = '';
             data.forEach(item => {
+                const filieresLabel = item.filieres || item.filier || '-';
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td>${item.nom}</td>
                     <td>${item.prenom}</td>
                     <td>${item.email}</td>
                     <td>${item.departement}</td>
-                    <td>${item.filier || '-'}</td>
+                    <td>${filieresLabel}</td>
                     <td>
                         <button class="btn btn-sm btn-warning btn-edit edit-Professeurs"
                             data-id="${item.id}"
@@ -62,7 +80,7 @@ AOS.init({ duration: 600, once: true });
                             data-prenom="${item.prenom}"
                             data-email="${item.email}"
                             data-dept="${item.departement}"
-                            data-filiere="${item.id_filiere || ''}">
+                            data-filieres="${item.id_filieres || (item.id_filiere || '')}">
                             <i class="fas fa-edit"></i>
                         </button>
                         <button class="btn btn-sm btn-danger btn-delete"
@@ -161,6 +179,7 @@ AOS.init({ duration: 600, once: true });
             if (!form.checkValidity()) return alert("Veuillez remplir tous les champs");
 
             const data = Object.fromEntries(new FormData(form));
+            data.id_filieres = getMultiSelectValues('selectFiliereProf');
             const res = await fetch('/ressource/professeur', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
@@ -171,7 +190,8 @@ AOS.init({ duration: 600, once: true });
                 form.reset();
                 loadProfesseurs();
             } else {
-                alert("Erreur lors de l'ajout");
+                const error = await res.json().catch(() => ({ error: "Erreur lors de l'ajout" }));
+                alert(error.error || "Erreur lors de l'ajout");
             }
         });
 
@@ -247,8 +267,13 @@ AOS.init({ duration: 600, once: true });
                 document.getElementById('editNomProf').value       = btnProf.dataset.nom;
                 document.getElementById('editPrenomProf').value    = btnProf.dataset.prenom;
                 document.getElementById('editEmailProf').value     = btnProf.dataset.email;
+                document.getElementById('editPasswordProf').value  = '';
                 document.getElementById('editDeptProf').value      = btnProf.dataset.dept;
-                document.getElementById('editFiliereProf').value   = btnProf.dataset.filiere;
+                const ids = String(btnProf.dataset.filieres || '')
+                    .split(',')
+                    .map(v => parseInt(v.trim(), 10))
+                    .filter(v => Number.isInteger(v) && v > 0);
+                setMultiSelectValues('editFiliereProf', ids);
                 new bootstrap.Modal(document.getElementById('editProfModal')).show();
             }
 
@@ -288,6 +313,7 @@ AOS.init({ duration: 600, once: true });
         document.getElementById('btnSaveEditProf').addEventListener('click', async () => {
             const id   = document.getElementById('editProfId').value;
             const data = Object.fromEntries(new FormData(document.getElementById('formEditProf')));
+            data.id_filieres = getMultiSelectValues('editFiliereProf');
 
             const res = await fetch(`/ressource/professeur/${id}`, {
                 method: 'PUT',
@@ -298,7 +324,8 @@ AOS.init({ duration: 600, once: true });
                 bootstrap.Modal.getInstance(document.getElementById('editProfModal')).hide();
                 loadProfesseurs();
             } else {
-                alert("Erreur modification");
+                const error = await res.json().catch(() => ({ error: "Erreur modification" }));
+                alert(error.error || "Erreur modification");
             }
         });
 

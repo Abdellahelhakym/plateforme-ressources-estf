@@ -103,83 +103,67 @@
         <div class="col-lg-2 col-md-4 col-6"><div class="kpi-card kpi-purple" style="min-height:90px"><div class="skeleton" style="height:100%;border-radius:12px;width:100%"></div></div></div>
     </div>
 
-    <!-- ROW 1 : Occupation par Jour + Par Filière -->
-    <div class="row g-3 mb-3">
-        <div class="col-lg-8" data-aos="fade-up">
-            <div class="chart-card h-100">
-                <div class="chart-card-header">
-                    <div class="chart-card-title"><i class="fas fa-chart-bar"></i> Occupations par Jour</div>
-                    <span class="chart-card-subtitle">Toutes semaines confondues</span>
-                </div>
-                <div class="chart-card-body">
-                    <div class="chart-wrap"><canvas id="chartJour"></canvas></div>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-4" data-aos="fade-up" data-aos-delay="100">
-            <div class="chart-card h-100">
-                <div class="chart-card-header">
-                    <div class="chart-card-title"><i class="fas fa-chart-pie"></i> Répartition par Filière</div>
-                </div>
-                <div class="chart-card-body">
-                    <div class="chart-wrap"><canvas id="chartFiliere"></canvas></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ROW 2 : Évolution par Semaine + Créneaux -->
-    <div class="row g-3 mb-3">
-        <div class="col-lg-8" data-aos="fade-up">
-            <div class="chart-card h-100">
-                <div class="chart-card-header">
-                    <div class="chart-card-title"><i class="fas fa-chart-line"></i> Évolution par Semaine</div>
-                </div>
-                <div class="chart-card-body">
-                    <div class="chart-wrap"><canvas id="chartSemaine"></canvas></div>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-4" data-aos="fade-up" data-aos-delay="100">
-            <div class="chart-card h-100">
-                <div class="chart-card-header">
-                    <div class="chart-card-title"><i class="fas fa-clock"></i> Charge par Créneau</div>
-                </div>
-                <div class="chart-card-body" id="creneauxBody">
-                    <div class="skeleton" style="height:210px"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ROW 3 : Top Salles + Top Profs -->
+    <!-- ROW 1 : Filières et Salles utilisées -->
     <div class="row g-3 mb-3">
         <div class="col-lg-6" data-aos="fade-up">
             <div class="chart-card h-100">
                 <div class="chart-card-header">
-                    <div class="chart-card-title"><i class="fas fa-door-open"></i> Top 10 Salles Utilisées</div>
+                    <div class="chart-card-title"><i class="fas fa-graduation-cap"></i> Mes Filières Enseignées</div>
                 </div>
-                <div class="chart-card-body" id="topSallesBody">
-                    <div class="skeleton" style="height:230px"></div>
+                <div class="chart-card-body">
+                    <div class="chart-wrap"><canvas id="chartFilieresEns"></canvas></div>
                 </div>
             </div>
         </div>
         <div class="col-lg-6" data-aos="fade-up" data-aos-delay="100">
             <div class="chart-card h-100">
                 <div class="chart-card-header">
-                    <div class="chart-card-title"><i class="fas fa-chalkboard-teacher"></i> Top Professeurs</div>
+                    <div class="chart-card-title"><i class="fas fa-door-open"></i> Mes Salles Utilisées</div>
                 </div>
-                <div class="chart-card-body" id="topProfsBody">
-                    <div class="skeleton" style="height:230px"></div>
+                <div class="chart-card-body">
+                    <div class="chart-wrap"><canvas id="chartSallesEns"></canvas></div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- ROW 4 : Activité Récente -->
+    <!-- ROW 2 : Utilisations par jour + Emploi du temps -->
+    <div class="row g-3 mb-3">
+        <div class="col-lg-5" data-aos="fade-up">
+            <div class="chart-card h-100">
+                <div class="chart-card-header">
+                    <div class="chart-card-title"><i class="fas fa-calendar-day"></i> Mes Utilisations par Jour</div>
+                </div>
+                <div class="chart-card-body">
+                    <div class="chart-wrap"><canvas id="chartJoursEns"></canvas></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-7" data-aos="fade-up" data-aos-delay="100">
+            <div class="chart-card h-100">
+                <div class="chart-card-header">
+                    <div class="chart-card-title"><i class="fas fa-table"></i> Emplois Du Temps Associés À Mes Cours</div>
+                </div>
+                <div class="chart-card-body" id="emploiBody" style="overflow-x:auto">
+                    <table class="recent-table">
+                        <thead>
+                            <tr>
+                                <th>Jour</th><th>Créneau</th><th>Salle</th><th>Module</th><th>Filière · Gr.</th><th>Semaines</th>
+                            </tr>
+                        </thead>
+                        <tbody id="emploiRows">
+                            <tr><td colspan="6" style="text-align:center;padding:1.5rem;color:#9ca3af">Chargement...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ROW 3 : Activité Récente Enseignant -->
     <div class="chart-card mb-4" data-aos="fade-up">
         <div class="chart-card-header">
-            <div class="chart-card-title"><i class="fas fa-history"></i> Dernières Occupations Créées</div>
+            <div class="chart-card-title"><i class="fas fa-history"></i> Mes Dernières Utilisations</div>
             <span class="chart-card-subtitle">8 plus récentes</span>
         </div>
         <div style="overflow-x:auto">
@@ -234,6 +218,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script src="./js/currentProfesseur.js"></script>
 <script src="./js/dashboard.js"></script>
 </body>
 </html>

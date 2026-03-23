@@ -76,10 +76,12 @@ AOS.init({ duration: 800, once: true });
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td>${item.nom_semestre}</td>
+                    <td><span class="badge bg-secondary">${item.type_partit || '—'}</span></td>
                     <td>
                         <button class="btn btn-sm btn-edit btn-edit-semestre"
                             data-id="${item.id_semestre}"
-                            data-nom="${item.nom_semestre}">
+                            data-nom="${item.nom_semestre}"
+                            data-type="${item.type_partit || ''}">
                             <i class="fas fa-edit"></i>
                         </button>
                         <button class="btn btn-sm btn-delete btn-del"
@@ -290,6 +292,7 @@ AOS.init({ duration: 800, once: true });
             if (btnS) {
                 document.getElementById('editSemestreId').value  = btnS.dataset.id;
                 document.getElementById('editNomSemestre').value = btnS.dataset.nom;
+                document.getElementById('editTypeSemestre').value = btnS.dataset.type || '';
                 new bootstrap.Modal(document.getElementById('editSemestreModal')).show();
             }
 

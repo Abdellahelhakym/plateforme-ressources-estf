@@ -145,13 +145,17 @@ occupation.get('/data/modules', (req, res) => {
 
 occupation.get('/data/professeurs', (req, res) => {
     const { id_filier } = req.query;
-    let sql = 'SELECT id_prof, CONCAT(nom, " ", prenom) AS nom_complet FROM professeur';
+    let sql = `
+        SELECT DISTINCT p.id_prof, CONCAT(p.nom, ' ', p.prenom) AS nom_complet
+        FROM professeur p
+        LEFT JOIN professeur_filiere pf ON pf.id_prof = p.id_prof
+    `;
     const params = [];
     if (id_filier) {
-        sql += ' WHERE id_filiere = ?';
-        params.push(id_filier);
+        sql += ' WHERE p.id_filiere = ? OR pf.id_filiere = ?';
+        params.push(id_filier, id_filier);
     }
-    sql += ' ORDER BY nom';
+    sql += ' ORDER BY p.nom, p.prenom';
     connection.query(sql, params, (err, r) => {
         if (err) return res.status(500).json({ error: err.message });
         res.json(r);
@@ -257,13 +261,10 @@ occupation.get('/', (req, res) => {
 
 occupation.delete('/:id', (req, res) => {
     const { id } = req.params;
-    connection.query('DELETE FROM occupation_semain WHERE id_occupation = ?', [id], (err) => {
+    connection.query('DELETE FROM occupation WHERE id_occupation = ?', [id], (err, result) => {
         if (err) return res.status(500).json({ error: err.message });
-        connection.query('DELETE FROM occupation WHERE id_occupation = ?', [id], (err2, result) => {
-            if (err2) return res.status(500).json({ error: err2.message });
-            if (result.affectedRows === 0) return res.status(404).json({ error: "Non trouvé" });
-            res.json({ success: true });
-        });
+        if (result.affectedRows === 0) return res.status(404).json({ error: "Non trouvé" });
+        res.json({ success: true });
     });
 });
 

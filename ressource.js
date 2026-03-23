@@ -1,9 +1,29 @@
 const express = require('express');
 const ressource = express.Router();
+const bcrypt = require('bcrypt');
 
 const connection = require('./db');
+const SALT_ROUNDS = 10;
 
 ressource.use(express.json());
+
+function normalizeFiliereIds(input) {
+    if (!input) return [];
+    const raw = Array.isArray(input) ? input : String(input).split(',');
+    const ids = raw
+        .map(v => parseInt(v, 10))
+        .filter(v => Number.isInteger(v) && v > 0);
+    return Array.from(new Set(ids));
+}
+
+function syncProfFilieres(idProf, filiereIds, done) {
+    connection.query('DELETE FROM professeur_filiere WHERE id_prof = ?', [idProf], (err) => {
+        if (err) return done(err);
+        if (!filiereIds.length) return done(null);
+        const values = filiereIds.map(fid => [idProf, fid]);
+        connection.query('INSERT INTO professeur_filiere (id_prof, id_filiere) VALUES ?', [values], done);
+    });
+}
 
 // =============================================================================
 // 1. FILIÈRES
@@ -66,46 +86,91 @@ ressource.delete('/filiere/:id', (req, res) => {
 ressource.get('/professeur', (req, res) => {
     connection.query(
         `SELECT p.id_prof AS id, p.nom, p.prenom, p.email, p.departement, p.id_filiere,
-                CONCAT(f.nom_filiere, ' - ', f.annee) AS filier
+                COALESCE(
+                    NULLIF(GROUP_CONCAT(DISTINCT pf.id_filiere ORDER BY pf.id_filiere SEPARATOR ','), ''),
+                    CASE WHEN p.id_filiere IS NOT NULL THEN CAST(p.id_filiere AS CHAR) ELSE '' END
+                ) AS id_filieres,
+                COALESCE(
+                    NULLIF(GROUP_CONCAT(DISTINCT CONCAT(f.nom_filiere, ' - ', f.annee) ORDER BY f.nom_filiere SEPARATOR ', '), ''),
+                    CONCAT(f0.nom_filiere, ' - ', f0.annee)
+                ) AS filieres
          FROM professeur p
-         LEFT JOIN filiere f ON p.id_filiere = f.id_filiere
+         LEFT JOIN professeur_filiere pf ON pf.id_prof = p.id_prof
+         LEFT JOIN filiere f ON pf.id_filiere = f.id_filiere
+         LEFT JOIN filiere f0 ON p.id_filiere = f0.id_filiere
+         GROUP BY p.id_prof, p.nom, p.prenom, p.email, p.departement, p.id_filiere, f0.nom_filiere, f0.annee
          ORDER BY p.nom, p.prenom`,
         (err, results) => {
             if (err) return res.status(500).json({ error: err.message });
-            res.json(results);
+            res.json((results || []).map(r => ({ ...r, filier: r.filieres || null })));
         }
     );
 });
 
 ressource.post('/professeur', (req, res) => {
-    const { nom, prenom, email, departement, id_filiere } = req.body;
-    if (!nom || !prenom || !email || !departement) {
+    const { nom, prenom, email, departement, id_filiere, id_filieres, password } = req.body;
+    const filiereIds = normalizeFiliereIds(id_filieres || id_filiere);
+    const principalFiliere = filiereIds[0] || null;
+    if (!nom || !prenom || !email || !departement || !password) {
         return res.status(400).json({ error: "Champs obligatoires manquants" });
     }
 
-    connection.query(
-        'INSERT INTO professeur (nom, prenom, email, departement, id_filiere) VALUES (?, ?, ?, ?, ?)',
-        [nom, prenom, email, departement, id_filiere || null],
-        (err, result) => {
-            if (err) return res.status(500).json({ error: err.message });
-            res.status(201).json({ id: result.insertId });
-        }
-    );
+    bcrypt.hash(password, SALT_ROUNDS)
+        .then((passwordHash) => {
+            connection.query(
+                'INSERT INTO professeur (nom, prenom, email, departement, id_filiere, password) VALUES (?, ?, ?, ?, ?, ?)',
+                [nom, prenom, email, departement, principalFiliere, passwordHash],
+                (err, result) => {
+                    if (err) return res.status(500).json({ error: err.message });
+                    const newId = result.insertId;
+                    syncProfFilieres(newId, filiereIds, (errSync) => {
+                        if (errSync) return res.status(500).json({ error: errSync.message });
+                        res.status(201).json({ id: newId });
+                    });
+                }
+            );
+        })
+        .catch((err) => {
+            res.status(500).json({ error: err.message });
+        });
 });
 
 ressource.put('/professeur/:id', (req, res) => {
     const { id } = req.params;
-    const { nom, prenom, email, departement, id_filiere } = req.body;
+    const { nom, prenom, email, departement, id_filiere, id_filieres, password } = req.body;
+    const filiereIds = normalizeFiliereIds(id_filieres || id_filiere);
+    const principalFiliere = filiereIds[0] || null;
 
-    connection.query(
-        'UPDATE professeur SET nom = ?, prenom = ?, email = ?, departement = ?, id_filiere = ? WHERE id_prof = ?',
-        [nom, prenom, email, departement, id_filiere || null, id],
-        (err, result) => {
+    const updateProfesseur = (passwordHash) => {
+        let sql = 'UPDATE professeur SET nom = ?, prenom = ?, email = ?, departement = ?, id_filiere = ?';
+        const params = [nom, prenom, email, departement, principalFiliere];
+
+        if (passwordHash) {
+            sql += ', password = ?';
+            params.push(passwordHash);
+        }
+
+        sql += ' WHERE id_prof = ?';
+        params.push(id);
+
+        connection.query(sql, params, (err, result) => {
             if (err) return res.status(500).json({ error: err.message });
             if (result.affectedRows === 0) return res.status(404).json({ error: "Non trouvé" });
-            res.json({ success: true });
-        }
-    );
+            syncProfFilieres(id, filiereIds, (errSync) => {
+                if (errSync) return res.status(500).json({ error: errSync.message });
+                res.json({ success: true });
+            });
+        });
+    };
+
+    if (password && password.trim()) {
+        bcrypt.hash(password, SALT_ROUNDS)
+            .then((passwordHash) => updateProfesseur(passwordHash))
+            .catch((err) => res.status(500).json({ error: err.message }));
+        return;
+    }
+
+    updateProfesseur(null);
 });
 
 ressource.delete('/professeur/:id', (req, res) => {
