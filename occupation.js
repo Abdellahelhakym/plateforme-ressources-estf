@@ -49,38 +49,122 @@ occupation.get('/data/salles_libres', (req, res) => {
     const sdInt = parseInt(sd, 10);
     const sfInt = parseInt(sf, 10);
 
-    if (isNaN(sdInt) || isNaN(sfInt) || sdInt > sfInt) {
-        return res.status(400).json({ error: "sd et sf doivent être des entiers valides avec sd <= sf" });
+    if (isNaN(sdInt) || isNaN(sfInt)) {
+        return res.status(400).json({ error: "sd et sf doivent être des entiers valides" });
     }
 
-    const sql = `
-        SELECT s.id_salle, s.nom_salle
-        FROM salles s
-        WHERE NOT EXISTS (
-            SELECT 1
-            FROM occupation o
-            WHERE o.id_annee    = ?
-              AND o.id_semestre = ?
-              AND o.jour        = ?
-              AND o.id_creneau  = ?
-              AND o.id_salles   = s.id_salle
-              AND o.sD <= ?
-              AND o.sF >= ?
-        )
-        ORDER BY s.nom_salle
-    `;
+    function normalizePartit(value) {
+        const v = String(value || '').trim().toLowerCase();
+        if (v === 'partie 1' || v === 'partit 1') return 'partit 1';
+        if (v === 'partie 2' || v === 'partit 2') return 'partit 2';
+        return null;
+    }
 
-    const params = [annee, semestre, jour, creneau, sfInt, sdInt];
-    console.log(`[salles_libres] jour=${jour} creneau=${creneau} sd=${sdInt} sf=${sfInt} annee=${annee} semestre=${semestre}`);
+    function derivePartitFromNomSemestre(nomSemestre) {
+        const m = String(nomSemestre || '').trim().match(/^S(\d+)$/i);
+        if (!m) return null;
+        const n = parseInt(m[1], 10);
+        if (Number.isNaN(n)) return null;
+        return (n % 2 === 0) ? 'partit 2' : 'partit 1';
+    }
 
-    connection.query(sql, params, (err, results) => {
-        if (err) {
-            console.error("[salles_libres] Erreur SQL:", err.message);
-            return res.status(500).json({ error: err.message });
+    connection.query(
+        'SELECT nom_semestre, type_partit FROM semestre WHERE id_semestre = ?',
+        [semestre],
+        (errPartit, semRows) => {
+            if (errPartit) {
+                console.error('[salles_libres] Erreur lecture semestre:', errPartit.message);
+                return res.status(500).json({ error: errPartit.message });
+            }
+
+            if (!semRows || semRows.length === 0) {
+                return res.status(400).json({ error: 'Semestre introuvable' });
+            }
+
+            const selectedSem = semRows[0];
+            const selectedPartit =
+                normalizePartit(selectedSem.type_partit) ||
+                derivePartitFromNomSemestre(selectedSem.nom_semestre) ||
+                `sem:${semestre}`;
+
+            connection.query(
+                'SELECT id_semaine, date_debut, date_fin FROM semaine WHERE id_semaine IN (?, ?)',
+                [sdInt, sfInt],
+                (errWeeks, weekRows) => {
+                    if (errWeeks) {
+                        console.error('[salles_libres] Erreur lecture semaines:', errWeeks.message);
+                        return res.status(500).json({ error: errWeeks.message });
+                    }
+
+                    const sdWeek = (weekRows || []).find(w => Number(w.id_semaine) === sdInt);
+                    const sfWeek = (weekRows || []).find(w => Number(w.id_semaine) === sfInt);
+                    if (!sdWeek || !sfWeek) {
+                        return res.status(400).json({ error: 'Semaine début/fin introuvable' });
+                    }
+
+                    const selectedStartDate = sdWeek.date_debut;
+                    const selectedEndDate = sfWeek.date_fin;
+                    if (!selectedStartDate || !selectedEndDate || new Date(selectedStartDate) > new Date(selectedEndDate)) {
+                        return res.status(400).json({ error: 'Intervalle de semaines invalide' });
+                    }
+
+                    const sql = `
+                        SELECT s.id_salle, s.nom_salle
+                        FROM salles s
+                        WHERE NOT EXISTS (
+                            SELECT 1
+                            FROM occupation o
+                            LEFT JOIN semestre se_occ ON se_occ.id_semestre = o.id_semestre
+                            LEFT JOIN semaine sd_occ ON sd_occ.id_semaine = o.sD
+                            LEFT JOIN semaine sf_occ ON sf_occ.id_semaine = o.sF
+                            WHERE o.id_annee   = ?
+                              AND o.jour       = ?
+                              AND o.id_creneau = ?
+                              AND o.id_salles  = s.id_salle
+                              AND sd_occ.date_debut <= ?
+                              AND sf_occ.date_fin >= ?
+                              AND COALESCE(
+                                  CASE
+                                      WHEN LOWER(TRIM(REPLACE(COALESCE(se_occ.type_partit, ''), 'partie', 'partit'))) IN ('partit 1', 'partit 2')
+                                          THEN LOWER(TRIM(REPLACE(se_occ.type_partit, 'partie', 'partit')))
+                                      WHEN COALESCE(se_occ.nom_semestre, '') REGEXP '^S[0-9]+$'
+                                          THEN CASE
+                                              WHEN MOD(CAST(SUBSTRING(se_occ.nom_semestre, 2) AS UNSIGNED), 2) = 0 THEN 'partit 2'
+                                              ELSE 'partit 1'
+                                          END
+                                      ELSE NULL
+                                  END,
+                                  CONCAT('sem:', o.id_semestre)
+                              ) = ?
+                        )
+                        ORDER BY s.nom_salle
+                    `;
+
+                    const params = [
+                        annee,
+                        jour,
+                        creneau,
+                        selectedEndDate,
+                        selectedStartDate,
+                        selectedPartit,
+                    ];
+
+                    console.log(
+                        `[salles_libres] jour=${jour} creneau=${creneau} sd=${sdInt} sf=${sfInt} annee=${annee} semestre=${semestre} group_key=${selectedPartit} range=${selectedStartDate}..${selectedEndDate}`
+                    );
+
+                    connection.query(sql, params, (err, results) => {
+                        if (err) {
+                            console.error('[salles_libres] Erreur SQL:', err.message);
+                            return res.status(500).json({ error: err.message });
+                        }
+                        console.log(`[salles_libres] → ${results.length} salle(s) libre(s) trouvée(s)`);
+                        res.json(results);
+                    });
+                }
+            );
         }
-        console.log(`[salles_libres] → ${results.length} salle(s) libre(s) trouvée(s)`);
-        res.json(results);
-    });
+    );
 });
 
 // =============================================================================
@@ -91,17 +175,23 @@ occupation.get('/data/filieres', (req, res) => {
     const { id_semestre } = req.query;
 
     // Mapping : nom_semestre -> annee filiere
-    // S1,S2 -> 1ere annee | S3,S4 -> 2eme annee | S5,S6 -> 3eme annee
+    // S1,S2 -> 1ere annee | S3,S4 -> 2eme annee | S5,S6 -> niveau Bachelor
     const semestreAnneeMap = {
         'S1': '1ere annee', 'S2': '1ere annee',
         'S3': '2eme annee', 'S4': '2eme annee',
-        'S5': '3eme annee', 'S6': '3eme annee',
     };
 
-    const buildQuery = (anneeFiliere) => {
-        let sql = "SELECT id_filiere AS id_filier, CONCAT(nom_filiere, ' - ', annee) AS nom_filiere, annee, nb_group FROM filiere";
+    const buildQuery = ({ anneeFiliere = null, bachelorOnly = false } = {}) => {
+        let sql = `
+            SELECT id_filiere AS id_filier,
+                   CONCAT(nom_filiere, ' - ', COALESCE(NULLIF(annee, ''), NULLIF(niveau, ''), 'Sans niveau')) AS nom_filiere,
+                   annee, niveau, nb_group
+            FROM filiere
+        `;
         const params = [];
-        if (anneeFiliere) {
+        if (bachelorOnly) {
+            sql += ' WHERE LOWER(COALESCE(niveau, \"\")) = \"bachelor\"';
+        } else if (anneeFiliere) {
             sql += ' WHERE annee = ?';
             params.push(anneeFiliere);
         }
@@ -119,11 +209,15 @@ occupation.get('/data/filieres', (req, res) => {
             (err, rows) => {
                 if (err) return res.status(500).json({ error: err.message });
                 const nomSem = rows[0]?.nom_semestre;
-                buildQuery(semestreAnneeMap[nomSem] || null);
+                if (nomSem === 'S5' || nomSem === 'S6') {
+                    buildQuery({ bachelorOnly: true });
+                    return;
+                }
+                buildQuery({ anneeFiliere: semestreAnneeMap[nomSem] || null });
             }
         );
     } else {
-        buildQuery(null);
+        buildQuery();
     }
 });
 
@@ -133,10 +227,14 @@ occupation.get('/data/filieres', (req, res) => {
 
 occupation.get('/data/modules', (req, res) => {
     const { id_filier } = req.query;
-    let sql = 'SELECT id_module AS id_modul, nom_module FROM module_tp';
+    let sql = 'SELECT DISTINCT m.id_module AS id_modul, m.nom_module FROM module_tp m';
     const params = [];
-    if (id_filier) { sql += ' WHERE id_filiere = ?'; params.push(id_filier); }
-    sql += ' ORDER BY nom_module';
+    if (id_filier) {
+        sql += ' LEFT JOIN module_filiere mf ON mf.id_module = m.id_module';
+        sql += ' WHERE m.id_filiere = ? OR mf.id_filiere = ?';
+        params.push(id_filier, id_filier);
+    }
+    sql += ' ORDER BY m.nom_module';
     connection.query(sql, params, (err, r) => {
         if (err) return res.status(500).json({ error: err.message });
         res.json(r);

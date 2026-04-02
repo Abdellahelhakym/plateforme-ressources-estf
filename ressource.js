@@ -25,6 +25,15 @@ function syncProfFilieres(idProf, filiereIds, done) {
     });
 }
 
+function syncModuleFilieres(idModule, filiereIds, done) {
+    connection.query('DELETE FROM module_filiere WHERE id_module = ?', [idModule], (err) => {
+        if (err) return done(err);
+        if (!filiereIds.length) return done(null);
+        const values = filiereIds.map(fid => [idModule, fid]);
+        connection.query('INSERT INTO module_filiere (id_module, id_filiere) VALUES ?', [values], done);
+    });
+}
+
 // =============================================================================
 // 1. FILIÈRES
 // =============================================================================
@@ -41,13 +50,16 @@ ressource.get('/filiere', (req, res) => {
 
 ressource.post('/filiere', (req, res) => {
     const { nom_filiere, annee, niveau, nb_group } = req.body;
-    if (!nom_filiere || !annee || !niveau || !nb_group) {
+    const isBachelor = String(niveau || '').toLowerCase() === 'bachelor';
+    const normalizedAnnee = isBachelor ? '' : annee;
+
+    if (!nom_filiere || !niveau || !nb_group || (!isBachelor && !normalizedAnnee)) {
         return res.status(400).json({ error: "Champs obligatoires manquants" });
     }
 
     connection.query(
         'INSERT INTO filiere (nom_filiere, annee, niveau, nb_group) VALUES (?, ?, ?, ?)',
-        [nom_filiere, annee, niveau, nb_group],
+        [nom_filiere, normalizedAnnee, niveau, nb_group],
         (err, result) => {
             if (err) return res.status(500).json({ error: err.message });
             res.status(201).json({ id: result.insertId });
@@ -58,10 +70,16 @@ ressource.post('/filiere', (req, res) => {
 ressource.put('/filiere/:id', (req, res) => {
     const { id } = req.params;
     const { nom_filiere, annee, niveau, nb_group } = req.body;
+    const isBachelor = String(niveau || '').toLowerCase() === 'bachelor';
+    const normalizedAnnee = isBachelor ? '' : annee;
+
+    if (!nom_filiere || !niveau || !nb_group || (!isBachelor && !normalizedAnnee)) {
+        return res.status(400).json({ error: "Champs obligatoires manquants" });
+    }
 
     connection.query(
         'UPDATE filiere SET nom_filiere = ?, annee = ?, niveau = ?, nb_group = ? WHERE id_filiere = ?',
-        [nom_filiere, annee, niveau, nb_group, id],
+        [nom_filiere, normalizedAnnee, niveau, nb_group, id],
         (err, result) => {
             if (err) return res.status(500).json({ error: err.message });
             if (result.affectedRows === 0) return res.status(404).json({ error: "Non trouvé" });
@@ -91,14 +109,14 @@ ressource.get('/professeur', (req, res) => {
                     CASE WHEN p.id_filiere IS NOT NULL THEN CAST(p.id_filiere AS CHAR) ELSE '' END
                 ) AS id_filieres,
                 COALESCE(
-                    NULLIF(GROUP_CONCAT(DISTINCT CONCAT(f.nom_filiere, ' - ', f.annee) ORDER BY f.nom_filiere SEPARATOR ', '), ''),
-                    CONCAT(f0.nom_filiere, ' - ', f0.annee)
+                    NULLIF(GROUP_CONCAT(DISTINCT CONCAT(f.nom_filiere, ' - ', COALESCE(NULLIF(f.annee, ''), NULLIF(f.niveau, ''), 'Sans niveau')) ORDER BY f.nom_filiere SEPARATOR ', '), ''),
+                    CONCAT(f0.nom_filiere, ' - ', COALESCE(NULLIF(f0.annee, ''), NULLIF(f0.niveau, ''), 'Sans niveau'))
                 ) AS filieres
          FROM professeur p
          LEFT JOIN professeur_filiere pf ON pf.id_prof = p.id_prof
          LEFT JOIN filiere f ON pf.id_filiere = f.id_filiere
          LEFT JOIN filiere f0 ON p.id_filiere = f0.id_filiere
-         GROUP BY p.id_prof, p.nom, p.prenom, p.email, p.departement, p.id_filiere, f0.nom_filiere, f0.annee
+         GROUP BY p.id_prof, p.nom, p.prenom, p.email, p.departement, p.id_filiere, f0.nom_filiere, f0.annee, f0.niveau
          ORDER BY p.nom, p.prenom`,
         (err, results) => {
             if (err) return res.status(500).json({ error: err.message });
@@ -191,10 +209,20 @@ ressource.get('/module', (req, res) => {
         SELECT 
             m.id_module,
             m.nom_module,
-            CONCAT(f.nom_filiere, ' - ', f.annee) AS filiere,
-            m.id_filiere
+            m.id_filiere,
+            COALESCE(
+                NULLIF(GROUP_CONCAT(DISTINCT mf.id_filiere ORDER BY mf.id_filiere SEPARATOR ','), ''),
+                CASE WHEN m.id_filiere IS NOT NULL THEN CAST(m.id_filiere AS CHAR) ELSE '' END
+            ) AS id_filieres,
+            COALESCE(
+                NULLIF(GROUP_CONCAT(DISTINCT CONCAT(f.nom_filiere, ' - ', COALESCE(NULLIF(f.annee, ''), NULLIF(f.niveau, ''), 'Sans niveau')) ORDER BY f.nom_filiere SEPARATOR ', '), ''),
+                CONCAT(f0.nom_filiere, ' - ', COALESCE(NULLIF(f0.annee, ''), NULLIF(f0.niveau, ''), 'Sans niveau'))
+            ) AS filieres
         FROM module_tp m
-        LEFT JOIN filiere f ON m.id_filiere = f.id_filiere
+        LEFT JOIN module_filiere mf ON mf.id_module = m.id_module
+        LEFT JOIN filiere f ON mf.id_filiere = f.id_filiere
+        LEFT JOIN filiere f0 ON m.id_filiere = f0.id_filiere
+        GROUP BY m.id_module, m.nom_module, m.id_filiere, f0.nom_filiere, f0.annee, f0.niveau
         ORDER BY m.nom_module ASC
     `;
     connection.query(sql, (err, results) => {
@@ -204,32 +232,48 @@ ressource.get('/module', (req, res) => {
 });
 
 ressource.post('/module', (req, res) => {
-    const { nom_module, id_filiere } = req.body;
-    if (!nom_module || !id_filiere) {
-        return res.status(400).json({ error: "Nom et filière obligatoires" });
+    const { nom_module, id_filiere, id_filieres } = req.body;
+    const filiereIds = normalizeFiliereIds(id_filieres || id_filiere);
+    const principalFiliere = filiereIds[0] || null;
+
+    if (!nom_module || !principalFiliere) {
+        return res.status(400).json({ error: "Nom et au moins une filière obligatoires" });
     }
 
     connection.query(
         'INSERT INTO module_tp (nom_module, id_filiere) VALUES (?, ?)',
-        [nom_module, id_filiere],
+        [nom_module, principalFiliere],
         (err, result) => {
             if (err) return res.status(500).json({ error: err.message });
-            res.status(201).json({ id: result.insertId });
+            const newId = result.insertId;
+            syncModuleFilieres(newId, filiereIds, (errSync) => {
+                if (errSync) return res.status(500).json({ error: errSync.message });
+                res.status(201).json({ id: newId });
+            });
         }
     );
 });
 
 ressource.put('/module/:id', (req, res) => {
     const { id } = req.params;
-    const { nom_module, id_filiere } = req.body;
+    const { nom_module, id_filiere, id_filieres } = req.body;
+    const filiereIds = normalizeFiliereIds(id_filieres || id_filiere);
+    const principalFiliere = filiereIds[0] || null;
+
+    if (!nom_module || !principalFiliere) {
+        return res.status(400).json({ error: "Nom et au moins une filière obligatoires" });
+    }
 
     connection.query(
         'UPDATE module_tp SET nom_module = ?, id_filiere = ? WHERE id_module = ?',
-        [nom_module, id_filiere, id],
+        [nom_module, principalFiliere, id],
         (err, result) => {
             if (err) return res.status(500).json({ error: err.message });
             if (result.affectedRows === 0) return res.status(404).json({ error: "Non trouvé" });
-            res.json({ success: true });
+            syncModuleFilieres(id, filiereIds, (errSync) => {
+                if (errSync) return res.status(500).json({ error: errSync.message });
+                res.json({ success: true });
+            });
         }
     );
 });

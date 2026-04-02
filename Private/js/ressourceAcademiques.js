@@ -2,6 +2,26 @@ AOS.init({ duration: 600, once: true });
 
         let deleteType = null;
         let deleteId = null;
+    let filieresData = [];
+    let professeursData = [];
+    let modulesData = [];
+
+    function parseIdList(raw) {
+        return String(raw || '')
+        .split(',')
+        .map(v => parseInt(v.trim(), 10))
+        .filter(v => Number.isInteger(v) && v > 0);
+    }
+
+    function getFiliereSuffix(f) {
+        const annee = String(f?.annee || '').trim();
+        const niveau = String(f?.niveau || '').trim();
+        return annee || niveau || 'Sans niveau';
+    }
+
+    function getFiliereLabel(f) {
+        return `${f.nom_filiere} - ${getFiliereSuffix(f)}`;
+    }
 
         function getMultiSelectValues(selectId) {
             const el = document.getElementById(selectId);
@@ -20,19 +40,49 @@ AOS.init({ duration: 600, once: true });
             });
         }
 
+        function syncAnneeByNiveau(niveauSelectId, anneeSelectId) {
+            const niveauEl = document.getElementById(niveauSelectId);
+            const anneeEl = document.getElementById(anneeSelectId);
+            if (!niveauEl || !anneeEl) return;
+
+            const isBachelor = String(niveauEl.value || '').toLowerCase() === 'bachelor';
+            if (isBachelor) {
+                anneeEl.value = '';
+                anneeEl.disabled = true;
+                anneeEl.required = false;
+            } else {
+                anneeEl.disabled = false;
+                anneeEl.required = true;
+            }
+        }
+
         // ────────────────────────────────────────────────
         // CHARGEMENT DES DONNÉES
         // ────────────────────────────────────────────────
         async function loadFilieres() {
             const res = await fetch('/ressource/filiere');
-            const data = await res.json();
+            filieresData = await res.json();
+            renderFilieres();
+            populateFiliereSelects(filieresData);
+            populateFilterFiliereOptions();
+        }
+
+        function renderFilieres() {
             const tbody = document.querySelector('#tableFilieres tbody');
             tbody.innerHTML = '';
-            data.forEach(item => {
+
+            const anneeFilter = document.getElementById('filterFiliereAnnee')?.value || '';
+            const filtered = filieresData.filter((item) => {
+                if (!anneeFilter) return true;
+                if (anneeFilter === '__empty__') return !String(item.annee || '').trim();
+                return String(item.annee || '') === anneeFilter;
+            });
+
+            filtered.forEach(item => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td>${item.nom_filiere}</td>
-                    <td>${item.annee}</td>
+                    <td>${getFiliereSuffix(item)}</td>
                     <td>${item.niveau}</td>
                     <td>${item.nb_group}</td>
                     <td>
@@ -54,17 +104,26 @@ AOS.init({ duration: 600, once: true });
                 `;
                 tbody.appendChild(tr);
             });
-
-            // Mettre à jour les selects de filières dans les modals module et professeur
-            populateFiliereSelects(data);
         }
 
         async function loadProfesseurs() {
             const res = await fetch('/ressource/professeur');
-            const data = await res.json();
+            professeursData = await res.json();
+            renderProfesseurs();
+        }
+
+        function renderProfesseurs() {
             const tbody = document.querySelector('#tableProfesseurs tbody');
             tbody.innerHTML = '';
-            data.forEach(item => {
+
+            const filiereFilter = parseInt(document.getElementById('filterProfFiliere')?.value || '', 10);
+            const filtered = professeursData.filter((item) => {
+                if (!Number.isInteger(filiereFilter)) return true;
+                const ids = parseIdList(item.id_filieres || item.id_filiere || '');
+                return ids.includes(filiereFilter);
+            });
+
+            filtered.forEach(item => {
                 const filieresLabel = item.filieres || item.filier || '-';
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
@@ -97,19 +156,31 @@ AOS.init({ duration: 600, once: true });
 
         async function loadModules() {
             const res = await fetch('/ressource/module');
-            const data = await res.json();
+            modulesData = await res.json();
+            renderModules();
+        }
+
+        function renderModules() {
             const tbody = document.querySelector('#tableModules tbody');
             tbody.innerHTML = '';
-            data.forEach(item => {
+
+            const filiereFilter = parseInt(document.getElementById('filterModuleFiliere')?.value || '', 10);
+            const filtered = modulesData.filter((item) => {
+                if (!Number.isInteger(filiereFilter)) return true;
+                const ids = parseIdList(item.id_filieres || item.id_filiere || '');
+                return ids.includes(filiereFilter);
+            });
+
+            filtered.forEach(item => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td>${item.nom_module}</td>
-                    <td>${item.filiere || '-'}</td>
+                    <td>${item.filieres || '-'}</td>
                     <td>
                         <button class="btn btn-sm btn-warning btn-edit edit-Modules"
                             data-id="${item.id_module}"
                             data-nom="${item.nom_module}"
-                            data-filiere="${item.id_filiere}">
+                            data-filieres="${item.id_filieres || (item.id_filiere || '')}">
                             <i class="fas fa-edit"></i>
                         </button>
                         <button class="btn btn-sm btn-danger btn-delete"
@@ -124,26 +195,76 @@ AOS.init({ duration: 600, once: true });
             });
         }
 
+        function populateFilterFiliereOptions() {
+            const targets = ['filterProfFiliere', 'filterModuleFiliere'];
+            targets.forEach((id) => {
+                const sel = document.getElementById(id);
+                if (!sel) return;
+                const current = sel.value;
+                sel.innerHTML = '<option value="">Toutes les filières</option>';
+                filieresData.forEach((f) => {
+                    const opt = document.createElement('option');
+                    opt.value = f.id;
+                    opt.textContent = getFiliereLabel(f);
+                    sel.appendChild(opt);
+                });
+                sel.value = current;
+            });
+        }
+
         // Peupler les selects filière dans les modals module ET professeur (nom + année)
         function populateFiliereSelects(filieres) {
             const selects = ['selectFiliereModule', 'editFiliereModule', 'selectFiliereProf', 'editFiliereProf'];
+            const moduleSelects = new Set(['selectFiliereModule', 'editFiliereModule']);
             selects.forEach(selectId => {
                 const select = document.getElementById(selectId);
                 if (!select) return;
-                const currentVal = select.value;
-                select.innerHTML = '<option value="">-- Aucune --</option>';
+
+                const currentVals = select.multiple
+                    ? Array.from(select.selectedOptions).map(o => o.value)
+                    : [select.value];
+
+                select.innerHTML = moduleSelects.has(selectId)
+                    ? ''
+                    : '<option value="">-- Aucune --</option>';
+
                 filieres.forEach(f => {
                     const opt = document.createElement('option');
                     opt.value = f.id;
-                    opt.textContent = `${f.nom_filiere} - ${f.annee}`;
+                    opt.textContent = getFiliereLabel(f);
                     select.appendChild(opt);
                 });
-                if (currentVal) select.value = currentVal;
+
+                if (select.multiple) {
+                    setMultiSelectValues(selectId, currentVals);
+                } else if (currentVals[0]) {
+                    select.value = currentVals[0];
+                }
             });
         }
 
         // Charger tout au démarrage
         window.addEventListener('load', () => {
+            const addNiveau = document.querySelector('#formAddFiliere [name="niveau"]');
+            const editNiveau = document.getElementById('editNiveauFiliere');
+
+            if (addNiveau) {
+                addNiveau.addEventListener('change', () => syncAnneeByNiveau(addNiveau.id || '', addNiveau.form?.querySelector('[name="annee"]')?.id || ''));
+                const addAnneeEl = addNiveau.form?.querySelector('[name="annee"]');
+                if (addNiveau.id === '') addNiveau.id = 'addNiveauFiliere';
+                if (addAnneeEl && addAnneeEl.id === '') addAnneeEl.id = 'addAnneeFiliere';
+                syncAnneeByNiveau('addNiveauFiliere', 'addAnneeFiliere');
+            }
+
+            if (editNiveau) {
+                editNiveau.addEventListener('change', () => syncAnneeByNiveau('editNiveauFiliere', 'editAnneeFiliere'));
+                syncAnneeByNiveau('editNiveauFiliere', 'editAnneeFiliere');
+            }
+
+            document.getElementById('filterFiliereAnnee')?.addEventListener('change', renderFilieres);
+            document.getElementById('filterProfFiliere')?.addEventListener('change', renderProfesseurs);
+            document.getElementById('filterModuleFiliere')?.addEventListener('change', renderModules);
+
             loadFilieres();
             loadProfesseurs();
             loadModules();
@@ -157,6 +278,9 @@ AOS.init({ duration: 600, once: true });
             if (!form.checkValidity()) return alert("Veuillez remplir tous les champs");
 
             const data = Object.fromEntries(new FormData(form));
+            if (String(data.niveau || '').toLowerCase() === 'bachelor') {
+                data.annee = '';
+            }
             const res = await fetch('/ressource/filiere', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
@@ -203,6 +327,11 @@ AOS.init({ duration: 600, once: true });
             if (!form.checkValidity()) return alert("Veuillez remplir tous les champs");
 
             const data = Object.fromEntries(new FormData(form));
+            data.id_filieres = getMultiSelectValues('selectFiliereModule');
+            if (!data.id_filieres.length) {
+                alert('Veuillez sélectionner au moins une filière');
+                return;
+            }
             const res = await fetch('/ressource/module', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
@@ -257,6 +386,7 @@ AOS.init({ duration: 600, once: true });
                 document.getElementById('editAnneeFiliere').value  = btnFiliere.dataset.annee;
                 document.getElementById('editNiveauFiliere').value = btnFiliere.dataset.niveau;
                 document.getElementById('editNbGroup').value       = btnFiliere.dataset.groupes;
+                syncAnneeByNiveau('editNiveauFiliere', 'editAnneeFiliere');
                 new bootstrap.Modal(document.getElementById('editFiliereModal')).show();
             }
 
@@ -282,7 +412,11 @@ AOS.init({ duration: 600, once: true });
             if (btnModule) {
                 document.getElementById('editModuleId').value      = btnModule.dataset.id;
                 document.getElementById('editNomModule').value     = btnModule.dataset.nom;
-                document.getElementById('editFiliereModule').value = btnModule.dataset.filiere;
+                const ids = String(btnModule.dataset.filieres || '')
+                    .split(',')
+                    .map(v => parseInt(v.trim(), 10))
+                    .filter(v => Number.isInteger(v) && v > 0);
+                setMultiSelectValues('editFiliereModule', ids);
                 new bootstrap.Modal(document.getElementById('editModuleModal')).show();
             }
         });
@@ -293,6 +427,9 @@ AOS.init({ duration: 600, once: true });
         document.getElementById('btnSaveEditFiliere').addEventListener('click', async () => {
             const id   = document.getElementById('editFiliereId').value;
             const data = Object.fromEntries(new FormData(document.getElementById('formEditFiliere')));
+            if (String(data.niveau || '').toLowerCase() === 'bachelor') {
+                data.annee = '';
+            }
 
             const res = await fetch(`/ressource/filiere/${id}`, {
                 method: 'PUT',
@@ -335,6 +472,11 @@ AOS.init({ duration: 600, once: true });
         document.getElementById('btnSaveEditModule').addEventListener('click', async () => {
             const id   = document.getElementById('editModuleId').value;
             const data = Object.fromEntries(new FormData(document.getElementById('formEditModule')));
+            data.id_filieres = getMultiSelectValues('editFiliereModule');
+            if (!data.id_filieres.length) {
+                alert('Veuillez sélectionner au moins une filière');
+                return;
+            }
 
             const res = await fetch(`/ressource/module/${id}`, {
                 method: 'PUT',

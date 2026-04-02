@@ -274,7 +274,10 @@ body {
 
 .table tbody tr:hover {
     background-color: #f8f9fa;
-    transform: translateX(5px);
+}
+
+.table tbody tr:hover td:first-child {
+    box-shadow: inset 3px 0 0 #2c75bd;
 }
 
 .table tbody td {

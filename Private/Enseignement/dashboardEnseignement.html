@@ -107,8 +107,18 @@
     <div class="row g-3 mb-3">
         <div class="col-lg-6" data-aos="fade-up">
             <div class="chart-card h-100">
-                <div class="chart-card-header">
+                <div class="chart-card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
                     <div class="chart-card-title"><i class="fas fa-graduation-cap"></i> Mes Filières Enseignées</div>
+                    <div class="d-flex align-items-center gap-2">
+                        <label for="anneeFilieresEnsSelect" class="mb-0 text-muted" style="font-size:14px">Année Univ.</label>
+                        <select id="anneeFilieresEnsSelect" class="form-select form-select-sm" style="width:170px">
+                            <option value="">Toutes</option>
+                        </select>
+                        <label for="partitFilieresEnsSelect" class="mb-0 text-muted" style="font-size:14px">Partie</label>
+                        <select id="partitFilieresEnsSelect" class="form-select form-select-sm" style="width:150px">
+                            <option value="">Toutes</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="chart-card-body">
                     <div class="chart-wrap"><canvas id="chartFilieresEns"></canvas></div>
@@ -117,8 +127,18 @@
         </div>
         <div class="col-lg-6" data-aos="fade-up" data-aos-delay="100">
             <div class="chart-card h-100">
-                <div class="chart-card-header">
+                <div class="chart-card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
                     <div class="chart-card-title"><i class="fas fa-door-open"></i> Mes Salles Utilisées</div>
+                    <div class="d-flex align-items-center gap-2">
+                        <label for="anneeSallesEnsSelect" class="mb-0 text-muted" style="font-size:14px">Année Univ.</label>
+                        <select id="anneeSallesEnsSelect" class="form-select form-select-sm" style="width:170px">
+                            <option value="">Toutes</option>
+                        </select>
+                        <label for="partitSallesEnsSelect" class="mb-0 text-muted" style="font-size:14px">Partie</label>
+                        <select id="partitSallesEnsSelect" class="form-select form-select-sm" style="width:150px">
+                            <option value="">Toutes</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="chart-card-body">
                     <div class="chart-wrap"><canvas id="chartSallesEns"></canvas></div>
@@ -131,8 +151,18 @@
     <div class="row g-3 mb-3">
         <div class="col-lg-5" data-aos="fade-up">
             <div class="chart-card h-100">
-                <div class="chart-card-header">
+                <div class="chart-card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
                     <div class="chart-card-title"><i class="fas fa-calendar-day"></i> Mes Utilisations par Jour</div>
+                    <div class="d-flex align-items-center gap-2">
+                        <label for="anneeJoursEnsSelect" class="mb-0 text-muted" style="font-size:14px">Année Univ.</label>
+                        <select id="anneeJoursEnsSelect" class="form-select form-select-sm" style="width:170px">
+                            <option value="">Toutes</option>
+                        </select>
+                        <label for="partitJoursEnsSelect" class="mb-0 text-muted" style="font-size:14px">Partie</label>
+                        <select id="partitJoursEnsSelect" class="form-select form-select-sm" style="width:150px">
+                            <option value="">Toutes</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="chart-card-body">
                     <div class="chart-wrap"><canvas id="chartJoursEns"></canvas></div>
@@ -141,8 +171,18 @@
         </div>
         <div class="col-lg-7" data-aos="fade-up" data-aos-delay="100">
             <div class="chart-card h-100">
-                <div class="chart-card-header">
+                <div class="chart-card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
                     <div class="chart-card-title"><i class="fas fa-table"></i> Emplois Du Temps Associés À Mes Cours</div>
+                    <div class="d-flex align-items-center gap-2">
+                        <label for="anneeEmploiEnsSelect" class="mb-0 text-muted" style="font-size:14px">Année Univ.</label>
+                        <select id="anneeEmploiEnsSelect" class="form-select form-select-sm" style="width:170px">
+                            <option value="">Toutes</option>
+                        </select>
+                        <label for="partitEmploiEnsSelect" class="mb-0 text-muted" style="font-size:14px">Partie</label>
+                        <select id="partitEmploiEnsSelect" class="form-select form-select-sm" style="width:150px">
+                            <option value="">Toutes</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="chart-card-body" id="emploiBody" style="overflow-x:auto">
                     <table class="recent-table">
@@ -162,9 +202,21 @@
 
     <!-- ROW 3 : Activité Récente Enseignant -->
     <div class="chart-card mb-4" data-aos="fade-up">
-        <div class="chart-card-header">
-            <div class="chart-card-title"><i class="fas fa-history"></i> Mes Dernières Utilisations</div>
-            <span class="chart-card-subtitle">8 plus récentes</span>
+        <div class="chart-card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
+            <div>
+                <div class="chart-card-title"><i class="fas fa-history"></i> Mes Dernières Utilisations</div>
+                <span class="chart-card-subtitle">8 plus récentes</span>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <label for="anneeRecentEnsSelect" class="mb-0 text-muted" style="font-size:14px">Année Univ.</label>
+                <select id="anneeRecentEnsSelect" class="form-select form-select-sm" style="width:170px">
+                    <option value="">Toutes</option>
+                </select>
+                <label for="partitRecentEnsSelect" class="mb-0 text-muted" style="font-size:14px">Partie</label>
+                <select id="partitRecentEnsSelect" class="form-select form-select-sm" style="width:150px">
+                    <option value="">Toutes</option>
+                </select>
+            </div>
         </div>
         <div style="overflow-x:auto">
             <table class="recent-table">

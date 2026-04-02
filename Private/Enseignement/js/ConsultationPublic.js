@@ -17,6 +17,14 @@ function anneeFromSemestre(nomSemestre) {
     return '3';
 }
 
+function isBachelorSemester(nomSemestre) {
+    if (!nomSemestre) return false;
+    const m = String(nomSemestre).match(/\d+/);
+    if (!m) return false;
+    const n = parseInt(m[0], 10);
+    return Number.isInteger(n) && n >= 5;
+}
+
 // =============================================================================
 // UTILITAIRES
 // =============================================================================
@@ -142,6 +150,7 @@ document.getElementById('filtSemestre').addEventListener('change', async functio
 document.getElementById('filtSemestreF').addEventListener('change', async function () {
     const nomSemestre = this.selectedOptions[0]?.text || '';
     const annee       = anneeFromSemestre(nomSemestre);
+    const bachelorSem = isBachelorSemester(nomSemestre);
     const selFiliere  = document.getElementById('filtFiliere');
 
     // Recharger les semaines
@@ -155,10 +164,13 @@ document.getElementById('filtSemestreF').addEventListener('change', async functi
         return;
     }
 
-    // Filtrer les filières selon l'année déduite
-    const filtered = annee
-        ? allFilieres.filter(f => String(f.annee || '').startsWith(annee))
-        : allFilieres;
+    // Règle métier : S5/S6 -> uniquement filières Bachelor.
+    // Sinon : filtrage classique par année.
+    const filtered = bachelorSem
+        ? allFilieres.filter(f => String(f.niveau || '').trim().toLowerCase() === 'bachelor')
+        : (annee
+            ? allFilieres.filter(f => String(f.annee || '').startsWith(annee))
+            : allFilieres);
 
     if (filtered.length === 0) {
         selFiliere.innerHTML = '<option value="">Aucune filière pour ce semestre</option>';

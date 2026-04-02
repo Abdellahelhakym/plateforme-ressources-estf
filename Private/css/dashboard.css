@@ -207,6 +207,35 @@ body {
 }
 .btn-refresh:hover { background: rgba(255,255,255,.25); }
 
+/* ============ FILTERS (ADMIN DASHBOARD) ============ */
+.chart-card-header {
+    gap: .5rem;
+}
+
+.chart-card-header .d-flex.align-items-center.gap-2 {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+}
+
+.chart-card-header label {
+    white-space: nowrap;
+}
+
+.chart-card-header .form-select-sm {
+    min-width: 140px;
+}
+
+@media (max-width: 992px) {
+    .chart-card-header .d-flex.align-items-center.gap-2 {
+        width: 100%;
+    }
+
+    .chart-card-header .form-select-sm {
+        width: 100% !important;
+        min-width: 0;
+    }
+}
+
 /* ============ KPI CARDS ============ */
 .kpi-card {
     background: #ffffff;

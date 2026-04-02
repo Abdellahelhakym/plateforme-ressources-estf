@@ -105,6 +105,17 @@
                 </button>
             </div>
             <div class="section-content">
+                <div class="row g-2 mb-3">
+                    <div class="col-md-4">
+                        <label class="form-label mb-1">Filtrer par année</label>
+                        <select class="form-select" id="filterFiliereAnnee">
+                            <option value="">Toutes les années</option>
+                            <option value="1ere annee">1ère année</option>
+                            <option value="2eme annee">2ème année</option>
+                            <option value="__empty__">Bachelor</option>
+                        </select>
+                    </div>
+                </div>
                 <div class="table-responsive">
                     <table class="table table-hover" id="tableFilieres">
                         <thead>
@@ -135,6 +146,14 @@
                 </button>
             </div>
             <div class="section-content">
+                <div class="row g-2 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label mb-1">Filtrer par filière/année</label>
+                        <select class="form-select" id="filterProfFiliere">
+                            <option value="">Toutes les filières</option>
+                        </select>
+                    </div>
+                </div>
                 <div class="table-responsive">
                     <table class="table table-hover" id="tableProfesseurs">
                         <thead>
@@ -143,7 +162,7 @@
                                 <th>Prénom</th>
                                 <th>Email</th>
                                 <th>Département</th>
-                                <th>Filières</th>
+                                <th>Filières/Année</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -166,12 +185,20 @@
                 </button>
             </div>
             <div class="section-content">
+                <div class="row g-2 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label mb-1">Filtrer par filière/année</label>
+                        <select class="form-select" id="filterModuleFiliere">
+                            <option value="">Toutes les filières</option>
+                        </select>
+                    </div>
+                </div>
                 <div class="table-responsive">
                     <table class="table table-hover" id="tableModules">
                         <thead>
                             <tr>
                                 <th>Nom du Module TP</th>
-                                <th>Filière</th>
+                                <th>Filière/Année</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -200,9 +227,9 @@
                             <div class="mb-3">
                                 <label class="form-label">Année</label>
                                 <select class="form-select" name="annee" required>
+                                    <option value="">-- Choisir --</option>
                                     <option value="1ere annee">1ère année</option>
                                     <option value="2eme annee">2ème année</option>
-                                    <option value="3eme annee">3ème année</option>
                                 </select>
                             </div>
                             <div class="mb-3">
@@ -244,11 +271,12 @@
                                 <label>Département</label>
                                 <select class="form-select" name="departement" required>
                                     <option value="Génie Informatique">Génie Informatique</option>
+                                    <option value="Autre département">Autre département</option>
                                 </select>
                             </div>
                             <!-- NEW: Filière select populated dynamically -->
                             <div class="mb-3">
-                                <label>Filières</label>
+                                <label>Filières/Année</label>
                                 <select class="form-select" name="id_filieres" id="selectFiliereProf" multiple size="6">
                                     <option value="">-- Aucune --</option>
                                 </select>
@@ -277,9 +305,10 @@
                             <div class="mb-3"><label>Nom du Module</label>
                                 <input type="text" class="form-control" name="nom_module" required></div>
                             <div class="mb-3">
-                                <label>Filière</label>
-                                <select class="form-select" name="id_filiere" id="selectFiliereModule" required>
+                                <label>Filière/Année</label>
+                                <select class="form-select" name="id_filieres" id="selectFiliereModule" multiple size="6" required>
                                 </select>
+                                <small class="text-muted">Utilisez Ctrl (ou Cmd) pour sélectionner plusieurs filières.</small>
                             </div>
                         </form>
                     </div>
@@ -332,9 +361,9 @@
                             <div class="mb-3">
                                 <label class="form-label">Année</label>
                                 <select class="form-select" id="editAnneeFiliere" name="annee" required>
+                                    <option value="">-- Choisir --</option>
                                     <option value="1ere annee">1ère année</option>
                                     <option value="2eme annee">2ème année</option>
-                                    <option value="3eme annee">3ème année</option>
                                 </select>
                             </div>
                             <div class="mb-3">
@@ -377,11 +406,12 @@
                                 <label>Département</label>
                                 <select class="form-select" id="editDeptProf" name="departement" required>
                                     <option value="Génie Informatique">Génie Informatique</option>
+                                    <option value="Autre département">Autre département</option>
                                 </select>
                             </div>
                             <!-- NEW: Filière select populated dynamically -->
                             <div class="mb-3">
-                                <label>Filières</label>
+                                <label>Filières/Année</label>
                                 <select class="form-select" id="editFiliereProf" name="id_filieres" multiple size="6">
                                     <option value="">-- Aucune --</option>
                                 </select>
@@ -410,9 +440,10 @@
                             <input type="hidden" id="editModuleId">
                             <div class="mb-3"><label>Nom du Module</label>
                                 <input type="text" class="form-control" id="editNomModule" name="nom_module" required></div>
-                            <div class="mb-3"><label>Filière</label>
-                                <select class="form-select" id="editFiliereModule" name="id_filiere" required>
+                            <div class="mb-3"><label>Filière/Année</label>
+                                <select class="form-select" id="editFiliereModule" name="id_filieres" multiple size="6" required>
                                 </select>
+                                <small class="text-muted">Utilisez Ctrl (ou Cmd) pour sélectionner plusieurs filières.</small>
                             </div>
                         </form>
                     </div>

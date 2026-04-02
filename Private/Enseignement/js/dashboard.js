@@ -17,6 +17,58 @@ async function api(path) {
     return r.json();
 }
 
+function getFilterValues(anneeId, partitId) {
+    return {
+        annee: document.getElementById(anneeId)?.value || '',
+        partit: document.getElementById(partitId)?.value || ''
+    };
+}
+
+function withFilters(path, anneeId, partitId) {
+    const { annee, partit } = getFilterValues(anneeId, partitId);
+    const qs = new URLSearchParams({ annee, partit });
+    return `${path}?${qs.toString()}`;
+}
+
+async function loadAnneesOptions(targetIds) {
+    try {
+        const annees = await api('/annees');
+        const opts = ['<option value="">Toutes</option>']
+            .concat((annees || []).map(a => `<option value="${a.id_annee}">${a.libelle || 'Année'}</option>`));
+        const html = opts.join('');
+        (targetIds || []).forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.innerHTML = html;
+        });
+    } catch (e) {
+        console.error('Annees load error', e);
+    }
+}
+
+async function loadPartitOptions(targetIds) {
+    try {
+        const parts = await api('/semestres/partitions');
+        let opts = [];
+        if (Array.isArray(parts) && parts.length) {
+            opts = ['<option value="">Toutes</option>']
+                .concat(parts.map(p => `<option value="${p.partit}">${p.label}</option>`));
+        } else {
+            opts = [
+                '<option value="">Toutes</option>',
+                '<option value="partit 1">S1 - S3</option>',
+                '<option value="partit 2">S4 - S6</option>'
+            ];
+        }
+        const html = opts.join('');
+        (targetIds || []).forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.innerHTML = html;
+        });
+    } catch (e) {
+        console.error('Partit load error', e);
+    }
+}
+
 async function loadStats() {
     const s = await api('/enseignant/stats');
     const configs = [
@@ -41,7 +93,7 @@ async function loadStats() {
 }
 
 async function loadChartFilieres() {
-    const rows = await api('/enseignant/filieres');
+    const rows = await api(withFilters('/enseignant/filieres', 'anneeFilieresEnsSelect', 'partitFilieresEnsSelect'));
     destroyChart('filieresEns');
     charts['filieresEns'] = new Chart(document.getElementById('chartFilieresEns'), {
         type: 'doughnut',
@@ -65,7 +117,7 @@ async function loadChartFilieres() {
 }
 
 async function loadChartSalles() {
-    const rows = await api('/enseignant/salles');
+    const rows = await api(withFilters('/enseignant/salles', 'anneeSallesEnsSelect', 'partitSallesEnsSelect'));
     destroyChart('sallesEns');
     charts['sallesEns'] = new Chart(document.getElementById('chartSallesEns'), {
         type: 'bar',
@@ -90,7 +142,7 @@ async function loadChartSalles() {
 }
 
 async function loadChartJours() {
-    const rows = await api('/enseignant/jours');
+    const rows = await api(withFilters('/enseignant/jours', 'anneeJoursEnsSelect', 'partitJoursEnsSelect'));
     destroyChart('joursEns');
     charts['joursEns'] = new Chart(document.getElementById('chartJoursEns'), {
         type: 'bar',
@@ -115,7 +167,7 @@ async function loadChartJours() {
 }
 
 async function loadEmploi() {
-    const rows = await api('/enseignant/emploi');
+    const rows = await api(withFilters('/enseignant/emploi', 'anneeEmploiEnsSelect', 'partitEmploiEnsSelect'));
     const body = document.getElementById('emploiRows');
     if (!rows.length) {
         body.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:1.5rem;color:#9ca3af">Aucun emploi du temps trouve</td></tr>';
@@ -134,7 +186,7 @@ async function loadEmploi() {
 }
 
 async function loadRecent() {
-    const rows = await api('/enseignant/recent');
+    const rows = await api(withFilters('/enseignant/recent', 'anneeRecentEnsSelect', 'partitRecentEnsSelect'));
     const body = document.getElementById('recentBody');
     if (!rows.length) {
         body.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:2rem;color:#9ca3af">Aucune utilisation</td></tr>';
@@ -152,7 +204,7 @@ async function loadRecent() {
     </tr>`).join('');
 }
 
-async function loadAll() {
+async function loadDashboardData() {
     try {
         await Promise.all([
             loadStats(),
@@ -167,4 +219,38 @@ async function loadAll() {
     }
 }
 
-window.addEventListener('load', loadAll);
+async function loadAll() {
+    await loadAnneesOptions([
+        'anneeFilieresEnsSelect',
+        'anneeSallesEnsSelect',
+        'anneeJoursEnsSelect',
+        'anneeEmploiEnsSelect',
+        'anneeRecentEnsSelect'
+    ]);
+    await loadPartitOptions([
+        'partitFilieresEnsSelect',
+        'partitSallesEnsSelect',
+        'partitJoursEnsSelect',
+        'partitEmploiEnsSelect',
+        'partitRecentEnsSelect'
+    ]);
+    await loadDashboardData();
+}
+
+window.addEventListener('load', () => {
+    const bind = (id, handler) => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('change', handler);
+    };
+    bind('anneeFilieresEnsSelect', loadChartFilieres);
+    bind('partitFilieresEnsSelect', loadChartFilieres);
+    bind('anneeSallesEnsSelect', loadChartSalles);
+    bind('partitSallesEnsSelect', loadChartSalles);
+    bind('anneeJoursEnsSelect', loadChartJours);
+    bind('partitJoursEnsSelect', loadChartJours);
+    bind('anneeEmploiEnsSelect', loadEmploi);
+    bind('partitEmploiEnsSelect', loadEmploi);
+    bind('anneeRecentEnsSelect', loadRecent);
+    bind('partitRecentEnsSelect', loadRecent);
+    loadAll();
+});

@@ -74,9 +74,10 @@ consultation.get('/data/semaines-par-partie', (req, res) => {
 consultation.get('/data/filieres', (req, res) => {
     const sql = `
         SELECT id_filiere,
-               CONCAT(nom_filiere, ' — ', annee) AS label,
+               CONCAT(nom_filiere, ' — ', COALESCE(NULLIF(annee, ''), NULLIF(niveau, ''), 'Sans niveau')) AS label,
                nom_filiere,
-               annee
+               annee,
+               niveau
         FROM filiere
         ORDER BY nom_filiere, annee
     `;

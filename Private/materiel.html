@@ -152,6 +152,79 @@
         </div>
     </div>
 
+    <div class="modal fade" id="editMaterielModal" tabindex="-1" aria-labelledby="editMaterielModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editMaterielModalLabel">
+                        <i class="fas fa-pen-to-square"></i> Modifier matériel
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formEditMateriel">
+                        <input type="hidden" id="editMaterielId">
+
+                        <div class="mb-3">
+                            <label class="form-label" for="editNomMateriel">Nom</label>
+                            <input type="text" class="form-control" id="editNomMateriel" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label" for="editTypeMateriel">Type</label>
+                            <select class="form-select" id="editTypeMateriel" required>
+                                <option value="Ordinateur">Ordinateur</option>
+                                <option value="Projecteur">Projecteur</option>
+                                <option value="Imprimante / Scanner">Imprimante / Scanner</option>
+                                <option value="Câbles & Accessoires">Câbles & Accessoires</option>
+                                <option value="Mobilier">Mobilier</option>
+                                <option value="Outils / Maintenance">Outils / Maintenance</option>
+                                <option value="Équipement Audio / Vidéo">Équipement Audio / Vidéo</option>
+                                <option value="Équipements réseau">Équipements réseau</option>
+                                <option value="Logiciel / Licence">Logiciel / Licence</option>
+                                <option value="Autre">Autre</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label" for="editQuantiteMateriel">Quantité</label>
+                            <input type="number" min="0" class="form-control" id="editQuantiteMateriel" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label" for="editEtatMateriel">État</label>
+                            <select class="form-select" id="editEtatMateriel">
+                                <option value="Disponible">Disponible</option>
+                                <option value="Occupée">Occupée</option>
+                                <option value="En Maintenance">En maintenance</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label" for="editSalleMateriel">Salle</label>
+                            <select class="form-select" id="editSalleMateriel" required></select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label" for="editRemarquesMateriel">Remarques</label>
+                            <textarea class="form-control" id="editRemarquesMateriel" rows="3"></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label" for="editImageMateriel">Nouvelle image (optionnelle)</label>
+                            <input type="file" class="form-control" id="editImageMateriel" accept="image/png, image/jpeg, image/jpg, image/webp">
+                            <div class="form-text">Laisser vide pour conserver l'image actuelle.</div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="button" class="btn btn-primary" id="btnSaveEditMateriel">Enregistrer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <footer class="text-white py-5">
         <div class="container">
             <div class="row">
@@ -186,7 +259,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-          AOS.init();
+         AOS.init({ duration: 200, once: true });
     </script>
     <script src="./js/materiel.js"></script>
 </body>

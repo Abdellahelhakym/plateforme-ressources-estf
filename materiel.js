@@ -141,6 +141,94 @@ materiel.get('/Info', (req, res) => {
     );
 });
 
+// modifier les informations d'un matériel (avec image optionnelle)
+materiel.put('/:id', upload.single('image_materiel'), (req, res) => {
+    const id = parseInt(req.params.id, 10);
+    const { nom_materiel, type_materiel, quantite, etat, Remarques, salle } = req.body;
+
+    if (!Number.isInteger(id) || id <= 0) {
+        return res.status(400).json({ success: false, message: 'Identifiant invalide' });
+    }
+
+    if (!nom_materiel || !type_materiel || !salle) {
+        return res.status(400).json({ success: false, message: 'Nom, type et salle sont obligatoires' });
+    }
+
+    const qty = parseInt(quantite, 10);
+    if (!Number.isInteger(qty) || qty < 0) {
+        return res.status(400).json({ success: false, message: 'Quantité invalide' });
+    }
+
+    connection.execute('SELECT id_salle FROM salles WHERE nom_salle = ? LIMIT 1', [salle], (roomErr, roomRows) => {
+        if (roomErr) {
+            return res.status(500).json({ success: false, message: 'Erreur SQL' });
+        }
+
+        const idSalle = roomRows.length ? roomRows[0].id_salle : null;
+
+        const doUpdate = (imgPathToSave) => {
+            let sql = 'UPDATE materiel SET nom_materiel = ?, type_materiel = ?, quantite = ?, etat = ?, Remarques = ?, salle = ?, id_salle = ?';
+            const params = [nom_materiel, type_materiel, qty, etat || 'Disponible', Remarques || '', salle, idSalle];
+
+            if (imgPathToSave) {
+                sql += ', img = ?';
+                params.push(imgPathToSave);
+            }
+
+            sql += ' WHERE id_materiel = ?';
+            params.push(id);
+
+            connection.execute(sql, params, (err, result) => {
+                if (err) {
+                    console.error(err);
+                    return res.status(500).json({ success: false, message: 'Erreur SQL' });
+                }
+
+                if (result.affectedRows === 0) {
+                    return res.status(404).json({ success: false, message: 'Matériel introuvable' });
+                }
+
+                res.json({ success: true, message: 'Matériel modifié avec succès' });
+            });
+        };
+
+        if (!req.file) {
+            doUpdate(null);
+            return;
+        }
+
+        connection.execute('SELECT img FROM materiel WHERE id_materiel = ?', [id], (errOld, oldRows) => {
+            if (errOld) {
+                return res.status(500).json({ success: false, message: 'Erreur SQL' });
+            }
+
+            const oldImgPath = oldRows[0]?.img;
+            if (oldImgPath) {
+                const cleanOldPath = oldImgPath.replace(/^\//, '');
+                const fullOldPath = path.join(__dirname, 'views', cleanOldPath);
+                if (fs.existsSync(fullOldPath)) {
+                    fs.unlink(fullOldPath, (unlinkErr) => {
+                        if (unlinkErr) console.error('Erreur suppression ancienne image :', unlinkErr);
+                    });
+                }
+            }
+
+            const ext = path.extname(req.file.originalname);
+            const newFilename = `img-${id}${ext}`;
+            const newPath = path.join(req.file.destination, newFilename);
+
+            fs.rename(req.file.path, newPath, (errRename) => {
+                if (errRename) {
+                    console.error(errRename);
+                    return res.status(500).json({ success: false, message: 'Erreur stockage image' });
+                }
+
+                doUpdate(`/img/materiel/${newFilename}`);
+            });
+        });
+    });
+});
+
 
 
 

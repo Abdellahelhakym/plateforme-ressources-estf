@@ -72,6 +72,17 @@
                 <!-- ✅ Pas de bouton Ajouter -->
             </div>
             <div class="section-content">
+                <div class="row g-2 mb-3">
+                    <div class="col-md-4">
+                        <label class="form-label mb-1">Filtrer par année</label>
+                        <select class="form-select" id="filterFiliereAnnee">
+                            <option value="">Toutes les années</option>
+                            <option value="1ere annee">1ère année</option>
+                            <option value="2eme annee">2ème année</option>
+                            <option value="__empty__">Bachelor</option>
+                        </select>
+                    </div>
+                </div>
                 <div class="table-responsive">
                     <table class="table table-hover" id="tableFilieres">
                         <thead>
@@ -97,6 +108,14 @@
                 </div>
             </div>
             <div class="section-content">
+                <div class="row g-2 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label mb-1">Filtrer par filière/année</label>
+                        <select class="form-select" id="filterProfFiliere">
+                            <option value="">Toutes les filières</option>
+                        </select>
+                    </div>
+                </div>
                 <div class="table-responsive">
                     <table class="table table-hover" id="tableProfesseurs">
                         <thead>
@@ -123,6 +142,14 @@
                 </div>
             </div>
             <div class="section-content">
+                <div class="row g-2 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label mb-1">Filtrer par filière/année</label>
+                        <select class="form-select" id="filterModuleFiliere">
+                            <option value="">Toutes les filières</option>
+                        </select>
+                    </div>
+                </div>
                 <div class="table-responsive">
                     <table class="table table-hover" id="tableModules">
                         <thead>

@@ -74,6 +74,7 @@ async function ensureInnoDB() {
         'salles',
         'filiere',
         'module_tp',
+        'module_filiere',
         'professeur',
         'professeur_filiere',
         'occupation',
@@ -100,6 +101,23 @@ async function ensureProfesseurFiliereTable() {
         `INSERT IGNORE INTO professeur_filiere (id_prof, id_filiere)
          SELECT id_prof, id_filiere
          FROM professeur
+         WHERE id_filiere IS NOT NULL`
+    );
+}
+
+async function ensureModuleFiliereTable() {
+    await query(
+        `CREATE TABLE IF NOT EXISTS module_filiere (
+            id_module INT NOT NULL,
+            id_filiere INT NOT NULL,
+            PRIMARY KEY (id_module, id_filiere)
+        ) ENGINE=InnoDB`
+    );
+
+    await query(
+        `INSERT IGNORE INTO module_filiere (id_module, id_filiere)
+         SELECT id_module, id_filiere
+         FROM module_tp
          WHERE id_filiere IS NOT NULL`
     );
 }
@@ -156,9 +174,12 @@ async function cleanupOrphans() {
     await query('DELETE pf FROM professeur_filiere pf LEFT JOIN professeur p ON p.id_prof = pf.id_prof WHERE p.id_prof IS NULL');
     await query('DELETE pf FROM professeur_filiere pf LEFT JOIN filiere f ON f.id_filiere = pf.id_filiere WHERE f.id_filiere IS NULL');
 
+    await query('DELETE mf FROM module_filiere mf LEFT JOIN module_tp m ON m.id_module = mf.id_module WHERE m.id_module IS NULL');
+    await query('DELETE mf FROM module_filiere mf LEFT JOIN filiere f ON f.id_filiere = mf.id_filiere WHERE f.id_filiere IS NULL');
+
     await query('UPDATE professeur p LEFT JOIN filiere f ON f.id_filiere = p.id_filiere SET p.id_filiere = NULL WHERE p.id_filiere IS NOT NULL AND f.id_filiere IS NULL');
 
-    await query('DELETE m FROM module_tp m LEFT JOIN filiere f ON f.id_filiere = m.id_filiere WHERE f.id_filiere IS NULL');
+    await query('DELETE m FROM module_tp m LEFT JOIN filiere f ON f.id_filiere = m.id_filiere WHERE m.id_filiere IS NOT NULL AND f.id_filiere IS NULL');
 
     await query('DELETE w FROM semaine w LEFT JOIN semestre s ON s.id_semestre = w.id_semestre WHERE w.id_semestre IS NOT NULL AND s.id_semestre IS NULL');
 
@@ -197,6 +218,18 @@ async function addForeignKeys() {
     await addFkIfMissing({
         tableName: 'module_tp',
         constraintName: 'fk_module_filiere',
+        fkSql: 'FOREIGN KEY (id_filiere) REFERENCES filiere(id_filiere) ON DELETE CASCADE ON UPDATE CASCADE'
+    });
+
+    await addFkIfMissing({
+        tableName: 'module_filiere',
+        constraintName: 'fk_module_filiere_module',
+        fkSql: 'FOREIGN KEY (id_module) REFERENCES module_tp(id_module) ON DELETE CASCADE ON UPDATE CASCADE'
+    });
+
+    await addFkIfMissing({
+        tableName: 'module_filiere',
+        constraintName: 'fk_module_filiere_fil',
         fkSql: 'FOREIGN KEY (id_filiere) REFERENCES filiere(id_filiere) ON DELETE CASCADE ON UPDATE CASCADE'
     });
 
@@ -295,6 +328,7 @@ async function runSchemaIntegrityMigrations() {
     try {
         await ensureInnoDB();
         await ensureProfesseurFiliereTable();
+        await ensureModuleFiliereTable();
         await migrateOccupationWeekColumns();
         await ensureMaterielSalleRelation();
         await cleanupOrphans();

@@ -10,6 +10,30 @@ AOS.init({ duration: 800, once: true });
         // ── Toutes les semaines en mémoire (pour le filtre) ────────
         let seminesAllData = [];
 
+        function parseDayMonthToIso(input) {
+            const raw = String(input || '').trim();
+            const m = raw.match(/^(\d{1,2})\/(\d{1,2})$/);
+            if (!m) return null;
+            const day = parseInt(m[1], 10);
+            const month = parseInt(m[2], 10);
+            if (month < 1 || month > 12 || day < 1 || day > 31) return null;
+
+            // Année de référence académique pour réutiliser le même calendrier chaque année.
+            const year = month >= 9 ? 2000 : 2001;
+            const iso = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            const d = new Date(`${iso}T00:00:00`);
+            if (Number.isNaN(d.getTime())) return null;
+            if (d.getUTCMonth() + 1 !== month || d.getUTCDate() !== day) return null;
+            return iso;
+        }
+
+        function formatIsoToDayMonth(isoLike) {
+            const raw = String(isoLike || '').trim();
+            const m = raw.match(/^(\d{4})-(\d{2})-(\d{2})/);
+            if (!m) return '-';
+            return `${m[3]}/${m[2]}`;
+        }
+
         // ══════════════════════════════════════════════════════════
         // UTILITAIRE : peupler un <select> depuis un tableau
         // ══════════════════════════════════════════════════════════
@@ -132,8 +156,10 @@ AOS.init({ duration: 800, once: true });
             filtered.forEach((item, index) => {
                 const col   = document.createElement('div');
                 col.className = 'col-md-3 col-sm-6 mb-3';
-                const debut = item.date_debut ? item.date_debut.substring(0, 10) : '-';
-                const fin   = item.date_fin   ? item.date_fin.substring(0, 10)   : '-';
+                const debutIso = item.date_debut ? item.date_debut.substring(0, 10) : '';
+                const finIso   = item.date_fin   ? item.date_fin.substring(0, 10)   : '';
+                const debut = formatIsoToDayMonth(debutIso);
+                const fin   = formatIsoToDayMonth(finIso);
 
                 // Badge couleur semestre
                 const semLabel = item.nom_semestre
@@ -149,8 +175,8 @@ AOS.init({ duration: 800, once: true });
                             <button class="btn btn-sm btn-edit btn-edit-semaine"
                                 data-id="${item.id_semaine}"
                                 data-nom="${item.nom_semaine}"
-                                data-debut="${debut}"
-                                data-fin="${fin}"
+                                data-debut="${debutIso}"
+                                data-fin="${finIso}"
                                 data-semestre="${item.id_semestre || ''}">
                                 <i class="fas fa-edit"></i>
                             </button>
@@ -221,6 +247,22 @@ AOS.init({ duration: 800, once: true });
                 const form = document.getElementById(formId);
                 if (!form.checkValidity()) return alert("Veuillez remplir tous les champs obligatoires");
                 const data = Object.fromEntries(new FormData(form));
+
+                if (endpoint === 'semaine') {
+                    const startIso = parseDayMonthToIso(data.date_debut);
+                    const endIso = parseDayMonthToIso(data.date_fin);
+                    if (!startIso || !endIso) {
+                        alert('Format de date invalide. Utilisez JJ/MM (ex: 15/09).');
+                        return;
+                    }
+                    if (new Date(`${startIso}T00:00:00`) > new Date(`${endIso}T00:00:00`)) {
+                        alert('La date début doit être antérieure ou égale à la date fin.');
+                        return;
+                    }
+                    data.date_debut = startIso;
+                    data.date_fin = endIso;
+                }
+
                 const res  = await fetch(`/config/${endpoint}`, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
@@ -301,8 +343,8 @@ AOS.init({ duration: 800, once: true });
             if (btnW) {
                 document.getElementById('editSemaineId').value        = btnW.dataset.id;
                 document.getElementById('editNomSemaine').value       = btnW.dataset.nom;
-                document.getElementById('editDateDebutSemaine').value = btnW.dataset.debut;
-                document.getElementById('editDateFinSemaine').value   = btnW.dataset.fin;
+                document.getElementById('editDateDebutSemaine').value = formatIsoToDayMonth(btnW.dataset.debut);
+                document.getElementById('editDateFinSemaine').value   = formatIsoToDayMonth(btnW.dataset.fin);
                 // Sélectionner le semestre actuel
                 document.getElementById('editSemaineSemestre').value  = btnW.dataset.semestre || '';
                 new bootstrap.Modal(document.getElementById('editSemaineModal')).show();
@@ -327,6 +369,22 @@ AOS.init({ duration: 800, once: true });
             document.getElementById(btnId).addEventListener('click', async () => {
                 const id   = document.getElementById(idFieldId).value;
                 const data = Object.fromEntries(new FormData(document.getElementById(formId)));
+
+                if (endpoint === 'semaine') {
+                    const startIso = parseDayMonthToIso(data.date_debut);
+                    const endIso = parseDayMonthToIso(data.date_fin);
+                    if (!startIso || !endIso) {
+                        alert('Format de date invalide. Utilisez JJ/MM (ex: 15/09).');
+                        return;
+                    }
+                    if (new Date(`${startIso}T00:00:00`) > new Date(`${endIso}T00:00:00`)) {
+                        alert('La date début doit être antérieure ou égale à la date fin.');
+                        return;
+                    }
+                    data.date_debut = startIso;
+                    data.date_fin = endIso;
+                }
+
                 const res  = await fetch(`/config/${endpoint}/${id}`, {
                     method: 'PUT',
                     headers: {'Content-Type': 'application/json'},
