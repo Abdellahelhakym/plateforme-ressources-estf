@@ -265,7 +265,11 @@
                         <form id="formAddProf">
                             <div class="mb-3"><label>Nom</label><input type="text" class="form-control" name="nom" required></div>
                             <div class="mb-3"><label>Prénom</label><input type="text" class="form-control" name="prenom" required></div>
-                            <div class="mb-3"><label>Email</label><input type="email" class="form-control" name="email" required></div>
+                            <div class="mb-3">
+                                <label>Email</label>
+                                <input type="email" class="form-control" name="email" required>
+                                <small id="addProfError" class="text-danger d-none"></small>
+                            </div>
                             <div class="mb-3"><label>Mot de passe</label><input type="password" class="form-control" name="password" minlength="4" required></div>
                             <div class="mb-3">
                                 <label>Département</label>

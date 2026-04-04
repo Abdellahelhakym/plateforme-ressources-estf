@@ -169,53 +169,56 @@
         </div>
     </div>
 
-    <!-- ROW 3 : Salles / Profs par semestre -->
+    <!-- ROW 3 : Occupation des professeurs -->
     <div class="row g-3 mb-3">
-        <div class="col-lg-6" data-aos="fade-up">
+        <div class="col-lg-12" data-aos="fade-up">
             <div class="chart-card h-100">
                 <div class="chart-card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
-                    <div class="chart-card-title"><i class="fas fa-door-open"></i> Salles les plus utilisées par semestre</div>
-                    <div class="d-flex align-items-center gap-2">
-                        <label for="anneeSallesSelect" class="mb-0 text-muted" style="font-size:14px">Année Univ.</label>
-                        <select id="anneeSallesSelect" class="form-select form-select-sm" style="width:170px">
+                    <div>
+                        <div class="chart-card-title"><i class="fas fa-user-tie"></i> Occupation des professeur</div>
+                        <span class="chart-card-subtitle">Pourcentage d'utilisation de chaque professeur par filière.</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                        <label for="anneeProfOccSelect" class="mb-0 text-muted" style="font-size:14px">Année Univ.</label>
+                        <select id="anneeProfOccSelect" class="form-select form-select-sm" style="width:170px">
                             <option value="">Toutes</option>
                         </select>
-                        <label for="semSallesSelect" class="mb-0 text-muted" style="font-size:14px">Les semestres</label>
-                        <select id="semSallesSelect" class="form-select form-select-sm" style="width:180px">
-                            <option value="">Toutes</option>
+                        <label for="jourProfOccSelect" class="mb-0 text-muted" style="font-size:14px">Jour</label>
+                        <select id="jourProfOccSelect" class="form-select form-select-sm" style="width:160px">
+                            <option value="ALL">Tous les jours</option>
+                            <option value="Lundi">Lundi</option>
+                            <option value="Mardi">Mardi</option>
+                            <option value="Mercredi">Mercredi</option>
+                            <option value="Jeudi">Jeudi</option>
+                            <option value="Vendredi">Vendredi</option>
+                            <option value="Samedi">Samedi</option>
                         </select>
-                        <label for="filiereSallesSelect" class="mb-0 text-muted" style="font-size:14px">Filière</label>
-                        <select id="filiereSallesSelect" class="form-select form-select-sm" style="width:200px">
+                        <label for="semProfOccSelect" class="mb-0 text-muted" style="font-size:14px">Les semestres</label>
+                        <select id="semProfOccSelect" class="form-select form-select-sm" style="width:180px">
+                            <option value="1">S1 - S3</option>
+                            <option value="2">S4 - S6</option>
+                        </select>
+                        <label for="semaineProfOccSelect" class="mb-0 text-muted" style="font-size:14px">Semaine</label>
+                        <select id="semaineProfOccSelect" class="form-select form-select-sm" style="width:180px">
                             <option value="">Toutes</option>
                         </select>
                     </div>
                 </div>
-                <div class="chart-card-body">
-                    <div class="chart-wrap"><canvas id="chartSallesSem"></canvas></div>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-6" data-aos="fade-up" data-aos-delay="100">
-            <div class="chart-card h-100">
-                <div class="chart-card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
-                    <div class="chart-card-title"><i class="fas fa-chalkboard-teacher"></i> Professeurs les plus actifs par semestre</div>
-                    <div class="d-flex align-items-center gap-2">
-                        <label for="anneeProfsSelect" class="mb-0 text-muted" style="font-size:14px">Année Univ.</label>
-                        <select id="anneeProfsSelect" class="form-select form-select-sm" style="width:170px">
-                            <option value="">Toutes</option>
-                        </select>
-                        <label for="semProfsSelect" class="mb-0 text-muted" style="font-size:14px">Les semestres</label>
-                        <select id="semProfsSelect" class="form-select form-select-sm" style="width:180px">
-                            <option value="">Toutes</option>
-                        </select>
-                        <label for="filiereProfsSelect" class="mb-0 text-muted" style="font-size:14px">Filière</label>
-                        <select id="filiereProfsSelect" class="form-select form-select-sm" style="width:200px">
-                            <option value="">Toutes</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="chart-card-body">
-                    <div class="chart-wrap"><canvas id="chartProfsSem"></canvas></div>
+                <div style="overflow-x:auto">
+                    <table class="recent-table">
+                        <thead>
+                            <tr>
+                                <th>Professeur</th>
+                                <th>Filières (détail)</th>
+                                <th>Pourcentage d'utilisation</th>
+                            </tr>
+                        </thead>
+                        <tbody id="profOccupationBody">
+                            <tr><td colspan="3" style="text-align:center;padding:1.5rem;color:#9ca3af">
+                                <i class="fas fa-spinner fa-spin me-2"></i>Chargement...
+                            </td></tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>

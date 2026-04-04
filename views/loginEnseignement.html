@@ -195,6 +195,32 @@
             border-color: var(--secondary-color);
         }
 
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 16px 0;
+            color: #7f98b8;
+            font-size: 0.8rem;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: "";
+            flex: 1;
+            border-bottom: 1px solid #d8e5f6;
+        }
+
+        .google-login-wrap {
+            display: flex;
+            justify-content: center;
+        }
+
+        .google-login-wrap .google-disabled {
+            font-size: 0.82rem;
+            color: #7f98b8;
+        }
+
         .alert {
             padding: 10px 14px;
             border-radius: 8px;
@@ -281,6 +307,13 @@
                     <i class="fas fa-sign-in-alt me-2"></i>
                     <span id="btnText">Se connecter</span>
                 </button>
+
+                <div class="divider">ou</div>
+
+                <div class="google-login-wrap" id="googleLoginWrap">
+                    <div id="googleLoginBtn"></div>
+                </div>
+
                 <a href="./index.html">
                     <button type="button" class="btn-back">
                         <i class="fas fa-arrow-left me-2"></i>
@@ -297,14 +330,81 @@
             .then(res => res.text())
             .then(msg => {
                 if (msg) {
-                    const errorEl = document.getElementById('error');
-                    errorEl.innerText = msg;
-
-                    const alertEl = document.getElementById('errorAlert');
-                    document.getElementById('errorText').innerText = msg;
-                    alertEl.style.display = 'block';
+                    showError(msg);
                 }
             });
+
+        function showError(message) {
+            const errorEl = document.getElementById('error');
+            errorEl.innerText = message;
+
+            const alertEl = document.getElementById('errorAlert');
+            document.getElementById('errorText').innerText = message;
+            alertEl.style.display = 'block';
+        }
+
+        async function handleGoogleCredential(response) {
+            if (!response || !response.credential) {
+                showError('Connexion Gmail invalide.');
+                return;
+            }
+
+            try {
+                const res = await fetch('/loginEnseignement/google', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ credential: response.credential })
+                });
+
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok) {
+                    showError(data.error || 'Connexion Gmail impossible.');
+                    return;
+                }
+
+                window.location.href = data.redirect || '/private/Enseignement/accueilEnseignement.html';
+            } catch (err) {
+                showError('Erreur de connexion Gmail. Réessayez.');
+            }
+        }
+
+        async function initGoogleLogin() {
+            const wrap = document.getElementById('googleLoginWrap');
+            const target = document.getElementById('googleLoginBtn');
+
+            try {
+                const configRes = await fetch('/loginEnseignement/google/config');
+                const config = await configRes.json();
+
+                if (!config.enabled || !config.clientId) {
+                    wrap.innerHTML = '<span class="google-disabled">Connexion Gmail indisponible: configurez GOOGLE_CLIENT_ID dans .env puis redémarrez le serveur.</span>';
+                    return;
+                }
+
+                const script = document.createElement('script');
+                script.src = 'https://accounts.google.com/gsi/client';
+                script.async = true;
+                script.defer = true;
+                script.onload = () => {
+                    window.google.accounts.id.initialize({
+                        client_id: config.clientId,
+                        callback: handleGoogleCredential
+                    });
+
+                    window.google.accounts.id.renderButton(target, {
+                        type: 'standard',
+                        theme: 'outline',
+                        size: 'large',
+                        text: 'continue_with',
+                        shape: 'pill',
+                        width: 320
+                    });
+                };
+                document.head.appendChild(script);
+            } catch (err) {
+                wrap.innerHTML = '<span class="google-disabled">Connexion Gmail indisponible pour le moment.</span>';
+            }
+        }
 
         function togglePassword() {
             const input = document.getElementById("password");
@@ -317,6 +417,8 @@
                 icon.classList.replace("fa-eye-slash", "fa-eye");
             }
         }
+
+        initGoogleLogin();
     </script>
 </body>
 </html>

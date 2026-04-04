@@ -455,9 +455,206 @@ dashboard.get('/salles-par-semestre', (req, res) => {
         ORDER BY nb DESC
         LIMIT 15
     `;
+    const totalSql = `
+        SELECT COUNT(o.id_occupation) AS total
+        FROM occupation o
+        LEFT JOIN semestre se ON o.id_semestre = se.id_semestre
+        WHERE se.nom_semestre IS NOT NULL
+          AND ${condition}
+    `;
+
     connection.query(sql, params, (err, rows) => {
         if (err) return res.status(500).json({ error: err.message });
-        res.json(rows || []);
+        connection.query(totalSql, params, (errTot, totals) => {
+            if (errTot) return res.status(500).json({ error: errTot.message });
+            const total = Number(totals?.[0]?.total) || 0;
+            const data = (rows || []).map((r) => {
+                const nb = Number(r.nb) || 0;
+                const pct = total > 0 ? Math.round((nb / total) * 1000) / 10 : 0;
+                return { ...r, pct };
+            });
+            res.json(data);
+        });
+    });
+});
+
+// =============================================================================
+// OCCUPATION DES PROFESSEURS (TABLEAU)
+// GET /dashboard/profs-occupation
+// =============================================================================
+dashboard.get('/profs-occupation', (req, res) => {
+    const rawPartit = (req.query.partit || '').trim();
+    const partit = rawPartit ? (rawPartit.replace(/[^0-9]/g, '') || rawPartit) : '';
+    const jourRaw = (req.query.jour || 'ALL').trim();
+    const jour = jourRaw || 'ALL';
+    const isAllDays = jour.toUpperCase() === 'ALL';
+    const annee = (req.query.annee || '').trim();
+    const semaineNom = (req.query.semaineNom || '').trim();
+    const semaine = (req.query.semaine || '').trim();
+
+    const weekCountExpr = semaineNom
+        ? 'COUNT(DISTINCT LOWER(TRIM(s.nom_semaine)))'
+        : 'COUNT(DISTINCT s.id_semaine)';
+
+    let weeksSql = `
+        SELECT ${weekCountExpr} AS nb_semaines
+        FROM semaine s
+        LEFT JOIN semestre se ON se.id_semestre = s.id_semestre
+        WHERE ( ? = '' OR se.type_partit = ? OR se.type_partit LIKE CONCAT('%', ?, '%') )
+    `;
+    const weeksParams = [partit, partit, partit];
+    if (semaineNom) {
+        // Keep week-name union behavior across semestres when same week label exists.
+        weeksSql += ' AND LOWER(TRIM(s.nom_semaine)) = LOWER(TRIM(?))';
+        weeksParams.push(semaineNom);
+    } else if (semaine) {
+        weeksSql += ' AND s.id_semaine = ?';
+        weeksParams.push(semaine);
+    }
+
+    const creneauxSql = 'SELECT COUNT(*) AS nb_creneaux FROM creneau';
+    let semaineFilterSql = '';
+    const semaineFilterParams = [];
+    if (semaineNom) {
+        semaineFilterSql = ' AND sw.nom_semaine IS NOT NULL AND LOWER(TRIM(sw.nom_semaine)) = LOWER(TRIM(?))';
+        semaineFilterParams.push(semaineNom);
+    } else if (semaine) {
+        semaineFilterSql = ' AND sw.id_semaine = ?';
+        semaineFilterParams.push(semaine);
+    }
+
+    const useFallbackWithoutWeeks = !(semaineNom || semaine);
+    const occupiedSlotExpr = semaineNom
+        ? 'CONCAT(LOWER(TRIM(sw.nom_semaine)), "|", o.jour, "|", o.id_creneau)'
+        : 'CONCAT(sw.id_semaine, "|", o.jour, "|", o.id_creneau)';
+
+    const totalSql = `
+        SELECT o.id_prof,
+               COUNT(DISTINCT
+                   CASE
+                       WHEN sw.id_semaine IS NOT NULL THEN ${occupiedSlotExpr}
+                       ${useFallbackWithoutWeeks ? "ELSE CONCAT('occ#', o.id_occupation)" : 'ELSE NULL'}
+                   END
+               ) AS occupes
+        FROM occupation o
+        LEFT JOIN semestre se ON se.id_semestre = o.id_semestre
+        LEFT JOIN semaine sw
+               ON sw.id_semestre = o.id_semestre
+              AND o.sD IS NOT NULL
+              AND o.sF IS NOT NULL
+              AND sw.id_semaine BETWEEN o.sD AND o.sF
+              ${semaineFilterSql}
+        WHERE ( ? = 'ALL' OR o.jour = ? )
+          AND ( ? = '' OR o.id_annee = ? )
+          AND ( ? = '' OR se.type_partit = ? OR se.type_partit LIKE CONCAT('%', ?, '%') )
+        GROUP BY o.id_prof
+    `;
+
+    const detailSql = `
+        SELECT o.id_prof,
+               f.id_filiere,
+               CONCAT(
+                   COALESCE(TRIM(f.nom_filiere), 'Filiere'),
+                   CASE
+                       WHEN COALESCE(NULLIF(TRIM(f.annee), ''), NULLIF(TRIM(f.niveau), '')) IS NOT NULL
+                           THEN CONCAT(' - ', COALESCE(NULLIF(TRIM(f.annee), ''), NULLIF(TRIM(f.niveau), '')))
+                       ELSE ''
+                   END
+               ) AS filiere_label,
+               COUNT(DISTINCT
+                   CASE
+                       WHEN sw.id_semaine IS NOT NULL THEN ${occupiedSlotExpr}
+                       ${useFallbackWithoutWeeks ? "ELSE CONCAT('occ#', o.id_occupation)" : 'ELSE NULL'}
+                   END
+               ) AS nb
+        FROM occupation o
+        LEFT JOIN filiere f ON f.id_filiere = o.id_filier
+        LEFT JOIN semestre se ON se.id_semestre = o.id_semestre
+        LEFT JOIN semaine sw
+               ON sw.id_semestre = o.id_semestre
+              AND o.sD IS NOT NULL
+              AND o.sF IS NOT NULL
+              AND sw.id_semaine BETWEEN o.sD AND o.sF
+                            ${semaineFilterSql}
+                WHERE ( ? = 'ALL' OR o.jour = ? )
+                    AND ( ? = '' OR o.id_annee = ? )
+                    AND ( ? = '' OR se.type_partit = ? OR se.type_partit LIKE CONCAT('%', ?, '%') )
+        GROUP BY o.id_prof, f.id_filiere, filiere_label
+        ORDER BY o.id_prof, nb DESC
+    `;
+
+        connection.query(weeksSql, weeksParams, (errW, weeksRows) => {
+        if (errW) return res.status(500).json({ error: errW.message });
+        const nb_semaines = Number(weeksRows?.[0]?.nb_semaines) || 0;
+
+        connection.query(creneauxSql, (errC, creneauxRows) => {
+            if (errC) return res.status(500).json({ error: errC.message });
+            const nb_creneaux = Number(creneauxRows?.[0]?.nb_creneaux) || 0;
+                        const nb_jours = isAllDays ? 6 : 1;
+            const totalSlots = nb_semaines * nb_creneaux * nb_jours;
+
+            connection.query('SELECT id_prof, CONCAT(nom, " ", prenom) AS nom_prof FROM professeur ORDER BY nom, prenom', (errP, profRows) => {
+                if (errP) return res.status(500).json({ error: errP.message });
+
+                const params = [...semaineFilterParams, jour, jour, annee, annee, partit, partit, partit];
+                connection.query(totalSql, params, (errT, totalRows) => {
+                    if (errT) return res.status(500).json({ error: errT.message });
+
+                    connection.query(detailSql, params, (errD, detailRows) => {
+                        if (errD) return res.status(500).json({ error: errD.message });
+
+                        const map = new Map();
+                        (profRows || []).forEach((p) => {
+                            map.set(String(p.id_prof), {
+                                nom_prof: (p.nom_prof || '').trim() || 'Professeur ?',
+                                total: 0,
+                                filiereMap: new Map()
+                            });
+                        });
+
+                        (totalRows || []).forEach((r) => {
+                            const key = String(r.id_prof);
+                            if (!map.has(key)) return;
+                            map.get(key).total = Number(r.occupes) || 0;
+                        });
+
+                        (detailRows || []).forEach((r) => {
+                            const key = String(r.id_prof);
+                            if (!map.has(key)) return;
+                            const label = (r.filiere_label || '').trim();
+                            if (!label) return;
+                            const nb = Number(r.nb) || 0;
+                            const current = map.get(key).filiereMap.get(label) || 0;
+                            map.get(key).filiereMap.set(label, current + nb);
+                        });
+
+                        const result = Array.from(map.values())
+                            .filter((entry) => (Number(entry.total) || 0) > 0)
+                            .map((entry) => {
+                                const cappedTotal = totalSlots > 0 ? Math.min(entry.total, totalSlots) : entry.total;
+                                const taux = totalSlots > 0 ? Math.round((cappedTotal / totalSlots) * 100) : 0;
+                                const filieres = Array.from(entry.filiereMap.entries())
+                                    .map(([nom, nb]) => {
+                                        const cappedNb = totalSlots > 0 ? Math.min(nb, totalSlots) : nb;
+                                        const filiereTaux = totalSlots > 0 ? Math.round((cappedNb / totalSlots) * 100) : 0;
+                                        return { nom, nb: cappedNb, taux: filiereTaux };
+                                    })
+                                    .sort((a, b) => b.taux - a.taux || a.nom.localeCompare(b.nom, 'fr', { sensitivity: 'base' }));
+
+                                return {
+                                    nom_prof: entry.nom_prof,
+                                    total: cappedTotal,
+                                    taux,
+                                    filieres
+                                };
+                            })
+                            .sort((a, b) => a.nom_prof.localeCompare(b.nom_prof, 'fr', { sensitivity: 'base' }));
+
+                        res.json({ totalSlots, data: result });
+                    });
+                });
+            });
+        });
     });
 });
 
@@ -498,9 +695,26 @@ dashboard.get('/profs-par-semestre', (req, res) => {
         ORDER BY nb DESC
         LIMIT 15
     `;
+    const totalSql = `
+        SELECT COUNT(o.id_occupation) AS total
+        FROM occupation o
+        LEFT JOIN semestre se ON o.id_semestre = se.id_semestre
+        WHERE se.nom_semestre IS NOT NULL
+          AND ${condition}
+    `;
+
     connection.query(sql, params, (err, rows) => {
         if (err) return res.status(500).json({ error: err.message });
-        res.json(rows || []);
+        connection.query(totalSql, params, (errTot, totals) => {
+            if (errTot) return res.status(500).json({ error: errTot.message });
+            const total = Number(totals?.[0]?.total) || 0;
+            const data = (rows || []).map((r) => {
+                const nb = Number(r.nb) || 0;
+                const pct = total > 0 ? Math.round((nb / total) * 1000) / 10 : 0;
+                return { ...r, pct };
+            });
+            res.json(data);
+        });
     });
 });
 

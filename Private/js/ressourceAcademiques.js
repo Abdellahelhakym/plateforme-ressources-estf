@@ -23,6 +23,18 @@ AOS.init({ duration: 600, once: true });
         return `${f.nom_filiere} - ${getFiliereSuffix(f)}`;
     }
 
+        function showAddProfError(message) {
+            const errorEl = document.getElementById('addProfError');
+            if (!errorEl) return;
+            if (!message) {
+                errorEl.textContent = '';
+                errorEl.classList.add('d-none');
+                return;
+            }
+            errorEl.textContent = message;
+            errorEl.classList.remove('d-none');
+        }
+
         function getMultiSelectValues(selectId) {
             const el = document.getElementById(selectId);
             if (!el) return [];
@@ -301,6 +313,7 @@ AOS.init({ duration: 600, once: true });
         document.getElementById('btnSaveProf').addEventListener('click', async () => {
             const form = document.getElementById('formAddProf');
             if (!form.checkValidity()) return alert("Veuillez remplir tous les champs");
+            showAddProfError('');
 
             const data = Object.fromEntries(new FormData(form));
             data.id_filieres = getMultiSelectValues('selectFiliereProf');
@@ -312,11 +325,22 @@ AOS.init({ duration: 600, once: true });
             if (res.ok) {
                 bootstrap.Modal.getInstance(document.getElementById('addProfModal')).hide();
                 form.reset();
+                showAddProfError('');
                 loadProfesseurs();
             } else {
                 const error = await res.json().catch(() => ({ error: "Erreur lors de l'ajout" }));
-                alert(error.error || "Erreur lors de l'ajout");
+                const errorMessage = error.error || "Erreur lors de l'ajout";
+                if (/gmail/i.test(errorMessage)) {
+                    showAddProfError(errorMessage);
+                } else {
+                    showAddProfError('');
+                    alert(errorMessage);
+                }
             }
+        });
+
+        document.getElementById('formAddProf')?.querySelector('[name="email"]')?.addEventListener('input', () => {
+            showAddProfError('');
         });
 
         // ────────────────────────────────────────────────

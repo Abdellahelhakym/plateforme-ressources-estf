@@ -53,7 +53,7 @@ async function loadSemestresOptions() {
         const fillWithAll = (el) => { if (el) el.innerHTML = optsWithAll.join(''); };
         const fillNoAll = (el) => { if (el) el.innerHTML = optsNoAll.join(''); };
         fillNoAll(document.getElementById('semSelect'));
-        fillWithAll(document.getElementById('semSallesSelect'));
+        fillNoAll(document.getElementById('semProfOccSelect'));
         fillWithAll(document.getElementById('semProfsSelect'));
         fillWithAll(document.getElementById('semLibreSelect'));
         fillNoAll(document.getElementById('semOccSelect'));
@@ -71,7 +71,7 @@ async function loadSemestresOptions() {
         const fillWithAll = (el) => { if (el) el.innerHTML = fallback; };
         const fillNoAll = (el) => { if (el) el.innerHTML = fallbackNoAll; };
         fillNoAll(document.getElementById('semSelect'));
-        fillWithAll(document.getElementById('semSallesSelect'));
+        fillNoAll(document.getElementById('semProfOccSelect'));
         fillWithAll(document.getElementById('semProfsSelect'));
         fillWithAll(document.getElementById('semLibreSelect'));
         fillNoAll(document.getElementById('semOccSelect'));
@@ -87,7 +87,7 @@ async function loadAnneesOptions() {
         const html = opts.join('');
 
         const fill = (el) => { if (el) el.innerHTML = html; };
-        fill(document.getElementById('anneeSallesSelect'));
+        fill(document.getElementById('anneeProfOccSelect'));
         fill(document.getElementById('anneeProfsSelect'));
         fill(document.getElementById('anneeOccSelect'));
         fill(document.getElementById('anneeJourSelect'));
@@ -226,33 +226,45 @@ async function loadStats() {
     });
 }
 
-// ── Chart : Salles par semestre ─────────────────────────────────────────────
-async function loadChartSallesSem(partit) {
-    const sel = partit || (document.getElementById('semSallesSelect')?.value || '');
-    const filiere = document.getElementById('filiereSallesSelect')?.value || '';
-    const annee = document.getElementById('anneeSallesSelect')?.value || '';
-    const qs = new URLSearchParams({ partit: sel, filiere, annee });
-    const rows = await api(`/salles-par-semestre?${qs.toString()}`);
-    destroyChart('sallesSem');
-    charts['sallesSem'] = new Chart(document.getElementById('chartSallesSem'), {
-        type: 'bar',
-        data: {
-            labels: rows.map(r => `${r.nom_semestre || 'Semestre ?'} · ${r.nom_salle || 'Salle ?'}`),
-            datasets: [{
-                label: 'Utilisations',
-                data: rows.map(r => r.nb),
-                backgroundColor: rows.map((_,i) => PALETTE[i % PALETTE.length] + 'cc'),
-                borderColor: rows.map((_,i) => PALETTE[i % PALETTE.length]),
-                borderWidth: 2,
-            }]
-        },
-        options: {
-            indexAxis: 'y',
-            responsive:true, maintainAspectRatio:false,
-            plugins:{ legend:{ display:false } },
-            scales:{ x:{ beginAtZero:true, ticks:{ precision:0 } }, y:{ ticks:{ font:{ size:11 } } } }
-        }
-    });
+// ── Tableau : Occupation des professeurs ─────────────────────────────────────
+async function loadProfOccupation(partit) {
+    const sel = partit || (document.getElementById('semProfOccSelect')?.value || '');
+    const jour = document.getElementById('jourProfOccSelect')?.value || 'ALL';
+    const annee = document.getElementById('anneeProfOccSelect')?.value || '';
+    const semaineNom = document.getElementById('semaineProfOccSelect')?.value || '';
+    const qs = new URLSearchParams({ partit: sel, jour, annee, semaineNom });
+    const response = await api(`/profs-occupation?${qs.toString()}`);
+    const rows = Array.isArray(response) ? response : (response.data || []);
+    const totalSlots = Array.isArray(response) ? 0 : (Number(response.totalSlots) || 0);
+
+    const body = document.getElementById('profOccupationBody');
+    if (!body) return;
+
+    body.innerHTML = rows.map((r, i) => {
+        const pct = Number.isFinite(r.taux)
+            ? Math.max(0, Math.min(100, Math.round(Number(r.taux))))
+            : (totalSlots > 0 ? Math.round(((Number(r.total) || 0) / totalSlots) * 100) : 0);
+        const color = PALETTE[i % PALETTE.length];
+        const detail = (r.filieres || []).map(f => {
+            const filierePct = Number.isFinite(f.taux)
+                ? Math.max(0, Math.min(100, Math.round(Number(f.taux))))
+                : (totalSlots > 0 ? Math.round(((Number(f.nb) || 0) / totalSlots) * 100) : 0);
+            return `<span class="badge" style="background:${color}15;color:${color};border:1px solid ${color}33;border-radius:12px;padding:2px 8px;font-size:12px;display:inline-block;margin:2px 4px 2px 0">${f.nom} · ${filierePct}%</span>`;
+        }).join('') || '<span style="color:#9ca3af">Aucune filière</span>';
+
+        return `<tr>
+            <td>${r.nom_prof || 'Professeur ?'}</td>
+            <td>${detail}</td>
+            <td>
+                <div class="bar-track" style="height:10px"><div class="bar-fill" style="width:${pct}%;background:${color}"></div></div>
+                <span style="font-size:.82rem;color:#6b7280">${pct}% utilisation</span>
+            </td>
+        </tr>`;
+    }).join('');
+
+    if (!rows.length) {
+        body.innerHTML = `<tr><td colspan="3" style="text-align:center;padding:1.5rem;color:#9ca3af">Aucune donnée</td></tr>`;
+    }
 }
 
 // ── Chart : Profs par semestre ─────────────────────────────────────────────
@@ -268,8 +280,8 @@ async function loadChartProfsSem(partit) {
         data: {
             labels: rows.map(r => `${r.nom_semestre || 'Semestre ?'} · ${r.professeur || 'Prof ?'}`),
             datasets: [{
-                label: 'Utilisations',
-                data: rows.map(r => r.nb),
+                label: 'Pourcentage d\'utilisation',
+                data: rows.map(r => Number(r.pct || 0)),
                 backgroundColor: rows.map((_,i) => PALETTE[(i+2) % PALETTE.length] + 'cc'),
                 borderColor: rows.map((_,i) => PALETTE[(i+2) % PALETTE.length]),
                 borderWidth: 2,
@@ -278,8 +290,21 @@ async function loadChartProfsSem(partit) {
         options: {
             indexAxis: 'y',
             responsive:true, maintainAspectRatio:false,
-            plugins:{ legend:{ display:false } },
-            scales:{ x:{ beginAtZero:true, ticks:{ precision:0 } }, y:{ ticks:{ font:{ size:11 } } } }
+            plugins:{
+                legend:{ display:false },
+                tooltip: {
+                    callbacks: {
+                        label: (ctx) => `${ctx.parsed.x}%`
+                    }
+                }
+            },
+            scales:{
+                x:{
+                    beginAtZero:true,
+                    ticks:{ callback: (value) => `${value}%` }
+                },
+                y:{ ticks:{ font:{ size:11 } } }
+            }
         }
     });
 }
@@ -393,10 +418,10 @@ async function loadAll() {
         await loadFilieresOptions();
         await loadSemainesOptions();
         await loadSemainesOptions(document.getElementById('semSelect')?.value || '', 'semaineJourSelect');
+        await loadSemainesOptions(document.getElementById('semProfOccSelect')?.value || '', 'semaineProfOccSelect');
         await Promise.all([
             loadStats(),
-            loadChartSallesSem(),
-            loadChartProfsSem(),
+            loadProfOccupation(),
             loadSallesOccupationSemaine(),
             loadJourSalleSemestre(),
             loadRecent(),
@@ -409,15 +434,13 @@ async function loadAll() {
 window.addEventListener('load', () => {
     const selectJour = document.getElementById('jourSelect');
     const selectSemJour  = document.getElementById('semSelect');
-    const selectSemSalles = document.getElementById('semSallesSelect');
-    const selectSemProfs  = document.getElementById('semProfsSelect');
-    const selectFiliereSalles = document.getElementById('filiereSallesSelect');
-    const selectFiliereProfs = document.getElementById('filiereProfsSelect');
+    const selectSemProfOcc = document.getElementById('semProfOccSelect');
+    const selectJourProfOcc = document.getElementById('jourProfOccSelect');
+    const selectSemaineProfOcc = document.getElementById('semaineProfOccSelect');
     const selectSemOcc  = document.getElementById('semOccSelect');
     const selectSemaineOcc = document.getElementById('semaineOccSelect');
     const selectSemaineJour = document.getElementById('semaineJourSelect');
-    const selectAnneeSalles = document.getElementById('anneeSallesSelect');
-    const selectAnneeProfs = document.getElementById('anneeProfsSelect');
+    const selectAnneeProfOcc = document.getElementById('anneeProfOccSelect');
     const selectAnneeOcc = document.getElementById('anneeOccSelect');
     const selectAnneeJour = document.getElementById('anneeJourSelect');
     const selectAnneeRecent = document.getElementById('anneeRecentSelect');
@@ -428,17 +451,18 @@ window.addEventListener('load', () => {
         loadJourSalleSemestre(selectJour ? selectJour.value : 'Lundi', e.target.value, selectAnneeJour ? selectAnneeJour.value : '', selectSemaineJour ? selectSemaineJour.value : '');
     });
     if (selectSemaineJour) selectSemaineJour.addEventListener('change', e => loadJourSalleSemestre(selectJour ? selectJour.value : 'Lundi', selectSemJour ? selectSemJour.value : '', selectAnneeJour ? selectAnneeJour.value : '', e.target.value));
-    if (selectSemSalles) selectSemSalles.addEventListener('change', e => loadChartSallesSem(e.target.value));
-    if (selectSemProfs)  selectSemProfs.addEventListener('change',  e => loadChartProfsSem(e.target.value));
-    if (selectFiliereSalles) selectFiliereSalles.addEventListener('change', () => loadChartSallesSem(selectSemSalles ? selectSemSalles.value : ''));
-    if (selectFiliereProfs) selectFiliereProfs.addEventListener('change', () => loadChartProfsSem(selectSemProfs ? selectSemProfs.value : ''));
+    if (selectSemProfOcc) selectSemProfOcc.addEventListener('change', async (e) => {
+        await loadSemainesOptions(e.target.value, 'semaineProfOccSelect');
+        loadProfOccupation(e.target.value);
+    });
+    if (selectJourProfOcc) selectJourProfOcc.addEventListener('change', () => loadProfOccupation(selectSemProfOcc ? selectSemProfOcc.value : ''));
+    if (selectSemaineProfOcc) selectSemaineProfOcc.addEventListener('change', () => loadProfOccupation(selectSemProfOcc ? selectSemProfOcc.value : ''));
     if (selectSemOcc) selectSemOcc.addEventListener('change', async (e) => {
         await loadSemainesOptions(e.target.value);
         loadSallesOccupationSemaine();
     });
     if (selectSemaineOcc) selectSemaineOcc.addEventListener('change', () => loadSallesOccupationSemaine());
-    if (selectAnneeSalles) selectAnneeSalles.addEventListener('change', () => loadChartSallesSem(selectSemSalles ? selectSemSalles.value : ''));
-    if (selectAnneeProfs) selectAnneeProfs.addEventListener('change', () => loadChartProfsSem(selectSemProfs ? selectSemProfs.value : ''));
+    if (selectAnneeProfOcc) selectAnneeProfOcc.addEventListener('change', () => loadProfOccupation(selectSemProfOcc ? selectSemProfOcc.value : ''));
     if (selectAnneeOcc) selectAnneeOcc.addEventListener('change', () => loadSallesOccupationSemaine());
     if (selectAnneeJour) selectAnneeJour.addEventListener('change', () => loadJourSalleSemestre(selectJour ? selectJour.value : 'Lundi', selectSemJour ? selectSemJour.value : '', selectAnneeJour.value, selectSemaineJour ? selectSemaineJour.value : ''));
     if (selectAnneeRecent) selectAnneeRecent.addEventListener('change', () => loadRecent());

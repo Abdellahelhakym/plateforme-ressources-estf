@@ -1,11 +1,134 @@
 const express = require('express');
 const ressource = express.Router();
 const bcrypt = require('bcrypt');
+const dns = require('dns').promises;
+const net = require('net');
 
 const connection = require('./db');
 const SALT_ROUNDS = 10;
+const SMTP_TIMEOUT_MS = 6000;
+const GMAIL_REGEX = /^[a-zA-Z0-9](?:[a-zA-Z0-9._%+-]{0,62}[a-zA-Z0-9])?@gmail\.com$/i;
 
 ressource.use(express.json());
+
+function readSmtpResponse(socket, timeoutMs = SMTP_TIMEOUT_MS) {
+    return new Promise((resolve, reject) => {
+        let buffer = '';
+
+        const timer = setTimeout(() => {
+            cleanup();
+            reject(new Error('SMTP timeout'));
+        }, timeoutMs);
+
+        const cleanup = () => {
+            clearTimeout(timer);
+            socket.off('data', onData);
+            socket.off('error', onError);
+            socket.off('close', onClose);
+        };
+
+        const onData = (chunk) => {
+            buffer += chunk.toString('utf8');
+            const lines = buffer
+                .split(/\r?\n/)
+                .map(l => l.trim())
+                .filter(Boolean);
+
+            if (!lines.length) return;
+            const lastLine = lines[lines.length - 1];
+            if (/^\d{3} /.test(lastLine)) {
+                cleanup();
+                resolve(lastLine);
+            }
+        };
+
+        const onError = (err) => {
+            cleanup();
+            reject(err);
+        };
+
+        const onClose = () => {
+            cleanup();
+            reject(new Error('SMTP socket closed'));
+        };
+
+        socket.on('data', onData);
+        socket.on('error', onError);
+        socket.on('close', onClose);
+    });
+}
+
+async function smtpCommand(socket, command) {
+    socket.write(`${command}\r\n`);
+    return readSmtpResponse(socket);
+}
+
+async function smtpProbeGmailAddress(email) {
+    const mxRecords = await dns.resolveMx('gmail.com');
+    if (!Array.isArray(mxRecords) || mxRecords.length === 0) {
+        throw new Error('No Gmail MX records found');
+    }
+
+    const mxHost = mxRecords.sort((a, b) => a.priority - b.priority)[0].exchange;
+
+    const socket = await new Promise((resolve, reject) => {
+        const s = net.createConnection({ host: mxHost, port: 25 });
+        s.setTimeout(SMTP_TIMEOUT_MS, () => {
+            s.destroy(new Error('SMTP connection timeout'));
+        });
+        s.once('connect', () => resolve(s));
+        s.once('error', reject);
+    });
+
+    try {
+        const banner = await readSmtpResponse(socket);
+        if (!banner.startsWith('220')) return false;
+
+        const helo = await smtpCommand(socket, 'HELO estf.local');
+        if (!helo.startsWith('250')) return false;
+
+        const mailFrom = await smtpCommand(socket, 'MAIL FROM:<noreply@estf.local>');
+        if (!mailFrom.startsWith('250')) return false;
+
+        const rcptTo = await smtpCommand(socket, `RCPT TO:<${email}>`);
+        await smtpCommand(socket, 'QUIT').catch(() => {});
+
+        if (rcptTo.startsWith('250') || rcptTo.startsWith('251')) return true;
+        if (rcptTo.startsWith('550') || rcptTo.startsWith('551') || rcptTo.startsWith('553')) return false;
+
+        return false;
+    } finally {
+        socket.destroy();
+    }
+}
+
+async function validateProfessorGmail(email) {
+    const normalized = String(email || '').trim().toLowerCase();
+    if (!GMAIL_REGEX.test(normalized)) {
+        return {
+            ok: false,
+            message: "Adresse Gmail invalide. Utilisez un compte @gmail.com valide."
+        };
+    }
+
+    try {
+        const exists = await smtpProbeGmailAddress(normalized);
+        if (!exists) {
+            return {
+                ok: false,
+                message: "Cette adresse Gmail n'existe pas ou n'est pas valide."
+            };
+        }
+    } catch (err) {
+        console.error('Validation Gmail SMTP impossible :', err.message);
+        return {
+            ok: false,
+            message: "Impossible de valider cette adresse Gmail pour le moment."
+        };
+    }
+
+    return { ok: true, normalizedEmail: normalized };
+}
 
 function normalizeFiliereIds(input) {
     if (!input) return [];
@@ -125,7 +248,7 @@ ressource.get('/professeur', (req, res) => {
     );
 });
 
-ressource.post('/professeur', (req, res) => {
+ressource.post('/professeur', async (req, res) => {
     const { nom, prenom, email, departement, id_filiere, id_filieres, password } = req.body;
     const filiereIds = normalizeFiliereIds(id_filieres || id_filiere);
     const principalFiliere = filiereIds[0] || null;
@@ -133,11 +256,16 @@ ressource.post('/professeur', (req, res) => {
         return res.status(400).json({ error: "Champs obligatoires manquants" });
     }
 
+    const gmailValidation = await validateProfessorGmail(email);
+    if (!gmailValidation.ok) {
+        return res.status(400).json({ error: gmailValidation.message });
+    }
+
     bcrypt.hash(password, SALT_ROUNDS)
         .then((passwordHash) => {
             connection.query(
                 'INSERT INTO professeur (nom, prenom, email, departement, id_filiere, password) VALUES (?, ?, ?, ?, ?, ?)',
-                [nom, prenom, email, departement, principalFiliere, passwordHash],
+                [nom, prenom, gmailValidation.normalizedEmail, departement, principalFiliere, passwordHash],
                 (err, result) => {
                     if (err) return res.status(500).json({ error: err.message });
                     const newId = result.insertId;
