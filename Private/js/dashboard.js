@@ -21,6 +21,19 @@ async function api(path) {
     return r.json();
 }
 
+function pickDefaultAnneeValue(selectEl) {
+    const options = Array.from(selectEl?.options || []);
+    const firstNonEmpty = options.find(o => String(o.value || '').trim() !== '');
+    return firstNonEmpty ? firstNonEmpty.value : '';
+}
+
+function setDefaultLundi(selectEl) {
+    if (!selectEl) return;
+    const hasLundi = Array.from(selectEl.options || [])
+        .some(o => String(o.value || '').trim().toLowerCase() === 'lundi');
+    if (hasLundi) selectEl.value = 'Lundi';
+}
+
 // ── SEMESTRES LISTE ────────────────────────────────────────────────────────
 async function loadSemestresOptions() {
     try {
@@ -86,7 +99,12 @@ async function loadAnneesOptions() {
             .concat((annees || []).map(a => `<option value="${a.id_annee}">${a.libelle || 'Année'}</option>`));
         const html = opts.join('');
 
-        const fill = (el) => { if (el) el.innerHTML = html; };
+        const fill = (el) => {
+            if (!el) return;
+            el.innerHTML = html;
+            const defaultValue = pickDefaultAnneeValue(el);
+            if (defaultValue) el.value = defaultValue;
+        };
         fill(document.getElementById('anneeProfOccSelect'));
         fill(document.getElementById('anneeProfsSelect'));
         fill(document.getElementById('anneeOccSelect'));
@@ -229,7 +247,7 @@ async function loadStats() {
 // ── Tableau : Occupation des professeurs ─────────────────────────────────────
 async function loadProfOccupation(partit) {
     const sel = partit || (document.getElementById('semProfOccSelect')?.value || '');
-    const jour = document.getElementById('jourProfOccSelect')?.value || 'ALL';
+    const jour = document.getElementById('jourProfOccSelect')?.value || 'Lundi';
     const annee = document.getElementById('anneeProfOccSelect')?.value || '';
     const semaineNom = document.getElementById('semaineProfOccSelect')?.value || '';
     const qs = new URLSearchParams({ partit: sel, jour, annee, semaineNom });
@@ -415,6 +433,8 @@ async function loadAll() {
     try {
         await loadSemestresOptions();
         await loadAnneesOptions();
+        setDefaultLundi(document.getElementById('jourSelect'));
+        setDefaultLundi(document.getElementById('jourProfOccSelect'));
         await loadFilieresOptions();
         await loadSemainesOptions();
         await loadSemainesOptions(document.getElementById('semSelect')?.value || '', 'semaineJourSelect');

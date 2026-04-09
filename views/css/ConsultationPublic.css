@@ -266,12 +266,6 @@ body {
 
      
 
-        @media(max-width:768px) {
-            .stats-row { grid-template-columns:repeat(2,1fr); }
-            .mode-tabs  { flex-direction:column; }
-            .grille-table { font-size:.68rem; }
-        }
-
 footer {
     background: var(--gradient-primary);
     margin-top: 4rem;
@@ -339,14 +333,143 @@ footer a:hover {
     .stats-row {
         grid-template-columns: repeat(2, 1fr);
     }
+
+    .filters-card {
+        padding: 1rem;
+    }
+
+    .schedule-card-header {
+        align-items: flex-start;
+        gap: .75rem;
+    }
+
+    .schedule-card-header .view-btns {
+        width: 100%;
+    }
+
+    .sem-acc-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: .75rem;
+    }
+
+    .sem-acc-header .text-end {
+        width: 100%;
+        text-align: left !important;
+    }
+
+    .taux-bar {
+        width: 100%;
+        max-width: 260px;
+    }
 }
 
 @media (max-width: 768px) {
+    .page-header {
+        padding: 1.3rem;
+    }
+
+    .page-header h1 {
+        font-size: 1.45rem;
+    }
+
+    .mode-tabs {
+        flex-direction: column;
+    }
+
+    .mode-btn {
+        width: 100%;
+    }
+
     .day-column {
         margin-bottom: 1.5rem;
     }
 
     .stats-row {
         grid-template-columns: 1fr;
+    }
+
+    .stat-card {
+        padding: 1rem;
+    }
+
+    .stat-info h3 {
+        font-size: 1.35rem;
+    }
+
+    .legend-card {
+        gap: .8rem;
+        padding: .9rem 1rem;
+    }
+
+    .grille-table {
+        min-width: 760px;
+        border-spacing: 3px;
+        padding: .75rem;
+    }
+
+    .grille-table th {
+        font-size: .72rem;
+        padding: .45rem .25rem;
+    }
+
+    .grille-table td {
+        min-width: 96px;
+        font-size: .68rem;
+        padding: .4rem .25rem;
+    }
+
+    .cell-heure {
+        min-width: 110px;
+        font-size: .68rem;
+    }
+
+    .occ-detail {
+        font-size: .64rem;
+    }
+
+    .btn-del-cell {
+        font-size: .62rem;
+        padding: 3px 8px;
+    }
+
+    .toast-container {
+        left: .75rem;
+        right: .75rem;
+        bottom: .75rem;
+    }
+
+    .toast-notif {
+        min-width: 0;
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .page-header h1 {
+        font-size: 1.3rem;
+    }
+
+    .page-header p {
+        font-size: .85rem;
+    }
+
+    .stat-icon {
+        width: 42px;
+        height: 42px;
+        font-size: 1.05rem;
+    }
+
+    .stat-info h3 {
+        font-size: 1.2rem;
+    }
+
+    .stat-info p {
+        font-size: .75rem;
+    }
+
+    .view-btn {
+        padding: 4px 10px;
+        font-size: .7rem;
     }
 }

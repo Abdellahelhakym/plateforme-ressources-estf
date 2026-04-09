@@ -4,7 +4,8 @@ const connection = require('./db');
 
 consultation.use(express.json());
 
-const JOURS = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
+// Consultation grids are displayed from Monday to Saturday.
+const JOURS = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
 const SEMESTER_GROUPS = {
     G1: ['S1', 'S3', 'S5'],
     G2: ['S2', 'S4', 'S6']

@@ -1,4 +1,4 @@
-AOS.init({ duration: 600, once: true });
+﻿AOS.init({ duration: 600, once: true });
 
 document.getElementById('currentDate').textContent =
     new Date().toLocaleDateString('fr-FR', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
@@ -30,15 +30,43 @@ function withFilters(path, anneeId, partitId) {
     return `${path}?${qs.toString()}`;
 }
 
+function pickDefaultAnneeValue(selectEl) {
+    const options = Array.from(selectEl?.options || []);
+    const normalize = (v) => String(v || '')
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '');
+    const byLabel = options.find(o => {
+        const label = normalize(o.textContent);
+        return (/(^|\b)1(ere)?\s*annee\b|premiere\s*annee/.test(label)) && String(o.value || '').trim() !== '';
+    });
+    if (byLabel) return byLabel.value;
+    const firstNonEmpty = options.find(o => String(o.value || '').trim() !== '');
+    return firstNonEmpty ? firstNonEmpty.value : '';
+}
+
+function pickDefaultPartitValue(selectEl) {
+    const options = Array.from(selectEl?.options || []);
+    const exact = options.find(o => String(o.value || '').trim().toLowerCase() === 'partit 1');
+    if (exact) return exact.value;
+    const byLabel = options.find(o => /s1|partit\s*1|partie\s*1|semestre\s*1/i.test((o.textContent || '').toLowerCase()) && String(o.value || '').trim() !== '');
+    if (byLabel) return byLabel.value;
+    const firstNonEmpty = options.find(o => String(o.value || '').trim() !== '');
+    return firstNonEmpty ? firstNonEmpty.value : '';
+}
+
 async function loadAnneesOptions(targetIds) {
     try {
         const annees = await api('/annees');
         const opts = ['<option value="">Toutes</option>']
-            .concat((annees || []).map(a => `<option value="${a.id_annee}">${a.libelle || 'Année'}</option>`));
+            .concat((annees || []).map(a => `<option value="${a.id_annee}">${a.libelle || 'Annee'}</option>`));
         const html = opts.join('');
         (targetIds || []).forEach(id => {
             const el = document.getElementById(id);
-            if (el) el.innerHTML = html;
+            if (el) {
+                el.innerHTML = html;
+                el.value = pickDefaultAnneeValue(el);
+            }
         });
     } catch (e) {
         console.error('Annees load error', e);
@@ -62,7 +90,10 @@ async function loadPartitOptions(targetIds) {
         const html = opts.join('');
         (targetIds || []).forEach(id => {
             const el = document.getElementById(id);
-            if (el) el.innerHTML = html;
+            if (el) {
+                el.innerHTML = html;
+                el.value = pickDefaultPartitValue(el);
+            }
         });
     } catch (e) {
         console.error('Partit load error', e);
@@ -141,31 +172,6 @@ async function loadChartSalles() {
     });
 }
 
-async function loadChartJours() {
-    const rows = await api(withFilters('/enseignant/jours', 'anneeJoursEnsSelect', 'partitJoursEnsSelect'));
-    destroyChart('joursEns');
-    charts['joursEns'] = new Chart(document.getElementById('chartJoursEns'), {
-        type: 'bar',
-        data: {
-            labels: rows.map(r => r.jour),
-            datasets: [{
-                label: 'Utilisations',
-                data: rows.map(r => Number(r.nb) || 0),
-                backgroundColor: rows.map((_,i) => PALETTE[i % PALETTE.length] + 'cc'),
-                borderColor: rows.map((_,i) => PALETTE[i % PALETTE.length]),
-                borderWidth: 2,
-                borderRadius: 8
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
-            scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
-        }
-    });
-}
-
 async function loadEmploi() {
     const rows = await api(withFilters('/enseignant/emploi', 'anneeEmploiEnsSelect', 'partitEmploiEnsSelect'));
     const body = document.getElementById('emploiRows');
@@ -175,12 +181,12 @@ async function loadEmploi() {
     }
     body.innerHTML = rows.map(r => `
         <tr>
-            <td><span class="badge-jour">${r.jour || '—'}</span></td>
-            <td><span class="badge-creneau">${r.creneau || '—'}</span></td>
-            <td><span class="badge-salle">${r.salle || '—'}</span></td>
-            <td style="color:#6b7280">${r.module || '—'}</td>
-            <td>${r.filiere || '—'} <span style="color:#9ca3af">Gr.${r.grp || '?'}</span></td>
-            <td style="font-size:.72rem;color:#9ca3af;white-space:nowrap">${r.semaine_debut || '?'} → ${r.semaine_fin || '?'}</td>
+            <td><span class="badge-jour">${r.jour || '-'}</span></td>
+            <td><span class="badge-creneau">${r.creneau || '-'}</span></td>
+            <td><span class="badge-salle">${r.salle || '-'}</span></td>
+            <td style="color:#6b7280">${r.module || '-'}</td>
+            <td>${r.filiere || '-'} <span style="color:#9ca3af">Gr.${r.grp || '?'}</span></td>
+            <td style="font-size:.72rem;color:#9ca3af;white-space:nowrap">${r.semaine_debut || '?'} -> ${r.semaine_fin || '?'}</td>
         </tr>
     `).join('');
 }
@@ -194,13 +200,13 @@ async function loadRecent() {
     }
     body.innerHTML = rows.map(r => `<tr>
         <td><span class="badge-jour">${r.jour}</span></td>
-        <td><span class="badge-creneau">${r.creneau||'—'}</span></td>
-        <td><span class="badge-salle">${r.salle||'—'}</span></td>
-        <td style="color:#6b7280">${r.module||'—'}</td>
-        <td>${r.filiere||'—'} <span style="color:#9ca3af">Gr.${r.group||'?'}</span></td>
-        <td><i class="fas fa-user-tie me-1" style="color:#9ca3af;font-size:.7rem"></i>${r.professeur||'—'}</td>
-        <td style="font-size:.72rem;color:#9ca3af;white-space:nowrap">${r.semaine_debut||'?'} → ${r.semaine_fin||'?'}</td>
-        <td style="font-size:.72rem;color:#9ca3af">${r.date_creation ? new Date(r.date_creation).toLocaleDateString('fr-FR') : '—'}</td>
+        <td><span class="badge-creneau">${r.creneau||'-'}</span></td>
+        <td><span class="badge-salle">${r.salle||'-'}</span></td>
+        <td style="color:#6b7280">${r.module||'-'}</td>
+        <td>${r.filiere||'-'} <span style="color:#9ca3af">Gr.${r.group||'?'}</span></td>
+        <td><i class="fas fa-user-tie me-1" style="color:#9ca3af;font-size:.7rem"></i>${r.professeur||'-'}</td>
+        <td style="font-size:.72rem;color:#9ca3af;white-space:nowrap">${r.semaine_debut||'?'} -> ${r.semaine_fin||'?'}</td>
+        <td style="font-size:.72rem;color:#9ca3af">${r.date_creation ? new Date(r.date_creation).toLocaleDateString('fr-FR') : '-'}</td>
     </tr>`).join('');
 }
 
@@ -210,7 +216,6 @@ async function loadDashboardData() {
             loadStats(),
             loadChartFilieres(),
             loadChartSalles(),
-            loadChartJours(),
             loadEmploi(),
             loadRecent(),
         ]);
@@ -223,14 +228,12 @@ async function loadAll() {
     await loadAnneesOptions([
         'anneeFilieresEnsSelect',
         'anneeSallesEnsSelect',
-        'anneeJoursEnsSelect',
         'anneeEmploiEnsSelect',
         'anneeRecentEnsSelect'
     ]);
     await loadPartitOptions([
         'partitFilieresEnsSelect',
         'partitSallesEnsSelect',
-        'partitJoursEnsSelect',
         'partitEmploiEnsSelect',
         'partitRecentEnsSelect'
     ]);
@@ -246,8 +249,6 @@ window.addEventListener('load', () => {
     bind('partitFilieresEnsSelect', loadChartFilieres);
     bind('anneeSallesEnsSelect', loadChartSalles);
     bind('partitSallesEnsSelect', loadChartSalles);
-    bind('anneeJoursEnsSelect', loadChartJours);
-    bind('partitJoursEnsSelect', loadChartJours);
     bind('anneeEmploiEnsSelect', loadEmploi);
     bind('partitEmploiEnsSelect', loadEmploi);
     bind('anneeRecentEnsSelect', loadRecent);

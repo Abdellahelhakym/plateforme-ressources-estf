@@ -21,10 +21,26 @@ const consultation = require('./consultation');
 const dashboard = require('./dashboard');
 const { runSchemaIntegrityMigrations } = require('./schemaIntegrity');
 
+const isProduction = process.env.NODE_ENV === 'production';
+
+if (isProduction && !process.env.SESSION_SECRET) {
+    throw new Error('SESSION_SECRET must be defined in production');
+}
+
+if (isProduction) {
+    app.set('trust proxy', 1);
+}
+
 app.use(session({
-    secret: '1234',
+    secret: process.env.SESSION_SECRET || 'dev_only_change_this_secret',
     resave: false,
-    saveUninitialized: false
+    saveUninitialized: false,
+    cookie: {
+        maxAge: 60 * 60 * 1000,
+        httpOnly: true,
+        sameSite: isProduction ? 'strict' : 'lax',
+        secure: isProduction
+    }
 }));
 
 runSchemaIntegrityMigrations();

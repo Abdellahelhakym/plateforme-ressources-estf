@@ -383,6 +383,47 @@ function updateStats(delta) {
     document.getElementById('statTaux').textContent = total > 0 ? Math.round(occ / total * 100) + '%' : '0%';
 }
 
+function computeStatsFromGrille(creneaux, grille) {
+    const safeCreneaux = creneaux || [];
+    const total = JOURS.length * safeCreneaux.length;
+    let occupes = 0;
+
+    JOURS.forEach(jour => {
+        safeCreneaux.forEach(cr => {
+            const cell = grille?.[jour]?.[cr.id_creneau];
+            if (cell?.statut === 'occupee') occupes++;
+        });
+    });
+
+    return {
+        total,
+        occupes,
+        libres: Math.max(0, total - occupes),
+        taux: total > 0 ? Math.round((occupes / total) * 100) : 0
+    };
+}
+
+function computeUnionStatsFromSemestres(creneaux, semestres) {
+    const safeCreneaux = creneaux || [];
+    const safeSemestres = Array.isArray(semestres) ? semestres : [];
+    const total = JOURS.length * safeCreneaux.length;
+    let occupes = 0;
+
+    JOURS.forEach(jour => {
+        safeCreneaux.forEach(cr => {
+            const isOccupee = safeSemestres.some(s => s?.grille?.[jour]?.[cr.id_creneau]?.statut === 'occupee');
+            if (isOccupee) occupes++;
+        });
+    });
+
+    return {
+        total,
+        occupes,
+        libres: Math.max(0, total - occupes),
+        taux: total > 0 ? Math.round((occupes / total) * 100) : 0
+    };
+}
+
 // =============================================================================
 // RENDER MODE SEMAINE (salle)
 // =============================================================================
@@ -434,7 +475,12 @@ function renderDetail(data) {
     const nomPartie = document.getElementById('filtSemestre').selectedOptions[0]?.text || '';
 
     let totalAll = 0, occAll = 0;
-    semaines.forEach(s => { if (s?.stats) { totalAll += s.stats.total; occAll += s.stats.occupes; } });
+    semaines.forEach(s => {
+        if (!s?.grille) return;
+        const recomputed = computeStatsFromGrille(creneaux, s.grille);
+        totalAll += recomputed.total;
+        occAll += recomputed.occupes;
+    });
     showStats(totalAll, occAll, totalAll - occAll, totalAll ? Math.round(occAll / totalAll * 100) : 0);
 
     const container = document.getElementById('resultsContainer');
@@ -448,8 +494,9 @@ function renderDetail(data) {
     }
 
     semaines.forEach((s, idx) => {
-        if (!s?.semaine || !s?.stats || !s?.grille) return;
-        const { semaine, grille, stats } = s;
+        if (!s?.semaine || !s?.grille) return;
+        const { semaine, grille } = s;
+        const stats = computeStatsFromGrille(creneaux, grille);
         const tauxColor = stats.taux > 70 ? '#ef4444' : stats.taux > 40 ? '#f59e0b' : '#22c55e';
 
         const acc = document.createElement('div');
@@ -499,15 +546,8 @@ function renderDetailPartie(data) {
     const nomSalle = document.getElementById('filtSalle').selectedOptions[0].text;
     const partieLabel = document.getElementById('filtSemestre').selectedOptions[0]?.text || '';
 
-    let totalAll = 0;
-    let occAll = 0;
-    (semestres || []).forEach(s => {
-        if (s?.stats) {
-            totalAll += s.stats.total;
-            occAll += s.stats.occupes;
-        }
-    });
-    showStats(totalAll, occAll, totalAll - occAll, totalAll ? Math.round(occAll / totalAll * 100) : 0);
+    const unionStats = computeUnionStatsFromSemestres(creneaux, semestres);
+    showStats(unionStats.total, unionStats.occupes, unionStats.libres, unionStats.taux);
 
     const container = document.getElementById('resultsContainer');
     container.innerHTML = `<h5 class="mb-3" style="color:#1a236d; font-weight:700;">
